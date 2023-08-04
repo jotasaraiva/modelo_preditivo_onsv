@@ -7,13 +7,14 @@ format:
 editor: visual
 ---
 
-- Colocar o carregamento de pacotes na mesma célula
+-   Colocar o carregamento de pacotes na mesma célula
 
 ```{r}
 library(tidyverse)
 library(microdatasus)
 library(obsplot)
 library(knitr)
+library(readxl)
 ```
 
 # Dados de mortes no trânsito (DATASUS)
@@ -41,13 +42,13 @@ if (file.exists("data/datasus.rda")) {
 head(df_datasus)
 ```
 
-- Sempre colocar espaço depois da vírgula; também antes e depois do `=`
+-   Sempre colocar espaço depois da vírgula; também antes e depois do `=`
 
-- Não deixe a linha passar de 80 caracteres
+-   Não deixe a linha passar de 80 caracteres
 
-- Usar o `head()` para não carregar tanta informação no terminal / notebook
+-   Usar o `head()` para não carregar tanta informação no terminal / notebook
 
-- Usar o `kable()` do pacote `knitr` para renderizar uma tabela mais bonita no documento final
+-   Usar o `kable()` do pacote `knitr` para renderizar uma tabela mais bonita no documento final
 
 ```{r}
 st_datasus <- df_datasus |> 
@@ -64,9 +65,9 @@ st_datasus <- df_datasus |>
 knitr::kable(head(st_datasus))
 ```
 
-- Aqui tem como substituir o `group_by()` + `summarise()` pelo `count()`
+-   Aqui tem como substituir o `group_by()` + `summarise()` pelo `count()`
 
-- Usei o `as_tibble()` para transformar o `data.frame` no formato padrão do tidyverse
+-   Usei o `as_tibble()` para transformar o `data.frame` no formato padrão do tidyverse
 
 ```{r}
 obitos_ano <- st_datasus |> 
@@ -80,15 +81,15 @@ obitos_ano <- st_datasus |>
 kable(obitos_ano)
 ```
 
-- Coloquei o carregamento do obsplot no começo do projeto
+-   Coloquei o carregamento do obsplot no começo do projeto
 
-- Apliquei umas correções no estilo de escrita:
+-   Apliquei umas correções no estilo de escrita:
 
-  - Espaçamento: espaços depois da vírgula e ao redor dos `=`
+    -   Espaçamento: espaços depois da vírgula e ao redor dos `=`
 
-  - GGplot: cada elemento / objeto deve ficar individualmente em uma linha
+    -   GGplot: cada elemento / objeto deve ficar individualmente em uma linha
 
-- Ajustei o título
+-   Ajustei o título
 
 ```{r}
 #library(obsplot)
@@ -111,7 +112,7 @@ ggplot(obitos_ano, aes(x = ano, y = obitos)) +
 
 # Sinistros em rodovias federais (PRF)
 
-- Aqui também eu ajustei o tamanho da linha (limite de 80 caracteres)
+-   Aqui também eu ajustei o tamanho da linha (limite de 80 caracteres)
 
 ```{r}
 datatran2007 <- read_csv2(
@@ -208,15 +209,15 @@ testes
 
 ```
 
-- Ajuste de espaçamento no `if`
+-   Ajuste de espaçamento no `if`
 
-- Deletei o `print()`, não é necessário
+-   Deletei o `print()`, não é necessário
 
 ```{r}
 #criação de loop para a importação de todos os anos
 
 k <- seq(2007, 2021, 1)
-enderecos <- paste("datatran/datatran", k ,"/datatran", k, ".csv", sep = "")
+enderecos_datatran <- paste("datatran/datatran", k ,"/datatran", k, ".csv", sep = "")
 
 # df_temp1 <- read_csv2(enderecos[1], locale = locale(encoding = "latin1")) |> datatran_extract()
 
@@ -225,7 +226,7 @@ if ("datatran_anos" |> exists()) {
   rm("datatran_anos")
 }
 
-for (i in enderecos) {
+for (i in enderecos_datatran) {
   df_temp <- read_csv2(i, locale = locale(encoding = "latin1")) |>
     datatran_extract()
   if(exists("datatran_anos")){
@@ -239,14 +240,71 @@ for (i in enderecos) {
 datatran_anos |> kable()
 ```
 
+# Frota por tipo de veículo (RENAVAM)
+
+Primeiramente, faz-se testes para criar uma função de importação dinâmica
+
 ```{r}
+enderecos_frota <- paste(
+  "dados_frota/frotas2000_2021/",
+  list.files("dados_frota/frotas2000_2021/"),
+  sep = ""
+  )
 
-import1 <- read_csv2(enderecos[7], locale = locale(encoding = "latin1"))
-process1 <- datatran_extract(import1)
+import_frota <- function(endereco) {
+  frota <- tryCatch(
+    read_excel(endereco, sheet = 2, range = "B41:W42"),
+    error = function(e) {
+      if (str_sub(enderecos_frota[num],34,37) %in% c("2005","2004")) {
+        return(read_excel(endereco, sheet = 1, range = "B42:W43"))
+      }
+      else {
+        return(read_excel(endereco, sheet = 1, range = "B41:W42"))
+      }
+    }
+  )
+  return(frota)
+}
 
-view(import1)
+num <- 22
+exemplo <- enderecos_frota[num] |> import_frota()
 
-import1$data_inversa |> year()
-
-import1|> filter_all(is.na)
+# # Algoritmo de Importação com erro validado para a função
+# frota <- tryCatch(
+#   read_excel(enderecos_frota[num], sheet = 2, range = "B41:W42"),
+#   error = function(e) {
+#     return(
+#       read_excel(enderecos_frota[num], sheet = 1, range = "B41:W42")
+#     )
+#   },
+#   warning = function(w) w
+# )
 ```
+
+Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
+
+```{r}
+frota_extract <- function(df){
+  result <- df |> 
+    mutate(
+    automovel = AUTOMÓVEL + CAMINHONETE + CAMIONETA + UTILITÁRIO,
+    motocicleta = MOTOCICLETA + MOTONETA + CICLOMOTOR,
+    total = TOTAL
+  ) |> 
+  select(
+    automovel,
+    motocicleta,
+    total
+  )
+}
+
+# resultado <- frota_extract(frota)
+```
+
+Juntando os dados numa mesma tabela, utilizando um loop
+
+```{r}
+num <- 6
+exemplo <- enderecos_frota[num]
+```
+
