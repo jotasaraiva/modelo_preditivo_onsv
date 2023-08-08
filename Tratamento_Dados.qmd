@@ -242,7 +242,7 @@ datatran_anos |> kable()
 
 # Frota por tipo de veículo (RENAVAM)
 
-Primeiramente, importa os endereços dos dados
+-   Primeiramente, importa os endereços dos dados
 
 ```{r}
 enderecos_frota <- paste(
@@ -253,7 +253,7 @@ enderecos_frota <- paste(
 
 ```
 
-Criando a função para a importação
+-   Criando a função para a importação
 
 ```{r}
 import_frota <- function(endereco) {
@@ -286,7 +286,9 @@ exemplo <- enderecos_frota[num] |> import_frota()
 # )
 ```
 
-Melhorando a função para os anos com exceções
+-   Melhorando a função para os anos com exceções
+
+-   Alguns *datasets* precisam de tratamento especial devido a diferenças em formatação
 
 ```{r}
 import_frota2 <- function(endereco) {
@@ -305,11 +307,11 @@ import_frota2 <- function(endereco) {
       else if (str_sub(endereco,34,37) == "2002") {
         aux <- read_excel(endereco, sheet = 1, range = "B7:W38")
         colnames(aux) <- c(
-          "AUTOMÓVEL", "BONDE", "CAMINHÃO", "CAMINHÃO TRATOR", "CAMINHONETE",
-          "CAMIONETA", "CHASSI PLATAF", "CICLOMOTOR", "MICROÔNIBUS",
+          "TOTAL", "AUTOMÓVEL", "BONDE", "CAMINHÃO", "CAMINHÃO TRATOR",
+          "CAMINHONETE", "CAMIONETA", "CHASSI PLATAF", "CICLOMOTOR", "MICROÔNIBUS",
           "MOTOCICLETA", "MOTONETA", "ÔNIBUS", "QUADRICICLO", "REBOQUE",
           "SEMIREBOQUE", "SIDECAR", "OUTROS", "TRATOR ESTEI", "TRATOR RODAS",
-          "TRICICLO","UTILITÁRIOS")
+          "TRICICLO","UTILITÁRIO")
         return(aux[nrow(aux),])
       }
       else if (str_sub(endereco,34,37) == "2001") {
@@ -327,16 +329,33 @@ import_frota2 <- function(endereco) {
   )
   return(frota)
 }
-
-num <- 1
-exemplo <- enderecos_frota[num] |> import_frota2()
 ```
 
-Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
+-   Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
 
 ```{r}
+num <- 6
+exemplo <- enderecos_frota[num] |> import_frota2()
+
+# frota_extract <- function(df){
+#   result <- df |> 
+#     mutate(
+#     automovel = AUTOMÓVEL + CAMINHONETE + CAMIONETA + UTILITÁRIO,
+#     motocicleta = MOTOCICLETA + MOTONETA + CICLOMOTOR,
+#     total = TOTAL
+#   ) |> 
+#   select(
+#     automovel,
+#     motocicleta,
+#     total
+#   )
+# }
+
 frota_extract <- function(df){
-  result <- df |> 
+  # transforma dados em númerico caso estejam em formato de carácter
+  df_temp <- as.data.frame(lapply(df, as.numeric))
+  
+  res <- df_temp |> 
     mutate(
     automovel = AUTOMÓVEL + CAMINHONETE + CAMIONETA + UTILITÁRIO,
     motocicleta = MOTOCICLETA + MOTONETA + CICLOMOTOR,
@@ -347,14 +366,30 @@ frota_extract <- function(df){
     motocicleta,
     total
   )
+  
+  return(res)
 }
 
-# resultado <- frota_extract(frota)
+resultado <- frota_extract(exemplo)
 ```
 
-Juntando os dados numa mesma tabela, utilizando um loop
+-   Juntando os dados numa mesma tabela, utilizando um loop
 
 ```{r}
+
+if ("frota_anos" |> exists()) {
+  rm("frota_anos")
+}
+
+for(i in enderecos_frota) {
+  if ("frota_anos" |> exists()) {
+    frota_anos <- rbind(frota_anos, frota_extract(import_frota2(i)))
+  }
+  else {
+    frota_anos <- import_frota2(i) |> frota_extract()
+  }
+}
+
 num <- 6
 exemplo <- enderecos_frota[num]
 ```
