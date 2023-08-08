@@ -299,11 +299,8 @@ import_frota2 <- function(endereco) {
         aux <- read_excel(endereco, sheet = 1, range = "B42:W43")
         nomes <- aux |>
           colnames() |>
-          toupper() |> 
-          replace(
-            nomes %in% "UTILITARIO",
-            "UTILITÁRIO"
-          )
+          toupper() 
+        nomes <- replace(nomes, nomes %in% "UTILITARIO", "UTILITÁRIO")
         colnames(aux) <- nomes
         return(aux)
       }
@@ -341,7 +338,7 @@ import_frota2 <- function(endereco) {
 }
 ```
 
--   Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
+- Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
 
 ```{r}
 num <- 5
@@ -383,7 +380,7 @@ frota_extract <- function(df){
 resultado <- frota_extract(exemplo)
 ```
 
--   Juntando os dados numa mesma tabela, utilizando um loop
+- Juntando os dados numa mesma tabela, utilizando um loop
 
 ```{r}
 
@@ -394,10 +391,14 @@ if ("frota_anos" |> exists()) {
 for(i in enderecos_frota) {
   if ("frota_anos" |> exists()) {
     frota_anos <- rbind(frota_anos, frota_extract(import_frota2(i)))
+    anos <- append(anos, i |> str_sub(34,37) |> as.numeric())
   }
   else {
     frota_anos <- import_frota2(i) |> frota_extract()
+    anos <- i |> str_sub(34,37) |> as.numeric()
   }
 }
+
+frota_anos$anos <- anos
 
 ```
