@@ -296,11 +296,21 @@ import_frota2 <- function(endereco) {
     read_excel(endereco, sheet = 2, range = "B41:W42"),
     error = function(e) {
       if (str_sub(endereco,34,37) %in% c("2005","2004")) {
-        return(read_excel(endereco, sheet = 1, range = "B42:W43"))
+        aux <- read_excel(endereco, sheet = 1, range = "B42:W43")
+        nomes <- aux |>
+          colnames() |>
+          toupper() |> 
+          replace(
+            nomes %in% "UTILITARIO",
+            "UTILITÁRIO"
+          )
+        colnames(aux) <- nomes
+        return(aux)
       }
       else if (str_sub(endereco,34,37) == "2003") {
-        # foi necessário alterar o formato da planilha de .xls para .xlsx e excluir planilhas vazias para 2003
-        # também é feito um subset da planilha
+        # precisou alterar o formato da planilha de .xls para .xlsx 
+        # e excluir páginas vazias
+        # também é feito um subset da planilha para coletar só os totais
         aux <- read_excel(endereco, sheet = 1, range = "B3:W33")
         return(aux[nrow(aux),])
       }
@@ -334,7 +344,7 @@ import_frota2 <- function(endereco) {
 -   Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
 
 ```{r}
-num <- 6
+num <- 5
 exemplo <- enderecos_frota[num] |> import_frota2()
 
 # frota_extract <- function(df){
@@ -390,6 +400,4 @@ for(i in enderecos_frota) {
   }
 }
 
-num <- 6
-exemplo <- enderecos_frota[num]
 ```
