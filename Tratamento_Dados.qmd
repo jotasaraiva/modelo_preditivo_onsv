@@ -404,17 +404,47 @@ frota_anos$anos <- anos
 ```
 ## Número de condutores (RENACH)
 
-- Importação de um dos *datasets* para visualização dos dados
+- Importação dos endereços
 
 ```{r}
-condutores2011 <- read_csv(
-  "dados_cnh/condutores_habilitados_2011-12.csv",
-  locale = locale(encoding = "latin1"),
-  col_names = c(
-    "regiao", "uf", "sexo", "categoria",
-    "A","AB","AC","AD","AE","B","C","D","E"
-  ),
-  skip = 2
+enderecos_condutores <- paste("dados_cnh/",list.files("dados_cnh/"),sep = "")
+```
+
+
+- Importação de um dos *datasets* e tratamento
+
+- Posteriormente, criar uma função para tratar todos os *datasets*
+
+```{r}
+num = 1
+condutores2011 <- read.csv(
+  enderecos_condutores[num],
+  fileEncoding = "UTF-16LE",
+  col.names = c("regiao","uf","sexo","faixa_etaria","categoria_a",
+                "categoria_ab","categoria_ac","categoria_ad","categoria_ae",
+                "categoria_b","categoria_c","categoria_d","categoria_e"),
+  skip = 1
 )
+
+condutores2011$ano <- enderecos_condutores[num] |> 
+  str_sub(34,37)
+
+df_temp <- condutores2011 |> select(
+  categoria_a,
+  categoria_ab,
+  categoria_ac,
+  categoria_ad,
+  categoria_ae,
+  categoria_b,
+  categoria_c,
+  categoria_d,
+  categoria_e,
+  ano
+) |> 
+  lapply(as.character) |> 
+  as.data.frame()
+
+
+df_temp
 ```
 
