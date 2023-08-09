@@ -7,8 +7,6 @@ format:
 editor: visual
 ---
 
--   Colocar o carregamento de pacotes na mesma célula
-
 ```{r}
 library(tidyverse)
 library(microdatasus)
@@ -18,8 +16,6 @@ library(readxl)
 ```
 
 ## Dados de mortes no trânsito (DATASUS)
-
-Aqui eu apliquei um método para não precisar baixar os dados do DATASUS toda hora que for compilar o documento. A função `save()` salva qualquer objeto do R em um arquivo binário do formado `.rda`. Assim, é só usar o `load()` para carregar novamente os dados. Assim, apliquei uma condicional para verificar se o arquivo já existe dentro da pasta `data/` (`file.exists()`). Caso sim, ele carrega com o `load()`, caso não, ele faz todo o processo do `microdatasus` com o `fetch_datasus`.
 
 ```{r}
 
@@ -39,20 +35,7 @@ if (file.exists("data/datasus.rda")) {
 ```
 
 ```{r}
-head(df_datasus)
-```
-
--   Sempre colocar espaço depois da vírgula; também antes e depois do `=`
-
--   Não deixe a linha passar de 80 caracteres
-
--   Usar o `head()` para não carregar tanta informação no terminal / notebook
-
--   Usar o `kable()` do pacote `knitr` para renderizar uma tabela mais bonita no documento final
-
-```{r}
 st_datasus <- df_datasus |> 
-  # filter(str_detect(CAUSABAS,paste(paste0("V",seq(0,8,1)),collapse="|"))) |> 
   filter(
     str_detect(CAUSABAS, paste(paste0("V", seq(0, 8, 1)), collapse = "|"))
   ) |> 
@@ -65,41 +48,15 @@ st_datasus <- df_datasus |>
 knitr::kable(head(st_datasus))
 ```
 
--   Aqui tem como substituir o `group_by()` + `summarise()` pelo `count()`
-
--   Usei o `as_tibble()` para transformar o `data.frame` no formato padrão do tidyverse
-
 ```{r}
 obitos_ano <- st_datasus |> 
-  # group_by(ano) |> 
-  # summarise(
-  #   obitos = n()
-  # )
   count(ano, name = "obitos") |> 
   as_tibble()
 
 kable(obitos_ano)
 ```
 
--   Coloquei o carregamento do obsplot no começo do projeto
-
--   Apliquei umas correções no estilo de escrita:
-
-    -   Espaçamento: espaços depois da vírgula e ao redor dos `=`
-
-    -   GGplot: cada elemento / objeto deve ficar individualmente em uma linha
-
--   Ajustei o título
-
 ```{r}
-#library(obsplot)
-
-# ggplot(obitos_ano,aes(x = ano, y = obitos)) +
-#   geom_point() + geom_line() + #objetos geométricos
-#   scale_x_continuous(breaks = seq(1996,2021,1)) + scale_y_continuous(limits = c(0,NA)) + #escala
-#   theme_obs() + theme(axis.text.x = element_text(angle=45,vjust=1,hjust=1)) + #tema
-#   ggtitle("Mortes por ano DATASUS")
-
 ggplot(obitos_ano, aes(x = ano, y = obitos)) +
   geom_point() +
   geom_line() +
@@ -112,62 +69,13 @@ ggplot(obitos_ano, aes(x = ano, y = obitos)) +
 
 ## Sinistros em rodovias federais (PRF)
 
--   Aqui também eu ajustei o tamanho da linha (limite de 80 caracteres)
+Função de extração:
 
 ```{r}
-datatran2007 <- read_csv2(
-  "datatran/datatran2007/datatran2007.csv", 
-  locale = locale(encoding = "latin1")
-)
-kable(head(datatran2007))
-```
-
-```{r}
-acidentes2007 <- datatran2007 |> 
-  select (
-    data_inversa,
-    mortos,
-    feridos,
-    classificacao_acidente
-  ) |> 
-  mutate(
-    ano = as.numeric(str_sub(data_inversa,-4,-1)),
-    classificacao_acidente = case_when(
-      classificacao_acidente %in% c("(null)","Ignorado") & mortos > 0 ~ "Com Vítimas Fatais",
-      classificacao_acidente %in% c("(null)","Ignorado") & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
-      classificacao_acidente %in% c("(null)","Ignorado") & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
-      TRUE ~ classificacao_acidente
-    )
-  )
-
-acidentes2007 |> 
-  select(
-    classificacao_acidente
-  ) |> 
-  unique()
-
-```
-
-```{r}
-mortes2007 <- acidentes2007 |> 
-  group_by(ano) |> 
-  summarise(
-    qnt_acidentes = n(),
-    qnt_acidentes_fatais = sum(classificacao_acidente == "Com Vítimas Fatais"),
-    qnt_feridos = sum(feridos),
-    qnt_mortos = sum(mortos)
-    )
-
-mortes2007
-```
-
-```{r}
-#criação da função
-
 datatran_extract <- function(df) {
 
   acidentes <- df |> 
-  select (
+  select(
     data_inversa,
     mortos,
     feridos,
@@ -200,44 +108,32 @@ datatran_extract <- function(df) {
   return(mortes)
 
 }
-
-#testando a função
-
-testes <- datatran_extract(datatran2007)
-
-testes
-
 ```
 
--   Ajuste de espaçamento no `if`
-
--   Deletei o `print()`, não é necessário
+Função que importa todos os anos e aplica a extração. Ao criar uma função, você não precisa se preocupar em ficar usando `rm()` no enviroment global, todo o calculo temporário fica no environemt local da função.
 
 ```{r}
-#criação de loop para a importação de todos os anos
 
-k <- seq(2007, 2021, 1)
-enderecos_datatran <- paste("datatran/datatran", k ,"/datatran", k, ".csv", sep = "")
-
-# df_temp1 <- read_csv2(enderecos[1], locale = locale(encoding = "latin1")) |> datatran_extract()
-
-
-if ("datatran_anos" |> exists()) {
-  rm("datatran_anos")
+arrange_datatran <- function() {
+  k <- seq(2007, 2021, 1)
+  enderecos_datatran <- paste(
+    "datatran/datatran", k ,"/datatran", k, ".csv", sep = ""
+  )
+  #criação de loop para a importação de todos os anos
+  for (i in enderecos_datatran) {
+    df_temp <- read_csv2(i, locale = locale(encoding = "latin1")) |>
+      datatran_extract()
+    if (exists("datatran_anos")) {
+      datatran_anos <- bind_rows(datatran_anos, df_temp)
+    }
+    else {
+      datatran_anos <- df_temp
+    }
+  }
+  return(datatran_anos)
 }
 
-for (i in enderecos_datatran) {
-  df_temp <- read_csv2(i, locale = locale(encoding = "latin1")) |>
-    datatran_extract()
-  if(exists("datatran_anos")){
-    datatran_anos <- bind_rows(datatran_anos, df_temp)
-  }
-  else{
-    datatran_anos <- df_temp
-  }
-}
-
-datatran_anos |> kable()
+sinistros_prf <- arrange_datatran()
 ```
 
 ## Frota por tipo de veículo (RENAVAM)
