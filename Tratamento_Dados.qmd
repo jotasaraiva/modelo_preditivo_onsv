@@ -1,5 +1,5 @@
 ---
-title: "Tratamento_Dados"
+title: "Tratamento de Dados para Modelo Preditivo de Mortes"
 format: 
   html:
     execute:
@@ -17,7 +17,7 @@ library(knitr)
 library(readxl)
 ```
 
-# Dados de mortes no trânsito (DATASUS)
+## Dados de mortes no trânsito (DATASUS)
 
 Aqui eu apliquei um método para não precisar baixar os dados do DATASUS toda hora que for compilar o documento. A função `save()` salva qualquer objeto do R em um arquivo binário do formado `.rda`. Assim, é só usar o `load()` para carregar novamente os dados. Assim, apliquei uma condicional para verificar se o arquivo já existe dentro da pasta `data/` (`file.exists()`). Caso sim, ele carrega com o `load()`, caso não, ele faz todo o processo do `microdatasus` com o `fetch_datasus`.
 
@@ -110,7 +110,7 @@ ggplot(obitos_ano, aes(x = ano, y = obitos)) +
   ggtitle("Mortes no Trânsito Brasileiro")
 ```
 
-# Sinistros em rodovias federais (PRF)
+## Sinistros em rodovias federais (PRF)
 
 -   Aqui também eu ajustei o tamanho da linha (limite de 80 caracteres)
 
@@ -240,7 +240,7 @@ for (i in enderecos_datatran) {
 datatran_anos |> kable()
 ```
 
-# Frota por tipo de veículo (RENAVAM)
+## Frota por tipo de veículo (RENAVAM)
 
 -   Primeiramente, importa os endereços dos dados
 
@@ -338,7 +338,7 @@ import_frota2 <- function(endereco) {
 }
 ```
 
-- Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
+-   Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
 
 ```{r}
 num <- 5
@@ -380,7 +380,7 @@ frota_extract <- function(df){
 resultado <- frota_extract(exemplo)
 ```
 
-- Juntando os dados numa mesma tabela, utilizando um loop
+-   Juntando os dados numa mesma tabela, utilizando um loop
 
 ```{r}
 
@@ -402,3 +402,19 @@ for(i in enderecos_frota) {
 frota_anos$anos <- anos
 
 ```
+## Número de condutores (RENACH)
+
+- Importação de um dos *datasets* para visualização dos dados
+
+```{r}
+condutores2011 <- read_csv(
+  "dados_cnh/condutores_habilitados_2011-12.csv",
+  locale = locale(encoding = "latin1"),
+  col_names = c(
+    "regiao", "uf", "sexo", "categoria",
+    "A","AB","AC","AD","AE","B","C","D","E"
+  ),
+  skip = 2
+)
+```
+
