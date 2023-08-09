@@ -125,8 +125,7 @@ arrange_datatran <- function() {
       datatran_extract()
     if (exists("datatran_anos")) {
       datatran_anos <- bind_rows(datatran_anos, df_temp)
-    }
-    else {
+    } else {
       datatran_anos <- df_temp
     }
   }
@@ -138,60 +137,25 @@ sinistros_prf <- arrange_datatran()
 
 ## Frota por tipo de veículo (RENAVAM)
 
--   Primeiramente, importa os endereços dos dados
+Primeiramente, cria um vetor com os endereços dos dados.
 
 ```{r}
 enderecos_frota <- paste(
   "dados_frota/frotas2000_2021/",
   list.files("dados_frota/frotas2000_2021/"),
   sep = ""
-  )
+)
 
 ```
 
--   Criando a função para a importação
+Função para importar os dados. Alguns *datasets* precisam de tratamento especial devido a diferenças em formatação.
 
 ```{r}
 import_frota <- function(endereco) {
   frota <- tryCatch(
     read_excel(endereco, sheet = 2, range = "B41:W42"),
     error = function(e) {
-      if (str_sub(enderecos_frota[num],34,37) %in% c("2005","2004")) {
-        return(read_excel(endereco, sheet = 1, range = "B42:W43"))
-      }
-      else {
-        return(read_excel(endereco, sheet = 1, range = "B41:W42"))
-      }
-    }
-  )
-  return(frota)
-}
-
-num <- 5
-exemplo <- enderecos_frota[num] |> import_frota()
-
-# # Algoritmo de Importação com erro validado para a função
-# frota <- tryCatch(
-#   read_excel(enderecos_frota[num], sheet = 2, range = "B41:W42"),
-#   error = function(e) {
-#     return(
-#       read_excel(enderecos_frota[num], sheet = 1, range = "B41:W42")
-#     )
-#   },
-#   warning = function(w) w
-# )
-```
-
--   Melhorando a função para os anos com exceções
-
--   Alguns *datasets* precisam de tratamento especial devido a diferenças em formatação
-
-```{r}
-import_frota2 <- function(endereco) {
-  frota <- tryCatch(
-    read_excel(endereco, sheet = 2, range = "B41:W42"),
-    error = function(e) {
-      if (str_sub(endereco,34,37) %in% c("2005","2004")) {
+      if (str_sub(endereco, 34, 37) %in% c("2005","2004")) {
         aux <- read_excel(endereco, sheet = 1, range = "B42:W43")
         nomes <- aux |>
           colnames() |>
@@ -199,15 +163,13 @@ import_frota2 <- function(endereco) {
         nomes <- replace(nomes, nomes %in% "UTILITARIO", "UTILITÁRIO")
         colnames(aux) <- nomes
         return(aux)
-      }
-      else if (str_sub(endereco,34,37) == "2003") {
+      } else if (str_sub(endereco, 34, 37) == "2003") {
         # precisou alterar o formato da planilha de .xls para .xlsx 
         # e excluir páginas vazias
         # também é feito um subset da planilha para coletar só os totais
         aux <- read_excel(endereco, sheet = 1, range = "B3:W33")
-        return(aux[nrow(aux),])
-      }
-      else if (str_sub(endereco,34,37) == "2002") {
+        return(aux[nrow(aux), ])
+      } else if (str_sub(endereco, 34, 37) == "2002") {
         aux <- read_excel(endereco, sheet = 1, range = "B7:W38")
         colnames(aux) <- c(
           "TOTAL", "AUTOMÓVEL", "BONDE", "CAMINHÃO", "CAMINHÃO TRATOR",
@@ -215,17 +177,14 @@ import_frota2 <- function(endereco) {
           "MOTOCICLETA", "MOTONETA", "ÔNIBUS", "QUADRICICLO", "REBOQUE",
           "SEMIREBOQUE", "SIDECAR", "OUTROS", "TRATOR ESTEI", "TRATOR RODAS",
           "TRICICLO","UTILITÁRIO")
-        return(aux[nrow(aux),])
-      }
-      else if (str_sub(endereco,34,37) == "2001") {
+        return(aux[nrow(aux), ])
+      } else if (str_sub(endereco, 34, 37) == "2001") {
         aux <- read_excel(endereco, sheet = 1, range = "B36:W38")
-        return(aux[nrow(aux),])
-      }
-      else if (str_sub(endereco,34,37) == "2000") {
+        return(aux[nrow(aux), ])
+      } else if (str_sub(endereco, 34, 37) == "2000") {
         aux <- read_excel(endereco, sheet = 1, range = "B36:W37")
-        return(aux[nrow(aux),])
-      }
-      else {
+        return(aux[nrow(aux), ])
+      } else {
         return(read_excel(endereco, sheet = 1, range = "B41:W42"))
       }
     }
@@ -234,27 +193,10 @@ import_frota2 <- function(endereco) {
 }
 ```
 
--   Tratando e selecionando as variáveis de interesse e desenvolvendo uma função
+Tratando e selecionando as variáveis de interesse, inserindo na função.
 
 ```{r}
-num <- 5
-exemplo <- enderecos_frota[num] |> import_frota2()
-
-# frota_extract <- function(df){
-#   result <- df |> 
-#     mutate(
-#     automovel = AUTOMÓVEL + CAMINHONETE + CAMIONETA + UTILITÁRIO,
-#     motocicleta = MOTOCICLETA + MOTONETA + CICLOMOTOR,
-#     total = TOTAL
-#   ) |> 
-#   select(
-#     automovel,
-#     motocicleta,
-#     total
-#   )
-# }
-
-frota_extract <- function(df){
+frota_extract <- function(df) {
   # transforma dados em númerico caso estejam em formato de carácter
   df_temp <- as.data.frame(lapply(df, as.numeric))
   
@@ -272,32 +214,35 @@ frota_extract <- function(df){
   
   return(res)
 }
-
-resultado <- frota_extract(exemplo)
 ```
 
--   Juntando os dados numa mesma tabela, utilizando um loop
+Finalizando a tabela anual através de uma última função.
 
 ```{r}
+arrange_frota <- function() {
+  for(i in enderecos_frota) {
+    if ("frota_anos" |> exists()) {
+      frota_anos <- rbind(frota_anos, frota_extract(import_frota(i)))
+      anos <- append(anos, i |> str_sub(34,37) |> as.numeric())
+    }
+    else {
+      frota_anos <- import_frota(i) |> frota_extract()
+      anos <- i |> str_sub(34,37) |> as.numeric()
+    }
+  }
 
-if ("frota_anos" |> exists()) {
-  rm("frota_anos")
+  frota_anos <- as_tibble(frota_anos)
+
+  frota_anos$anos <- anos
+  return(frota_anos)
 }
 
-for(i in enderecos_frota) {
-  if ("frota_anos" |> exists()) {
-    frota_anos <- rbind(frota_anos, frota_extract(import_frota2(i)))
-    anos <- append(anos, i |> str_sub(34,37) |> as.numeric())
-  }
-  else {
-    frota_anos <- import_frota2(i) |> frota_extract()
-    anos <- i |> str_sub(34,37) |> as.numeric()
-  }
-}
+frota_veiculos <- arrange_frota()
 
-frota_anos$anos <- anos
+kable(frota_veiculos)
 
 ```
+
 ## Número de condutores (RENACH)
 
 - Importação dos endereços
