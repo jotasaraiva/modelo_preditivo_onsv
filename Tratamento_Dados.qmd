@@ -245,47 +245,63 @@ kable(frota_veiculos)
 
 ## Número de condutores (RENACH)
 
-- Importação dos endereços
+-   Importação dos endereços
 
 ```{r}
-enderecos_condutores <- paste("dados_cnh/",list.files("dados_cnh/"),sep = "")
+enderecos_condutores <- paste(
+  "dados_cnh/cnh_xl/",
+  list.files("dados_cnh/cnh_xl/"),
+  sep = ""
+)
 ```
 
-
-- Importação de um dos *datasets* e tratamento
-
-- Posteriormente, criar uma função para tratar todos os *datasets*
+-   Função que importa e trata o *dataset*
 
 ```{r}
-num = 1
-condutores2011 <- read.csv(
-  enderecos_condutores[num],
-  fileEncoding = "UTF-16LE",
-  col.names = c("regiao","uf","sexo","faixa_etaria","categoria_a",
-                "categoria_ab","categoria_ac","categoria_ad","categoria_ae",
-                "categoria_b","categoria_c","categoria_d","categoria_e"),
-  skip = 1
-)
+num <- 4
 
-condutores2011$ano <- enderecos_condutores[num] |> 
-  str_sub(34,37)
+import_cnh <- function(endereco) {
+  
+  df <- read_excel(
+    endereco,
+    range = cell_cols("N:"),
+    sheet = 1
+  )
+  
+  if (colnames(df) != "Total") {
+    df <- read_excel(
+      endereco,
+      range = cell_cols("S:"),
+      sheet = 1
+    )
+  }
+  
+  df <- df[-(1:nrow(df)-1),] |> 
+    lapply(as.numeric) |> 
+    as.data.frame()
+  
+  df$ano <- endereco |>
+    str_sub(41,44) |>
+    as.numeric()
+    
+  return(df)
+}
 
-df_temp <- condutores2011 |> select(
-  categoria_a,
-  categoria_ab,
-  categoria_ac,
-  categoria_ad,
-  categoria_ae,
-  categoria_b,
-  categoria_c,
-  categoria_d,
-  categoria_e,
-  ano
-) |> 
-  lapply(as.character) |> 
-  as.data.frame()
+import_cnh(enderecos_condutores[num]) |> kable()
 
+```
+- Script para importação de todos os anos
 
-df_temp
+```{r}
+for(i in enderecos_condutores) {
+  if ("n_condutores" |> exists()) {
+    n_condutores <- rbind(n_condutores, import_cnh(i))
+  }
+  else {
+    n_condutores <- import_cnh(i)
+  }
+}
+
+n_condutores |> kable()
 ```
 
