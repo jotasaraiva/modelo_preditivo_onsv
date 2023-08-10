@@ -245,7 +245,7 @@ kable(frota_veiculos)
 
 ## Número de condutores (RENACH)
 
--   Importação dos endereços
+Importação dos endereços
 
 ```{r}
 enderecos_condutores <- paste(
@@ -255,7 +255,7 @@ enderecos_condutores <- paste(
 )
 ```
 
--   Função que importa e trata o *dataset*
+Função que importa e trata o *dataset*
 
 ```{r}
 num <- 4
@@ -290,9 +290,13 @@ import_cnh <- function(endereco) {
 import_cnh(enderecos_condutores[num]) |> kable()
 
 ```
-- Script para importação de todos os anos
+Script para importação de todos os anos
 
 ```{r}
+if ("n_condutores" |> exists()) {
+  rm("n_condutores")
+}
+
 for(i in enderecos_condutores) {
   if ("n_condutores" |> exists()) {
     n_condutores <- rbind(n_condutores, import_cnh(i))
