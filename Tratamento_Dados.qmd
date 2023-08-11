@@ -330,22 +330,26 @@ num <- 8
 import_pop <- function(endereco) {
   
   try(
-    df <- read_excel(
-      endereco,
-      sheet = 2,
-      range = cell_cols("B:"),
-      col_names = "total"
-    ) 
+    return(
+      read_excel(
+        endereco,
+        sheet = 2,
+        range = cell_cols("B:"),
+        col_names = "total"
+      ) 
+    )  
   )
   
   
-  df <- df[-(2:nrow(df)),] |>
-  mutate(
-    ano = str_sub(endereco,24,27) |>
-      as.numeric()
+  try(
+    return(
+      read_excel(
+        endereco,
+        sheet = 1,
+        range = cell_cols("A:E")
+      )
+    )
   )
-  
-  return(df)
 }
 
 
@@ -354,6 +358,11 @@ teste <- import_pop(enderecos_pop[num])
 teste
 
 
+# df <- df[-(2:nrow(df)),] |>
+#   mutate(
+#     ano = str_sub(endereco,24,27) |>
+#       as.numeric()
+#   )
 
 ```
 
