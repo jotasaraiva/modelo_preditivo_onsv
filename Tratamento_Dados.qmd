@@ -328,16 +328,20 @@ Função de importação dos *datasets*
 num <- 8
 
 import_pop <- function(endereco) {
-  df <- read_excel(
-    enderecos_pop[num],
-    sheet = 2,
-    range = cell_cols("B:"),
-    col_names = "total"
+  
+  try(
+    df <- read_excel(
+      endereco,
+      sheet = 2,
+      range = cell_cols("B:"),
+      col_names = "total"
+    ) 
   )
+  
   
   df <- df[-(2:nrow(df)),] |>
   mutate(
-    ano = str_sub(enderecos_pop[num],24,27) |>
+    ano = str_sub(endereco,24,27) |>
       as.numeric()
   )
   
