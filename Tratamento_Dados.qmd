@@ -325,7 +325,7 @@ enderecos_pop <- paste(
 Função de importação dos *datasets*
 
 ```{r}
-num <- 10
+num <- 15
 
 import_pop <- function(endereco) {
   
@@ -362,33 +362,80 @@ import_pop <- function(endereco) {
             as.numeric()
         ) |> 
         slice(1) |> 
-        select(
-          total,
-          ano
-        )
+        select(total, ano)
     )
   )
   
+  # try(
+  #   return(
+  #     read_excel(
+  #       endereco,
+  #       sheet = 1
+  #     ) |>
+  #       filter(!row_number() %in% seq(1,4)) |>
+  #       select(last_col()) |>
+  #       rename("pop" = starts_with(".")) |>
+  #       mutate(
+  #         total = sum(as.numeric(pop)),
+  #         ano = str_sub(endereco,24,27) |>
+  #           as.numeric()
+  #       ) |>
+  #       slice(1) |>
+  #       select(
+  #         total,
+  #         ano
+  #       )
+  #   )
+  # )
+  # 
+  
   try(
-    return(
-      read_excel(
-        endereco,
-        sheet = 1
-      ) |> 
-        filter(!row_number() %in% seq(1,4)) |> 
-        select(last_col()) |> 
-        rename("pop" = starts_with(".")) |> 
-        mutate(
-          total = sum(as.numeric(pop)),
-          ano = str_sub(endereco,24,27) |> 
-            as.numeric()
-        ) |> 
-        slice(1) |> 
-        select(
-          total,
-          ano
-        )
-    )
+    if(str_sub(endereco,24,27) == "2001"){
+      return(
+        read_excel(endereco) |> 
+          filter(!row_number() %in% seq(1,4)) |> 
+          select(last_col()) |> 
+          rename("pop" = starts_with(".")) |> 
+          mutate(
+            total = sum(as.numeric(pop)),
+            ano = str_sub(endereco,24,27) |> 
+              as.numeric()
+          ) |> 
+          slice(1) |> 
+          select(total, ano)
+      )
+    }
+    else if(str_sub(endereco,24,27) == "2002"){
+      return(
+        read_excel(endereco) |> 
+          filter(!row_number() %in% seq(1,5)) |> 
+          select(last_col()) |> 
+          rename("pop" = starts_with(".")) |> 
+          mutate(
+            total = as.numeric(pop[length(pop)]),
+            ano = str_sub(endereco,24,27) |> 
+              as.numeric()
+          ) |> 
+          slice(1) |> 
+          select(total, ano)
+      )
+    }
+    else{
+      return(
+        read_excel(endereco) |> 
+          filter(!row_number() %in% seq(1,4)) |> 
+          drop_na() |> 
+          select(last_col()) |> 
+          rename("pop" = starts_with(".")) |> 
+          mutate(
+            total = sum(as.numeric(pop)),
+            ano = str_sub(endereco,24,27) |> 
+              as.numeric()
+          ) |> 
+          slice(1) |> 
+          select(total, ano)
+      )
+    }
   )
 }
 
@@ -396,12 +443,5 @@ import_pop <- function(endereco) {
 
 teste <- import_pop(enderecos_pop[num])
 teste |> view()
-
-
-# df <- df[-(2:nrow(df)),] |>
-#   mutate(
-#     ano = str_sub(endereco,24,27) |>
-#       as.numeric()
-#   )
 
 ```
