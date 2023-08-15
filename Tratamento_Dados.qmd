@@ -13,6 +13,7 @@ library(microdatasus)
 library(obsplot)
 library(knitr)
 library(readxl)
+library(foreign)
 ```
 
 ## Dados de mortes no trânsito (DATASUS)
@@ -316,8 +317,8 @@ Importação dos endereços dos dados
 
 ```{r}
 enderecos_pop <- paste(
-  "dados_pop/populacao/",
-  list.files("dados_pop/populacao/"),
+  "dados_pop/poptcu/",
+  list.files("dados_pop/poptcu/"),
   sep = ""
 )
 ```
@@ -325,116 +326,43 @@ enderecos_pop <- paste(
 Função de importação dos *datasets*
 
 ```{r}
-num <- 14
+num <- 1
 
 import_pop <- function(endereco) {
   
-  try(
-    return(
-      read_excel(
-        endereco,
-        sheet = 2,
-        range = cell_cols("B:"),
-        col_names = "total"
-      ) |> 
-        slice(1) |> 
-        mutate(
-          ano = str_sub(endereco,24,27) |> 
-            as.numeric()
-        )
-    )
-  )
+  df1 <- read.dbf(endereco)
   
-  try(
-    return(
-      read_excel(
-        endereco,
-        sheet = 1,
-        range = cell_cols("A:E")
-      ) |> 
-        filter(!row_number() %in% c(1,2)) |> 
-        drop_na() |> 
-        select(last_col()) |> 
-        rename("pop" = starts_with(".")) |> 
-        mutate(
-          total = sum(pop),
-          ano = str_sub(endereco,24,27) |> 
-            as.numeric()
-        ) |> 
-        slice(1) |> 
-        select(total, ano)
-    )
-  )
+  df2 <- df1 |> 
+    mutate(
+      total = sum(POPULACAO),
+      ano = ANO |> as.character() |> as.numeric()
+    ) |> 
+    select(total, ano) |> 
+    slice(1)
   
-  # try(
-  #   if(str_sub(endereco,24,27) == "2001"){
-  #     return(
-  #       read_excel(endereco) |>
-  #         filter(!row_number() %in% seq(1,4)) |>
-  #         select(last_col()) |>
-  #         rename("pop" = starts_with(".")) |>
-  #         mutate(
-  #           total = sum(as.numeric(pop)),
-  #           ano = str_sub(endereco,24,27) |>
-  #             as.numeric()
-  #         ) |>
-  #         slice(1) |>
-  #         select(total, ano)
-  #     )
-  #   }
-  #   else if(str_sub(endereco,24,27) == "2002"){
-  #     return(
-  #       read_excel(endereco) |>
-  #         filter(!row_number() %in% seq(1,5)) |>
-  #         select(last_col()) |>
-  #         rename("pop" = starts_with(".")) |>
-  #         mutate(
-  #           total = as.numeric(pop[length(pop)]),
-  #           ano = str_sub(endereco,24,27) |>
-  #             as.numeric()
-  #         ) |>
-  #         slice(1) |>
-  #         select(total, ano)
-  #     )
-  #   }
-  #   else if(str_sub(endereco,24,27) == "2003"){
-  #     return(
-  #       read_excel(endereco) |>
-  #         filter(!row_number() %in% seq(1,4)) |>
-  #         drop_na() |>
-  #         select(last_col()) |>
-  #         rename("pop" = starts_with(".")) |>
-  #         mutate(
-  #           total = sum(as.numeric(pop)),
-  #           ano = str_sub(endereco,24,27) |>
-  #             as.numeric()
-  #         ) |>
-  #         slice(1) |>
-  #         select(total, ano)
-  #     )
-  #   }
-  # )
+  return(df2)
 }
-
-
 
 teste <- import_pop(enderecos_pop[num])
 teste |> view()
-
 ```
+
+Função para organizar os dados em uma mesma tabela
 
 ```{r}
-num <- 14
-
-import_pop <- function(endereco) {
-  read_excel(
-    endereco,
-    skip = 4
-  ) |> 
-    drop_na()
+arrange_pop <- function() {
+  for (i in enderecos_pop) {
+    
+    if("df_temp" |> exists()) {
+      df_temp <- rbind(df_temp,import_pop(i))
+    }
+    else {
+      df_temp <- import_pop(i)
+    }
+  }
+  return(df_temp)
 }
 
-teste <- import_pop(enderecos_pop[num])
-teste |> view()
-```
+arrange_pop()
 
+```
