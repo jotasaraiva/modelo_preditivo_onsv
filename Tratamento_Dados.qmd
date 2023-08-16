@@ -366,3 +366,37 @@ arrange_pop <- function() {
 arrange_pop()
 
 ```
+
+## PIB (IBGE)
+
+Função de importação (não necessitou importar os caminhos dos dados pois é uma única planilha)
+
+```{r}
+endereco <- "dados_pib/dados_pib/tabela2072.xlsx"
+
+import_pib <- function(endereco) {
+  municipios <- read_excel(endereco) |> 
+  drop_na() |> 
+  slice(-1)
+
+  colnames(municipios) <- c("trim_ano", "pib")
+
+  municipios <- municipios |> 
+    mutate(
+      ano = str_sub(trim_ano,14,17) |> as.numeric(),
+      trim = str_sub(trim_ano,1,1) |> as.numeric(),
+      total = pib |> as.numeric()
+    ) |> 
+    filter(
+      trim == 4
+    ) |> 
+    select(
+      total,
+      ano
+    )
+  
+  return(municipios)
+}
+
+municipios <- import_pib(endereco)
+```
