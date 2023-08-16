@@ -1,3 +1,7 @@
 .Rproj.user/
 
 /.quarto/
+
+.Rhistory
+
+.RData
