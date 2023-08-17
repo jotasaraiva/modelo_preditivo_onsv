@@ -324,25 +324,19 @@ enderecos_pop <- paste(
 Função de importação dos *datasets*
 
 ```{r}
-num <- 1
 
 import_pop <- function(endereco) {
   
   df1 <- read.dbf(endereco)
   
   df2 <- df1 |> 
-    mutate(
-      total = sum(POPULACAO),
-      ano = ANO |> as.character() |> as.numeric()
-    ) |> 
-    select(total, ano) |> 
-    slice(1)
+    mutate(ano = as.numeric(as.character(ANO))) |>
+    group_by(ano) |>
+    summarise(populacao = sum(POPULACAO))
   
   return(df2)
 }
 
-teste <- import_pop(enderecos_pop[num])
-teste |> view()
 ```
 
 Função para organizar os dados em uma mesma tabela
@@ -351,17 +345,16 @@ Função para organizar os dados em uma mesma tabela
 arrange_pop <- function() {
   for (i in enderecos_pop) {
     
-    if("df_temp" |> exists()) {
-      df_temp <- rbind(df_temp,import_pop(i))
-    }
-    else {
+    if ("df_temp"|> exists()) {
+      df_temp <- rbind(df_temp, import_pop(i))
+    } else {
       df_temp <- import_pop(i)
     }
   }
   return(df_temp)
 }
 
-arrange_pop()
+populacao <- arrange_pop()
 
 ```
 
@@ -370,12 +363,12 @@ arrange_pop()
 Função de importação (não necessitou importar os caminhos dos dados pois é uma única planilha)
 
 ```{r}
-endereco <- "dados_pib/dados_pib/tabela2072.xlsx"
+endereco_pib <- "dados_pib/dados_pib/tabela2072.xlsx"
 
-import_pib <- function(endereco) {
-  municipios <- read_excel(endereco) |> 
-  drop_na() |> 
-  slice(-1)
+import_pib <- function(path) {
+  municipios <- read_excel(path) |> 
+    drop_na() |> 
+    slice(-1)
 
   colnames(municipios) <- c("trim_ano", "pib")
 
@@ -396,5 +389,5 @@ import_pib <- function(endereco) {
   return(municipios)
 }
 
-municipios <- import_pib(endereco)
+pib <- import_pib(endereco_pib)
 ```
