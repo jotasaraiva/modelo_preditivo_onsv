@@ -16,8 +16,8 @@ st_datasus <- df_datasus |>
 
 save(st_datasus, file = "data-raw/datasus.rda")
 
-obitos_ano <- st_datasus |> 
+obitos_transito <- st_datasus |> 
   count(ano, name = "mortes") |> 
   as_tibble()
 
-save(obitos_ano, file = "data/obitos_ano.rda")
+save(obitos_transito, file = "data/obitos_transito.rda")
