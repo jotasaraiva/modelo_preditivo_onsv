@@ -1,3 +1,41 @@
+anos <- seq(2006,2021,1)
+
+download_datasus_ibge <- function(intervalo){
+  
+  intervalo <- intervalo |> as.character() |> str_sub(3,4)
+  
+  for(i in intervalo){
+    endereco <- paste("ftp://ftp.datasus.gov.br/dissemin/publicos/IBGE/POPTCU/POPTBR",i,".zip",sep = "")
+    destino <- paste("data-raw/populacao_zip/",i,".zip",sep = "")
+    
+    # download
+    download.file(endereco, destfile = destino)
+    
+    #unzip
+    unzip(destino, exdir = "data-raw/populacao_zip/")
+  }
+  
+}
+
+move_datasus_files <- function(intervalo){
+  
+  for(i in intervalo){
+    
+    j <- i |> as.character() |> str_sub(3,4)
+    
+    #endereços
+    endereco <- paste("data-raw/populacao_zip/",j,".DBF",sep = "")
+    destino <- paste("data-raw/populacao/",i,".DBF",sep = "")
+    
+    #copiar para nova pasta
+    file.copy(from = endereco, to = destino)
+  }
+  
+}
+
+download_datasus_ibge(anos)
+move_datasus_files(anos)
+
 enderecos_pop <- paste(
   "data-raw/populacao/",
   list.files("data-raw/populacao/"),

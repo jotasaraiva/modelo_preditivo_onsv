@@ -14,8 +14,6 @@ st_datasus <- df_datasus |>
     ano = as.numeric(str_sub(datas, -4, -1))
   )
 
-save(st_datasus, file = "data-raw/datasus.rda")
-
 obitos_transito <- st_datasus |> 
   count(ano, name = "mortes") |> 
   as_tibble()
