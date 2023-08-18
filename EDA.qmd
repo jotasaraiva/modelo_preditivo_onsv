@@ -1,0 +1,77 @@
+---
+title: "Análise Exploratória de Dados"
+author: "João Saraiva"
+format: html
+---
+
+## Importando bibliotecas
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(reshape2)
+```
+
+## Carregando dados
+
+```{r}
+enderecos_data <- paste(
+ "data/",
+ list.files("data/"),
+ sep = ""
+)
+
+for (k in enderecos_data) {
+  load(k)
+}
+```
+
+## Preparando labels para junção dos dataframes
+
+```{r}
+ frota_veiculos <- frota_veiculos |> 
+    rename(
+      veiculos_total = total,
+      ano = anos
+    )
+
+  pib <- pib |> 
+    rename(
+      pib = total
+    )
+```
+
+## Juntando os dataframes
+
+```{r}
+df_list <- list(
+  frota_veiculos,
+  obitos_transito,
+  pib,
+  populacao,
+  sinistros_prf,
+  tabela_condutores
+)
+
+df_total <- df_list |> 
+  reduce(full_join, by = "ano") |> 
+  relocate(ano) |> 
+  arrange(ano)
+```
+
+## Iniciando EDA
+
+```{r}
+# séries temporais em uma mesmo gráfico
+df_series <- melt(df_total, id.vars = "ano", variable.name = "series")
+
+st_todos <- ggplot(df_series, aes(ano, value)) +
+  geom_line(aes(colour = series))
+
+# séries temporais isoladas
+st_list <- list()
+for (i in colnames(df_total)) {
+  temp_plot <- ggplot(df_total, aes(x = ano))
+}
+```

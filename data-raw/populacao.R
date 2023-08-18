@@ -1,4 +1,6 @@
-anos <- seq(2006,2021,1)
+library(foreign)
+
+anos <- seq(1997,2021,1)
 
 download_datasus_ibge <- function(intervalo){
   
@@ -24,8 +26,8 @@ move_datasus_files <- function(intervalo){
     j <- i |> as.character() |> str_sub(3,4)
     
     #endereços
-    endereco <- paste("data-raw/populacao_zip/",j,".DBF",sep = "")
-    destino <- paste("data-raw/populacao/",i,".DBF",sep = "")
+    endereco <- paste("data-raw/populacao_zip/POPTBR",j,".DBF",sep = "")
+    destino <- paste("data-raw/populacao/POPTBR",i,".DBF",sep = "")
     
     #copiar para nova pasta
     file.copy(from = endereco, to = destino)

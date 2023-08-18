@@ -1,0 +1,392 @@
+---
+title: "Tratamento de Dados para Modelo Preditivo de Mortes"
+format: 
+  html:
+    execute:
+      warning: false
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(microdatasus)
+library(obsplot)
+library(knitr)
+library(readxl)
+library(foreign)
+```
+
+## Dados de mortes no trânsito (DATASUS)
+
+```{r}
+
+if (file.exists("data/datasus.rda")) {
+  load("data/datasus.rda")
+} else {
+  df_datasus <- fetch_datasus(
+    year_start = 1996,
+    year_end = 2021,
+    information_system = "SIM-DOEXT",
+    vars = c("DTOBITO","CAUSABAS")
+  )
+
+  save(df_datasus, file = "data/datasus.rda")
+}
+
+```
+
+```{r}
+st_datasus <- df_datasus |> 
+  filter(
+    str_detect(CAUSABAS, paste(paste0("V", seq(0, 8, 1)), collapse = "|"))
+  ) |> 
+  mutate(
+    datas = as.character(DTOBITO),
+    ano = as.numeric(str_sub(datas, -4, -1))
+  )
+
+# st_datasus
+knitr::kable(head(st_datasus))
+```
+
+```{r}
+obitos_ano <- st_datasus |> 
+  count(ano, name = "mortes") |> 
+  as_tibble()
+
+kable(obitos_ano)
+```
+
+```{r}
+ggplot(obitos_ano, aes(x = ano, y = obitos)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(1996, 2021, 1)) +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme_obs() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  ggtitle("Mortes no Trânsito Brasileiro")
+```
+
+## Sinistros em rodovias federais (PRF)
+
+Função de extração:
+
+```{r}
+datatran_extract <- function(df) {
+
+  acidentes <- df |> 
+  select(
+    data_inversa,
+    mortos,
+    feridos,
+    classificacao_acidente
+  ) |> 
+  mutate(
+    
+    ano = case_when(
+      is.character(data_inversa) ~ year(dmy(data_inversa)),
+      !is.character(data_inversa) ~ year(data_inversa)
+    ),
+    
+    classificacao_acidente = case_when(
+      classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos > 0 ~ "Com Vítimas Fatais",
+      classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
+      classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
+      TRUE ~ classificacao_acidente
+    )
+  )
+  
+  mortes <- acidentes |> 
+  group_by(ano) |> 
+  summarise(
+    qnt_acidentes = n(),
+    qnt_acidentes_fatais = sum(classificacao_acidente == "Com Vítimas Fatais"),
+    qnt_feridos = sum(feridos),
+    qnt_mortos = sum(mortos)
+  )
+  
+  return(mortes)
+
+}
+```
+
+Função que importa todos os anos e aplica a extração. Ao criar uma função, você não precisa se preocupar em ficar usando `rm()` no enviroment global, todo o calculo temporário fica no environemt local da função.
+
+```{r}
+
+arrange_datatran <- function() {
+  k <- seq(2007, 2021, 1)
+  enderecos_datatran <- paste(
+    "datatran/datatran", k ,"/datatran", k, ".csv", sep = ""
+  )
+  #criação de loop para a importação de todos os anos
+  for (i in enderecos_datatran) {
+    df_temp <- read_csv2(i, locale = locale(encoding = "latin1")) |>
+      datatran_extract()
+    if (exists("datatran_anos")) {
+      datatran_anos <- bind_rows(datatran_anos, df_temp)
+    } else {
+      datatran_anos <- df_temp
+    }
+  }
+  return(datatran_anos)
+}
+
+sinistros_prf <- arrange_datatran()
+```
+
+## Frota por tipo de veículo (RENAVAM)
+
+Primeiramente, cria um vetor com os endereços dos dados.
+
+```{r}
+enderecos_frota <- paste(
+  "dados_frota/frotas2000_2021/",
+  list.files("dados_frota/frotas2000_2021/"),
+  sep = ""
+)
+```
+
+Função para importar os dados. Alguns *datasets* precisam de tratamento especial devido a diferenças em formatação.
+
+```{r}
+import_frota <- function(endereco) {
+  frota <- tryCatch(
+    read_excel(endereco, sheet = 2, range = "B41:W42"),
+    error = function(e) {
+      if (str_sub(endereco, 34, 37) %in% c("2005","2004")) {
+        aux <- read_excel(endereco, sheet = 1, range = "B42:W43")
+        nomes <- aux |>
+          colnames() |>
+          toupper() 
+        nomes <- replace(nomes, nomes %in% "UTILITARIO", "UTILITÁRIO")
+        colnames(aux) <- nomes
+        return(aux)
+      } else if (str_sub(endereco, 34, 37) == "2003") {
+        # precisou alterar o formato da planilha de .xls para .xlsx 
+        # e excluir páginas vazias
+        # também é feito um subset da planilha para coletar só os totais
+        aux <- read_excel(endereco, sheet = 1, range = "B3:W33")
+        return(aux[nrow(aux), ])
+      } else if (str_sub(endereco, 34, 37) == "2002") {
+        aux <- read_excel(endereco, sheet = 1, range = "B7:W38")
+        colnames(aux) <- c(
+          "TOTAL", "AUTOMÓVEL", "BONDE", "CAMINHÃO", "CAMINHÃO TRATOR",
+          "CAMINHONETE", "CAMIONETA", "CHASSI PLATAF", "CICLOMOTOR", "MICROÔNIBUS",
+          "MOTOCICLETA", "MOTONETA", "ÔNIBUS", "QUADRICICLO", "REBOQUE",
+          "SEMIREBOQUE", "SIDECAR", "OUTROS", "TRATOR ESTEI", "TRATOR RODAS",
+          "TRICICLO","UTILITÁRIO")
+        return(aux[nrow(aux), ])
+      } else if (str_sub(endereco, 34, 37) == "2001") {
+        aux <- read_excel(endereco, sheet = 1, range = "B36:W38")
+        return(aux[nrow(aux), ])
+      } else if (str_sub(endereco, 34, 37) == "2000") {
+        aux <- read_excel(endereco, sheet = 1, range = "B36:W37")
+        return(aux[nrow(aux), ])
+      } else {
+        return(read_excel(endereco, sheet = 1, range = "B41:W42"))
+      }
+    }
+  )
+  return(frota)
+}
+```
+
+Tratando e selecionando as variáveis de interesse, inserindo na função.
+
+```{r}
+frota_extract <- function(df) {
+  # transforma dados em númerico caso estejam em formato de carácter
+  df_temp <- as.data.frame(lapply(df, as.numeric))
+  
+  res <- df_temp |> 
+    mutate(
+    automovel = AUTOMÓVEL + CAMINHONETE + CAMIONETA + UTILITÁRIO,
+    motocicleta = MOTOCICLETA + MOTONETA + CICLOMOTOR,
+    total = TOTAL
+  ) |> 
+  select(
+    automovel,
+    motocicleta,
+    total
+  )
+  
+  return(res)
+}
+```
+
+Finalizando a tabela anual através de uma última função.
+
+```{r}
+arrange_frota <- function() {
+  for(i in enderecos_frota) {
+    if ("frota_anos" |> exists()) {
+      frota_anos <- rbind(frota_anos, frota_extract(import_frota(i)))
+      anos <- append(anos, i |> str_sub(34,37) |> as.numeric())
+    } else {
+      frota_anos <- import_frota(i) |> frota_extract()
+      anos <- i |> str_sub(34,37) |> as.numeric()
+    }
+  }
+
+  frota_anos <- as_tibble(frota_anos)
+
+  frota_anos$anos <- anos
+  return(frota_anos)
+}
+
+frota_veiculos <- arrange_frota()
+
+kable(frota_veiculos)
+
+```
+
+## Número de condutores (RENACH)
+
+Importação dos endereços
+
+```{r}
+enderecos_condutores <- paste(
+  "dados_cnh/cnh_xl/",
+  list.files("dados_cnh/cnh_xl/"),
+  sep = ""
+)
+```
+
+Função que importa e trata o *dataset*
+
+```{r}
+import_cnh <- function(endereco) {
+  
+  df <- read_excel(
+    endereco,
+    range = cell_cols("N:"),
+    sheet = 1
+  )
+  
+  if (colnames(df) != "Total") {
+    df <- read_excel(
+      endereco,
+      range = cell_cols("S:"),
+      sheet = 1
+    )
+  }
+  
+  df <- df |> rename(condutores = Total)
+  qtde_condutores <- last(df)
+  
+  qtde_condutores |>
+    mutate(
+      ano = as.numeric(str_sub(endereco, 41, 44)),
+      condutores = as.numeric(condutores)
+    )
+}
+
+import_cnh(enderecos_condutores[1]) |> kable()
+
+```
+
+Script para importação de todos os anos
+
+```{r}
+extract_cnh <- function() {
+  for (i in enderecos_condutores) {
+    if ("n_condutores" |> exists()) {
+      n_condutores <- rbind(n_condutores, import_cnh(i))
+    }
+    else {
+      n_condutores <- import_cnh(i)
+    }
+  }
+  return(n_condutores)
+}
+```
+
+```{r}
+tabela_condutores <- extract_cnh()
+kable(tabela_condutores)
+```
+
+## População (IBGE)
+
+Importação dos endereços dos dados
+
+```{r}
+enderecos_pop <- paste(
+  "dados_pop/poptcu/",
+  list.files("dados_pop/poptcu/"),
+  sep = ""
+)
+```
+
+Função de importação dos *datasets*
+
+```{r}
+
+import_pop <- function(endereco) {
+  
+  df1 <- read.dbf(endereco)
+  
+  df2 <- df1 |> 
+    mutate(ano = as.numeric(as.character(ANO))) |>
+    group_by(ano) |>
+    summarise(populacao = sum(POPULACAO))
+  
+  return(df2)
+}
+
+```
+
+Função para organizar os dados em uma mesma tabela
+
+```{r}
+arrange_pop <- function() {
+  for (i in enderecos_pop) {
+    
+    if ("df_temp"|> exists()) {
+      df_temp <- rbind(df_temp, import_pop(i))
+    } else {
+      df_temp <- import_pop(i)
+    }
+  }
+  return(df_temp)
+}
+
+populacao <- arrange_pop()
+
+```
+
+## PIB (IBGE)
+
+Função de importação (não necessitou importar os caminhos dos dados pois é uma única planilha)
+
+```{r}
+endereco_pib <- "dados_pib/dados_pib/tabela2072.xlsx"
+
+import_pib <- function(path) {
+  municipios <- read_excel(path) |> 
+    drop_na() |> 
+    slice(-1)
+
+  colnames(municipios) <- c("trim_ano", "pib")
+
+  municipios <- municipios |> 
+    mutate(
+      ano = str_sub(trim_ano,14,17) |> as.numeric(),
+      trim = str_sub(trim_ano,1,1) |> as.numeric(),
+      total = pib |> as.numeric()
+    ) |> 
+    filter(
+      trim == 4
+    ) |> 
+    select(
+      total,
+      ano
+    )
+  
+  return(municipios)
+}
+
+pib <- import_pib(endereco_pib)
+```
