@@ -70,8 +70,8 @@ st_todos <- ggplot(df_series, aes(ano, value)) +
   geom_line(aes(colour = series))
 
 # séries temporais isoladas
-st_list <- list()
-for (i in colnames(df_total)) {
-  temp_plot <- ggplot(df_total, aes(x = ano))
-}
+lista_st <- list()
+ggplot(df_total ,aes(x = ano)) +
+  geom_line(aes(y = .data[["populacao"]]))
+
 ```
