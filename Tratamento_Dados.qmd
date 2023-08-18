@@ -146,7 +146,6 @@ enderecos_frota <- paste(
   list.files("dados_frota/frotas2000_2021/"),
   sep = ""
 )
-
 ```
 
 Função para importar os dados. Alguns *datasets* precisam de tratamento especial devido a diferenças em formatação.
