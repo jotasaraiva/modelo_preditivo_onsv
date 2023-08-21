@@ -11,6 +11,8 @@ library(tidyverse)
 library(ggplot2)
 library(knitr)
 library(obsplot)
+library(ggcorrplot)
+library(Hmisc)
 ```
 
 ## Carregando dados
@@ -62,7 +64,9 @@ df_total <- df_list |>
 
 ## Iniciando EDA
 
-- Veículos
+### Séries temporais
+
+-   Veículos
 
 ```{r}
 veiculos_plot <- df_total |> 
@@ -80,6 +84,7 @@ veiculos_plot <- df_total |>
 
 veiculos_plot + scale_discrete_obs()
 ```
+- Mortes no trânsito
 
 ```{r}
 mortes_plot <- ggplot(df_total, aes(x = ano, y = mortes)) +
@@ -93,6 +98,8 @@ mortes_plot <- ggplot(df_total, aes(x = ano, y = mortes)) +
 
 mortes_plot
 ```
+
+- Acidentes
 
 ```{r}
 prf_plot1 <- df_total |> 
@@ -109,7 +116,7 @@ prf_plot1 <- df_total |>
 
 prf_plot2 <- df_total |> 
   select(ano, qnt_acidentes_fatais, qnt_mortos) |> 
-  pivot_longer(-1) |>
+  pivot_longer(-1) |> 
   drop_na() |> 
   ggplot(aes(x = ano, y = value, color = name)) +
     geom_line() +
@@ -122,6 +129,78 @@ prf_plot2 <- df_total |>
 prf_plot1
 prf_plot2
 ```
+
+- PIB
+
+```{r}
+pib_plot <- df_total |> 
+  select(ano, pib) |> 
+  drop_na() |> 
+  ggplot(aes(x = ano, y = pib)) +
+    geom_line() +
+    geom_point() +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(1999,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  
+pib_plot
+```
+
+- Condutores
+
+```{r}
+condutores_plot <- df_total |> 
+  select(ano, condutores) |> 
+  drop_na() |> 
+  ggplot(aes(ano, condutores)) +
+    geom_line() +
+    geom_point() +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(1996,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  
+condutores_plot
+```
+
+### Correlograma
+
+```{r}
+cor_spearman <- df_total |> 
+  drop_na() |> 
+  cor(method = c("spearman"))
+
+cor_pearson <- df_total |> 
+  drop_na() |> 
+  cor(method = c("pearson"))
+
+cor_kendall <- df_total |> 
+  drop_na() |> 
+  cor(method = "kendall")
+```
+
+- Visualização
+
+```{r}
+ggcorrplot(cor_pearson, type = "lower",
+           lab = TRUE, hc.order = TRUE,
+           lab_size = 3)
+
+ggcorrplot(cor_spearman, type = "lower",
+           lab = TRUE, hc.order = TRUE,
+           lab_size = 3)
+
+ggcorrplot(cor_kendall, type = "lower",
+           lab = TRUE, hc.order = TRUE,
+           lab_size = 3)
+```
+### Dispersão
+
+```{r}
+
+```
+
+
+
 
 ```{r}
 
