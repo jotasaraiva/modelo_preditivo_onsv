@@ -10,9 +10,10 @@ format: html
 library(tidyverse)
 library(ggplot2)
 library(knitr)
-library(obsplot)
+library(onsvplot)
 library(ggcorrplot)
 library(Hmisc)
+library(reshape2)
 ```
 
 ## Carregando dados
@@ -84,7 +85,8 @@ veiculos_plot <- df_total |>
 
 veiculos_plot + scale_discrete_obs()
 ```
-- Mortes no trânsito
+
+-   Mortes no trânsito
 
 ```{r}
 mortes_plot <- ggplot(df_total, aes(x = ano, y = mortes)) +
@@ -99,7 +101,7 @@ mortes_plot <- ggplot(df_total, aes(x = ano, y = mortes)) +
 mortes_plot
 ```
 
-- Acidentes
+-   Acidentes
 
 ```{r}
 prf_plot1 <- df_total |> 
@@ -130,7 +132,7 @@ prf_plot1
 prf_plot2
 ```
 
-- PIB
+-   PIB
 
 ```{r}
 pib_plot <- df_total |> 
@@ -146,7 +148,7 @@ pib_plot <- df_total |>
 pib_plot
 ```
 
-- Condutores
+-   Condutores
 
 ```{r}
 condutores_plot <- df_total |> 
@@ -178,7 +180,7 @@ cor_kendall <- df_total |>
   cor(method = "kendall")
 ```
 
-- Visualização
+-   Visualização
 
 ```{r}
 ggcorrplot(cor_pearson, type = "lower",
@@ -193,16 +195,31 @@ ggcorrplot(cor_kendall, type = "lower",
            lab = TRUE, hc.order = TRUE,
            lab_size = 3)
 ```
-### Dispersão
+
+### Distribuição
 
 ```{r}
+df_total |> 
+  select(automovel, motocicleta, veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(x = value, fill = variable)) +
+    geom_density(alpha = 0.35)
 
+df_total |> 
+  select(automovel,motocicleta,veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(x = variable, y = value)) + 
+    geom_boxplot(aes(fill = variable))
 ```
-
-
-
 
 ```{r}
+df_standardized <- df_total |> 
+  scale(center = TRUE, scale = TRUE) |> 
+  as.tibble()
 
+df_standardized |> 
+  select(automovel, motocicleta, veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(x = value, fill = variable)) +
+    geom_density(alpha = 0.35)
 ```
-
