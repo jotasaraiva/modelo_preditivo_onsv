@@ -10,7 +10,7 @@ format: html
 library(tidyverse)
 library(ggplot2)
 library(knitr)
-library(reshape2)
+library(obsplot)
 ```
 
 ## Carregando dados
@@ -62,16 +62,68 @@ df_total <- df_list |>
 
 ## Iniciando EDA
 
+- Veículos
+
 ```{r}
-# séries temporais em uma mesmo gráfico
-df_series <- melt(df_total, id.vars = "ano", variable.name = "series")
+veiculos_plot <- df_total |> 
+  select(ano, automovel, motocicleta, veiculos_total) |> 
+  pivot_longer(-1) |>
+  drop_na() |> 
+  ggplot(aes(ano, value, color = name)) +
+    geom_point() +
+    geom_line() +
+    xlab("Anos") +
+    ylab("Quantidade") +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(2000,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-st_todos <- ggplot(df_series, aes(ano, value)) +
-  geom_line(aes(colour = series))
+veiculos_plot + scale_discrete_obs()
+```
 
-# séries temporais isoladas
-lista_st <- list()
-ggplot(df_total ,aes(x = ano)) +
-  geom_line(aes(y = .data[["populacao"]]))
+```{r}
+mortes_plot <- ggplot(df_total, aes(x = ano, y = mortes)) +
+  geom_line() +
+  geom_point() +
+  expand_limits(y = 0) +
+  scale_discrete_obs() +
+  scale_y_continuous(limits = c(0,NA)) +
+  scale_x_continuous(breaks = seq(1995,2021,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+mortes_plot
+```
+
+```{r}
+prf_plot1 <- df_total |> 
+  select(ano, qnt_acidentes_fatais, qnt_mortos, qnt_acidentes, qnt_feridos) |> 
+  pivot_longer(-1) |>
+  drop_na() |> 
+  ggplot(aes(x = ano, y = value, color = name)) +
+    geom_line() +
+    geom_point() +
+    scale_discrete_obs() +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(2006,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+prf_plot2 <- df_total |> 
+  select(ano, qnt_acidentes_fatais, qnt_mortos) |> 
+  pivot_longer(-1) |>
+  drop_na() |> 
+  ggplot(aes(x = ano, y = value, color = name)) +
+    geom_line() +
+    geom_point() +
+    scale_discrete_obs() +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(2006,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+prf_plot1
+prf_plot2
+```
+
+```{r}
 
 ```
+
