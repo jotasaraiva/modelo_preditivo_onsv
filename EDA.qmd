@@ -4,13 +4,17 @@ author: "João Saraiva"
 format: html
 ---
 
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 ## Importando bibliotecas
 
 ```{r}
 library(tidyverse)
 library(ggplot2)
 library(knitr)
-library(onsvplot)
+library(obsplot)
 library(ggcorrplot)
 library(Hmisc)
 library(reshape2)
@@ -198,6 +202,8 @@ ggcorrplot(cor_kendall, type = "lower",
 
 ### Distribuição
 
+-   Veículos
+
 ```{r}
 df_total |> 
   select(automovel, motocicleta, veiculos_total) |> 
@@ -210,6 +216,22 @@ df_total |>
   melt() |> 
   ggplot(aes(x = variable, y = value)) + 
     geom_boxplot(aes(fill = variable))
+
+df_total |> 
+  select(automovel,motocicleta,veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(x = value)) +
+    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    facet_wrap(vars(variable)) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+df_total |> 
+  select(automovel, motocicleta, veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(sample = value)) +
+    facet_wrap(vars(variable)) +
+    stat_qq() +
+    stat_qq_line()
 ```
 
 ```{r}
@@ -222,4 +244,54 @@ df_standardized |>
   melt() |> 
   ggplot(aes(x = value, fill = variable)) +
     geom_density(alpha = 0.35)
+
+df_standardized |> 
+  select(automovel,motocicleta,veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(x = variable, y = value)) + 
+    geom_boxplot(aes(fill = variable))
+
+df_standardized |> 
+  select(automovel,motocicleta,veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(x = value)) +
+    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    facet_wrap(vars(variable)) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+df_standardized |> 
+  select(automovel, motocicleta, veiculos_total) |> 
+  melt() |> 
+  ggplot(aes(sample = value)) +
+    facet_wrap(vars(variable)) +
+    stat_qq() +
+    stat_qq_line()
 ```
+
+- Mortes
+
+```{r}
+df_total |> 
+  ggplot(aes(x = mortes)) +
+    geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
+    geom_density(color = "red")
+
+df_total |> 
+  ggplot(aes(y = mortes)) +
+    geom_boxplot()
+
+df_total |> 
+    ggplot(aes(sample = mortes)) +
+      stat_qq() +
+      stat_qq_line()
+```
+
+- PIB
+
+```{r}
+df_total |> 
+  ggplot(aes(x = pib)) +
+    geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
+    geom_density(color = "red")
+```
+
