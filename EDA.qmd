@@ -58,7 +58,8 @@ df_list <- list(
   pib,
   populacao,
   sinistros_prf,
-  tabela_condutores
+  tabela_condutores,
+  quilometragem
 )
 
 df_total <- df_list |> 
@@ -168,6 +169,23 @@ condutores_plot <- df_total |>
 condutores_plot
 ```
 
+- Quilometragem
+
+```{r}
+quilometragem_plot <- df_total |> 
+  select(ano, quilometragem_10_bilhoes) |>
+  drop_na() |>
+  ggplot(aes(ano, quilometragem_10_bilhoes)) +
+    geom_line() +
+    geom_point() +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(1996,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+quilometragem_plot
+```
+
+
 ### Correlograma
 
 ```{r}
@@ -189,15 +207,15 @@ cor_kendall <- df_total |>
 ```{r}
 ggcorrplot(cor_pearson, type = "lower",
            lab = TRUE, hc.order = TRUE,
-           lab_size = 3)
+           lab_size = 2)
 
 ggcorrplot(cor_spearman, type = "lower",
            lab = TRUE, hc.order = TRUE,
-           lab_size = 3)
+           lab_size = 2)
 
 ggcorrplot(cor_kendall, type = "lower",
            lab = TRUE, hc.order = TRUE,
-           lab_size = 3)
+           lab_size = 2)
 ```
 
 ### Distribuição
@@ -293,5 +311,154 @@ df_total |>
   ggplot(aes(x = pib)) +
     geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
     geom_density(color = "red")
+
+df_total |> 
+  ggplot(aes(x = pib)) +
+    geom_boxplot()
+
+df_total |> 
+    ggplot(aes(sample = pib)) +
+      stat_qq() +
+      stat_qq_line()
+```
+
+- População
+
+```{r}
+df_total |> 
+  ggplot(aes(x = populacao)) +
+    geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
+    geom_density(color = "red")
+
+df_total |> 
+  ggplot(aes(x = populacao)) +
+    geom_boxplot()
+
+df_total |> 
+    ggplot(aes(sample = populacao)) +
+      stat_qq() +
+      stat_qq_line()
+```
+
+- PRF
+
+```{r}
+df_total |> 
+  select(qnt_acidentes, qnt_feridos) |> 
+  melt() |> 
+  ggplot(aes(x = value, fill = variable)) +
+    geom_density(alpha = 0.35)
+
+df_total |> 
+  select(qnt_acidentes, qnt_feridos) |> 
+  melt() |> 
+  ggplot(aes(x = variable, y = value)) + 
+    geom_boxplot(aes(fill = variable))
+
+df_total |> 
+  select(qnt_acidentes, qnt_feridos) |> 
+  melt() |> 
+  ggplot(aes(x = value)) +
+    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    facet_wrap(vars(variable)) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+df_total |> 
+  select(qnt_acidentes, qnt_feridos) |> 
+  melt() |> 
+  ggplot(aes(sample = value)) +
+    facet_wrap(vars(variable)) +
+    stat_qq() +
+    stat_qq_line()
+```
+
+```{r}
+df_total |> 
+  select(qnt_acidentes_fatais, qnt_mortos) |> 
+  melt() |> 
+  ggplot(aes(x = value, fill = variable)) +
+    geom_density(alpha = 0.35)
+
+df_total |> 
+  select(qnt_acidentes_fatais, qnt_mortos) |> 
+  melt() |> 
+  ggplot(aes(x = variable, y = value)) + 
+    geom_boxplot(aes(fill = variable))
+
+df_total |> 
+  select(qnt_acidentes_fatais, qnt_mortos) |> 
+  melt() |> 
+  ggplot(aes(x = value)) +
+    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    facet_wrap(vars(variable)) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+df_total |> 
+  select(qnt_acidentes_fatais, qnt_mortos) |> 
+  melt() |> 
+  ggplot(aes(sample = value)) +
+    facet_wrap(vars(variable)) +
+    stat_qq() +
+    stat_qq_line()
+```
+
+- Condutores
+
+```{r}
+df_total |> 
+  ggplot(aes(x = condutores)) +
+    geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
+    geom_density(color = "red")
+
+df_total |> 
+  ggplot(aes(y = condutores)) +
+    geom_boxplot()
+
+df_total |> 
+    ggplot(aes(sample = condutores)) +
+      stat_qq() +
+      stat_qq_line()
+```
+
+- Quilometragem
+
+```{r}
+df_total |> 
+  ggplot(aes(x = quilometragem_10_bilhoes)) +
+    geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
+    geom_density(color = "red")
+
+df_total |> 
+  ggplot(aes(y = quilometragem_10_bilhoes)) +
+    geom_boxplot()
+
+df_total |> 
+    ggplot(aes(sample = quilometragem_10_bilhoes)) +
+      stat_qq() +
+      stat_qq_line()
+```
+
+
+### Mortes por bilhão
+
+```{r}
+mortes_hab <- df_total |> 
+  select(ano, mortes, populacao) |> 
+  drop_na() |> 
+  mutate(mortos_por_pop = mortes / populacao * 100000)
+
+mortes_hab |> 
+  ggplot(aes(x = ano, y = mortos_por_pop)) +
+    geom_line() +
+    geom_point() +
+    scale_y_continuous(limits = c(0,NA)) +
+    scale_x_continuous(breaks = seq(1996,2021,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+mortes_hab |> 
+  ggplot(aes(x = mortos_por_pop)) +
+    geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
+    geom_density(color = "red")
+  
 ```
 
