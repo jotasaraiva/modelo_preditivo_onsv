@@ -16,8 +16,8 @@ library(ggplot2)
 library(knitr)
 library(obsplot)
 library(ggcorrplot)
-library(Hmisc)
 library(reshape2)
+library(here)
 ```
 
 ## Carregando dados
@@ -28,6 +28,8 @@ enderecos_data <- paste(
  list.files("data/"),
  sep = ""
 )
+
+map_df(enderecos_data, ~load(file = .x))
 
 for (k in enderecos_data) {
   load(k)
