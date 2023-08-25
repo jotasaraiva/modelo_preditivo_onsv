@@ -16,8 +16,12 @@ library(ggplot2)
 library(knitr)
 library(obsplot)
 library(ggcorrplot)
-library(Hmisc)
 library(reshape2)
+library(here)
+library(camcorder)
+
+theme_set(theme_obs())
+options(scipen = 999999)
 ```
 
 ## Carregando dados
@@ -72,7 +76,7 @@ df_total <- df_list |>
 
 ### Séries temporais
 
--   Veículos
+- Veículos
 
 ```{r}
 veiculos_plot <- df_total |> 
@@ -84,11 +88,13 @@ veiculos_plot <- df_total |>
     geom_line() +
     xlab("Anos") +
     ylab("Quantidade") +
-    scale_y_continuous(limits = c(0,NA)) +
-    scale_x_continuous(breaks = seq(2000,2021,1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(breaks = seq(2000, 2021, 1)) +
+    theme_obs() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 veiculos_plot + scale_discrete_obs()
+
 ```
 
 -   Mortes no trânsito
@@ -97,11 +103,11 @@ veiculos_plot + scale_discrete_obs()
 mortes_plot <- ggplot(df_total, aes(x = ano, y = mortes)) +
   geom_line() +
   geom_point() +
-  expand_limits(y = 0) +
   scale_discrete_obs() +
-  scale_y_continuous(limits = c(0,NA)) +
-  scale_x_continuous(breaks = seq(1995,2021,1)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  scale_y_continuous(limits = c(0, NA)) +
+  scale_x_continuous(breaks = seq(1995, 2021, 1)) +
+  theme_obs() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 mortes_plot
 ```
@@ -110,16 +116,16 @@ mortes_plot
 
 ```{r}
 prf_plot1 <- df_total |> 
-  select(ano, qnt_acidentes_fatais, qnt_mortos, qnt_acidentes, qnt_feridos) |> 
+  select(ano, qnt_acidentes_fatais, qnt_mortos, qnt_acidentes, qnt_feridos) |>
   pivot_longer(-1) |>
   drop_na() |> 
   ggplot(aes(x = ano, y = value, color = name)) +
     geom_line() +
     geom_point() +
     scale_discrete_obs() +
-    scale_y_continuous(limits = c(0,NA)) +
-    scale_x_continuous(breaks = seq(2006,2021,1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(breaks = seq(2006, 2021, 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 prf_plot2 <- df_total |> 
   select(ano, qnt_acidentes_fatais, qnt_mortos) |> 
@@ -131,7 +137,7 @@ prf_plot2 <- df_total |>
     scale_discrete_obs() +
     scale_y_continuous(limits = c(0,NA)) +
     scale_x_continuous(breaks = seq(2006,2021,1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 prf_plot1
 prf_plot2
@@ -146,12 +152,51 @@ pib_plot <- df_total |>
   ggplot(aes(x = ano, y = pib)) +
     geom_line() +
     geom_point() +
-    scale_y_continuous(limits = c(0,NA)) +
-    scale_x_continuous(breaks = seq(1999,2021,1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    scale_y_continuous(
+      limits = c(0,NA),
+      labels = scales::dollar_format(
+        prefix = "R$",
+        big.mark = ".",
+        decimal.mark = ","
+      )
+    ) +
+    scale_x_continuous(breaks = seq(1999, 2022, 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
   
 pib_plot
 ```
+
+```{r}
+# gg_record(
+#   width = 6,
+#   height = 4,
+#   device = "png",
+#   dpi = 300
+# )
+
+pib_mortes_plot <- ggplot(df_total, aes(x = mortes, y = pib)) + 
+  geom_point(color = obs_palette$red) + 
+  geom_text(aes(label = ano), nudge_y = 100000, size = 2.5) +
+  scale_y_continuous(
+    limits = c(0, NA),
+    labels = scales::dollar_format(
+        prefix = "R$ ",
+        big.mark = ".",
+        decimal.mark = ","
+    )
+  ) +
+  scale_x_continuous(
+    labels = scales::number_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  labs(x = "Quantidade de mortes", y = "PIB anual (em milhões de R$)") +
+  theme(
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 9)
+  )
+
+# ggsave(filename = "pib_mortes_plot.png", plot = pib_mortes_plot, dpi = 300, width = 6, height = 4, device = "png")
+```
+
 
 -   Condutores
 
@@ -163,8 +208,8 @@ condutores_plot <- df_total |>
     geom_line() +
     geom_point() +
     scale_y_continuous(limits = c(0,NA)) +
-    scale_x_continuous(breaks = seq(1996,2021,1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    scale_x_continuous(breaks = seq(1996,2022,1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
   
 condutores_plot
 ```
@@ -178,8 +223,8 @@ quilometragem_plot <- df_total |>
   ggplot(aes(ano, quilometragem_10_bilhoes)) +
     geom_line() +
     geom_point() +
-    scale_y_continuous(limits = c(0,NA)) +
-    scale_x_continuous(breaks = seq(1996,2021,1)) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(breaks = seq(1996, 2021, 1)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 quilometragem_plot
@@ -205,9 +250,13 @@ cor_kendall <- df_total |>
 -   Visualização
 
 ```{r}
-ggcorrplot(cor_pearson, type = "lower",
-           lab = TRUE, hc.order = TRUE,
-           lab_size = 2)
+ggcorrplot(
+  cor_pearson,
+  type = "lower",
+  lab = TRUE,
+  hc.order = TRUE,
+  lab_size = 2
+)
 
 ggcorrplot(cor_spearman, type = "lower",
            lab = TRUE, hc.order = TRUE,
@@ -239,7 +288,7 @@ df_total |>
   select(automovel,motocicleta,veiculos_total) |> 
   melt() |> 
   ggplot(aes(x = value)) +
-    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    geom_histogram(bins = 15, color = "black", fill = obs_palette$red) +
     facet_wrap(vars(variable)) +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
@@ -459,6 +508,8 @@ mortes_hab |>
   ggplot(aes(x = mortos_por_pop)) +
     geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
     geom_density(color = "red")
+
+
   
 ```
 
