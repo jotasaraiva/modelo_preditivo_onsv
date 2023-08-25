@@ -12,8 +12,6 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ```{r}
 library(tidyverse)
-library(ggplot2)
-library(knitr)
 library(obsplot)
 library(ggcorrplot)
 library(reshape2)
@@ -28,8 +26,9 @@ options(scipen = 999999)
 
 ```{r}
 enderecos_data <- paste(
- "data/",
- list.files("data/"),
+ here("data/"),
+ "/",
+ list.files(here("data/")),
  sep = ""
 )
 
@@ -70,6 +69,18 @@ df_total <- df_list |>
   reduce(full_join, by = "ano") |> 
   relocate(ano) |> 
   arrange(ano)
+```
+
+## Calculando mortes por 100.000 habitantes e juntando no dataframe
+
+```{r}
+mortes_hab <- df_total |> 
+  select(ano, mortes, populacao) |> 
+  drop_na() |> 
+  mutate(mortos_por_pop = mortes / populacao * 100000) |> 
+  select(ano, mortos_por_pop)
+
+df_total <- left_join(df_total, mortes_hab, by = "ano")
 ```
 
 ## Iniciando EDA
@@ -488,14 +499,9 @@ df_total |>
 ```
 
 
-### Mortes por bilhão
+### Mortes por 100.000 habitantes
 
 ```{r}
-mortes_hab <- df_total |> 
-  select(ano, mortes, populacao) |> 
-  drop_na() |> 
-  mutate(mortos_por_pop = mortes / populacao * 100000)
-
 mortes_hab |> 
   ggplot(aes(x = ano, y = mortos_por_pop)) +
     geom_line() +
