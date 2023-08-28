@@ -1,0 +1,30 @@
+---
+title: "Modelo de Regressão Linear Múltipla"
+format: html
+editor: visual
+---
+
+# Importando pacotes
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(here)
+tidymodels_prefer()
+```
+
+# Importando dados
+
+```{r}
+load(here("data","tabela_total.rda"))
+```
+
+# Criando `recipe()` para preprocessamento
+
+```{r}
+receita_mortes <- df_total |> 
+  recipe(mortes ~ .) |> 
+  step_rm(mortos_por_pop)
+
+receita_mortes
+```

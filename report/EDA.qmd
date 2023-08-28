@@ -40,16 +40,16 @@ for (k in enderecos_data) {
 ## Preparando labels para junção dos dataframes
 
 ```{r}
- frota_veiculos <- frota_veiculos |> 
-    rename(
-      veiculos_total = total,
-      ano = anos
-    )
+frota_veiculos <- frota_veiculos |> 
+   rename(
+     veiculos_total = total,
+     ano = anos
+   )
 
-  pib <- pib |> 
-    rename(
-      pib = total
-    )
+pib <- pib |> 
+  rename(
+    pib = total
+  )
 ```
 
 ## Juntando os dataframes
@@ -71,7 +71,7 @@ df_total <- df_list |>
   arrange(ano)
 ```
 
-## Calculando mortes por 100.000 habitantes e juntando no dataframe
+## Calculando mortes por 100.000 habitantes e juntando ao dataframe
 
 ```{r}
 mortes_hab <- df_total |> 
@@ -81,6 +81,8 @@ mortes_hab <- df_total |>
   select(ano, mortos_por_pop)
 
 df_total <- left_join(df_total, mortes_hab, by = "ano")
+
+save(df_total, file = here("data","tabela_total.rda"))
 ```
 
 ## Iniciando EDA
@@ -241,6 +243,19 @@ quilometragem_plot <- df_total |>
 quilometragem_plot
 ```
 
+- Mortos por 100.000 habitantes
+
+```{r}
+df_total |> 
+  select(ano, mortos_por_pop) |>
+  drop_na() |>
+  ggplot(aes(ano, mortos_por_pop)) +
+    geom_line() +
+    geom_point() +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(breaks = seq(1996, 2021, 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
 
 ### Correlograma
 
@@ -299,7 +314,7 @@ df_total |>
   select(automovel,motocicleta,veiculos_total) |> 
   melt() |> 
   ggplot(aes(x = value)) +
-    geom_histogram(bins = 15, color = "black", fill = obs_palette$red) +
+    geom_histogram(bins = 15, color = "black", fill = obs_palette$blue) +
     facet_wrap(vars(variable)) +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
@@ -333,7 +348,7 @@ df_standardized |>
   select(automovel,motocicleta,veiculos_total) |> 
   melt() |> 
   ggplot(aes(x = value)) +
-    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    geom_histogram(bins = 15, color = "black", fill = obs_palette$blue) +
     facet_wrap(vars(variable)) +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
@@ -419,7 +434,7 @@ df_total |>
   select(qnt_acidentes, qnt_feridos) |> 
   melt() |> 
   ggplot(aes(x = value)) +
-    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    geom_histogram(bins = 15, color = "black", fill = obs_palette$blue) +
     facet_wrap(vars(variable)) +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
@@ -449,7 +464,7 @@ df_total |>
   select(qnt_acidentes_fatais, qnt_mortos) |> 
   melt() |> 
   ggplot(aes(x = value)) +
-    geom_histogram(bins = 15, color = "black", fill = "yellow") +
+    geom_histogram(bins = 15, color = "black", fill = obs_palette$blue) +
     facet_wrap(vars(variable)) +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
@@ -499,23 +514,21 @@ df_total |>
 ```
 
 
-### Mortes por 100.000 habitantes
+- Mortes por 100.000 habitantes
 
 ```{r}
-mortes_hab |> 
-  ggplot(aes(x = ano, y = mortos_por_pop)) +
-    geom_line() +
-    geom_point() +
-    scale_y_continuous(limits = c(0,NA)) +
-    scale_x_continuous(breaks = seq(1996,2021,1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-mortes_hab |> 
+df_total |> 
   ggplot(aes(x = mortos_por_pop)) +
     geom_histogram(aes(y = ..density..), bins = 15, color = "blue", fill = "lightblue") +
     geom_density(color = "red")
 
+df_total |> 
+  ggplot(aes(y = mortos_por_pop)) +
+    geom_boxplot()
 
+df_total |> 
+    ggplot(aes(sample = mortos_por_pop)) +
+      stat_qq() +
+      stat_qq_line()
   
 ```
-
