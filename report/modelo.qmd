@@ -4,27 +4,79 @@ format: html
 editor: visual
 ---
 
-# Importando pacotes
+## Importando pacotes
 
 ```{r}
 library(tidyverse)
 library(tidymodels)
 library(here)
+library(knitr)
 tidymodels_prefer()
 ```
 
-# Importando dados
+## Importando dados
 
 ```{r}
 load(here("data","tabela_total.rda"))
 ```
 
-# Criando `recipe()` para preprocessamento
+## Pré-processamento
+
+A função `recipe()` cria uma "receita" parametrizada para os passos de pré-processamento, retornando um objeto *recipe*. Esta receita passa as instruções de cada passo utilizado para tratar o dataset, podendo ser utilizado em outros modelos posteriormente.
 
 ```{r}
 receita_mortes <- df_total |> 
   recipe(mortes ~ .) |> 
-  step_rm(mortos_por_pop)
+  step_rm(mortos_por_pop) |> 
+  step_naomit(all_numeric())
+  
 
 receita_mortes
+```
+
+A função `prep()` retorna um objeto com todos o passos do pré-processamento e estimativas necessárias baseada nos dados fornecidos. Com `retain = TRUE` o objeto armazena o dataset que utilizou para ser calibrado.
+
+```{r}
+receita_mortes_prep <- prep(receita_mortes, training = df_total, retain = TRUE)
+
+receita_mortes_prep
+```
+As funções `bake()` e `juice()` retornam datasets tratados com a receita de formas diferentes. 
+
+```{r}
+df_mortes_preprocessado <- bake(receita_mortes_prep, new_data = NULL)
+
+df_mortes_preprocessado |> kable()
+```
+
+## Criando o modelo
+
+Modelo de regressão linear multivariada generalizado
+
+```{r}
+modelo_linear <- 
+  linear_reg() |> 
+  set_engine("glm")
+
+modelo_linear |> translate()
+```
+
+Criando um workdflow com a receita e o modelo. O workflow aceita um método fit, onde o modelo pode ser ajustado e o dataframe pré-processado diretamente no workflow.
+
+```{r}
+mortes_wflow <- 
+  workflow() |> 
+  add_recipe(receita_mortes) |> 
+  add_model(modelo_linear)
+
+mortes_wflow_ajustado <- mortes_wflow |> fit(df_total)
+  
+previsao <- mortes_wflow_ajustado |> predict(df_total)
+
+df_total_previsto <- cbind(df_total, previsao)
+
+df_total_previsto |> 
+  ggplot(aes(x = ano)) +
+    geom_line(aes(y = .pred, color = "red")) +
+    geom_point(aes(y = mortes))
 ```
