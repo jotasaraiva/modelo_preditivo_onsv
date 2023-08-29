@@ -12,6 +12,7 @@ library(tidymodels)
 library(here)
 library(knitr)
 tidymodels_prefer()
+options(scipen = 999)
 ```
 
 ## Importando dados
@@ -27,7 +28,7 @@ A função `recipe()` cria uma "receita" parametrizada para os passos de pré-pr
 ```{r}
 receita_mortes <- df_total |> 
   recipe(mortes ~ .) |> 
-  step_rm(mortos_por_pop) |> 
+  step_rm(mortos_por_pop, ano) |>
   step_naomit(all_numeric())
   
 
@@ -47,6 +48,16 @@ As funções `bake()` e `juice()` retornam datasets tratados com a receita de fo
 df_mortes_preprocessado <- bake(receita_mortes_prep, new_data = NULL)
 
 df_mortes_preprocessado |> kable()
+```
+
+## Estabelecendo métricas
+
+O pacote `yardstick` permite criar um conjunto de métricas para ser utilizadas em um modelo em um mesmo objeto.
+
+```{r}
+metricas <- metric_set(rmse, mae, rsq)
+
+metricas
 ```
 
 ## Criando o modelo
@@ -71,12 +82,93 @@ mortes_wflow <-
 
 mortes_wflow_ajustado <- mortes_wflow |> fit(df_total)
   
-previsao <- mortes_wflow_ajustado |> predict(df_total)
+mortes_previsao <- mortes_wflow_ajustado |> predict(df_total) |> rename(mortes_pred = .pred)
 
-df_total_previsto <- cbind(df_total, previsao)
-
-df_total_previsto |> 
-  ggplot(aes(x = ano)) +
-    geom_line(aes(y = .pred, color = "red")) +
-    geom_point(aes(y = mortes))
+mortes_previsto <- cbind(df_total, mortes_previsao)
 ```
+
+```{r}
+mortes_previsto |> 
+  ggplot(aes(x = ano)) +
+    geom_text(aes(label = ano, y = mortes), nudge_y = 1000, size = 2.5) +
+    geom_point(aes(y = mortes)) +
+    geom_line(aes(y = mortes)) +
+    geom_point(aes(y = mortes_pred), color = "red")
+   
+```
+
+```{r}
+mortes_wflow_ajustado |> tidy()
+```
+
+```{r}
+metricas(data = mortes_previsto, truth = mortes, estimate = mortes_pred)
+```
+
+# Modelo com normalização
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(here)
+library(knitr)
+tidymodels_prefer()
+options(scipen = 999)
+```
+
+```{r}
+load(here("data","tabela_total.rda"))
+```
+
+```{r}
+metricas <- metric_set(rmse, mae, rsq)
+
+receita_norm <- df_total |> 
+  recipe(mortes ~ 
+           automovel + 
+           motocicleta + 
+           veiculos_total + 
+           pib + 
+           populacao +
+           ano
+  ) |>
+  step_naomit(all_numeric()) |> 
+  step_normalize()
+
+modelo_linear_norm <- 
+  linear_reg() |> 
+  set_engine("lm")
+
+lm_wflow_norm <- 
+  workflow() |> 
+  add_recipe(receita_norm) |> 
+  add_model(modelo_linear_norm)
+
+lm_wflow_norm_fit <- fit(lm_wflow_norm, df_total)
+
+pred_norm <-
+  lm_wflow_norm_fit |> 
+  predict(df_total) |> 
+  rename(mortes_previstas = .pred)
+
+df_pred_norm <- 
+  cbind(df_total, pred_norm)
+
+df_pred_norm |> 
+  ggplot(aes(x = ano)) +
+    geom_text(aes(label = ano, y = mortes), nudge_y = 1000, size = 2.5) +
+    geom_point(aes(y = mortes)) +
+    geom_line(aes(y = mortes)) +
+    geom_point(aes(y = mortes_previstas), color = "red") +
+    geom_smooth(aes(y = mortes_previstas))
+```
+
+```{r}
+metricas(df_pred_norm, mortes, mortes_previstas)
+```
+
+
+```{r}
+lm_wflow_norm_fit |> tidy()
+```
+
