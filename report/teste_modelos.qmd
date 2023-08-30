@@ -24,52 +24,38 @@ load(here("data","tabela_total.rda"))
 ## Receitas
 
 ```{r}
-receita_1 <- df_total |> 
-  recipe(mortes ~ 
-           automovel +
-           motocicleta +
-           veiculos_total +
-           pib +
-           populacao +
-           qnt_acidentes +
-           qnt_feridos +
-           qnt_acidentes_fatais +
-           condutores
+receita_mortes <- df_total |> 
+  recipe(
+    mortes ~ 
+      automovel +
+      motocicleta +
+      veiculos_total +
+      pib +
+      populacao +
+      qnt_acidentes +
+      qnt_feridos +
+      qnt_acidentes_fatais +
+      qnt_mortos +
+      condutores +
+      quilometragem_10_bilhoes
   ) |> 
   step_naomit(all_numeric()) |>
   step_normalize(all_numeric_predictors())
 
-receita_2 <- df_total |> 
-  recipe(mortos_por_pop ~ 
-           automovel +
-           motocicleta +
-           veiculos_total +
-           pib +
-           populacao
-  ) |> 
-  step_naomit(all_numeric()) |>
-  step_normalize(all_numeric_predictors())
-
-receita_3 <- df_total |> 
-  recipe(mortes ~
-           qnt_acidentes +
-           qnt_acidentes_fatais +
-           qnt_mortos + 
-           qnt_feridos +
-           condutores +
-           quilometragem_10_bilhoes
-  ) |> 
-  step_naomit(all_numeric()) |>
-  step_normalize(all_numeric_predictors())
-
-receita_4 <- df_total |> 
-  recipe(mortos_por_pop ~
-           qnt_acidentes +
-           qnt_acidentes_fatais +
-           qnt_mortos + 
-           qnt_feridos +
-           condutores +
-           quilometragem_10_bilhoes
+receita_taxa <- df_total |> 
+  recipe(
+    mortos_por_pop ~ 
+      automovel +
+      motocicleta +
+      veiculos_total +
+      pib +
+      populacao +
+      qnt_acidentes +
+      qnt_feridos +
+      qnt_acidentes_fatais +
+      qnt_mortos +
+      condutores +
+      quilometragem_10_bilhoes
   ) |> 
   step_naomit(all_numeric()) |>
   step_normalize(all_numeric_predictors())
@@ -97,11 +83,11 @@ modelo_randforest <- rand_forest(
 
 ```{r}
 linear_wflow <- workflow() |> 
-  add_recipe(receita_1) |> 
+  add_recipe(receita_mortes) |> 
   add_model(modelo_linear_lm)
 
 randforest_wflow <- workflow() |> 
-  add_recipe(receita_1) |> 
+  add_recipe(receita_mortes) |> 
   add_model(modelo_randforest)
 ```
 
@@ -124,6 +110,7 @@ linear_pred <- linear_wflow_fit |>
 
 randforest_pred <- randforest_wflow_fit |> 
   predict(df_total |> drop_na())
+randforest_pred <- cbind(randforest_pred, df_total |> drop_na())
 ```
 
 ## Avaliação
@@ -133,16 +120,36 @@ metricas(linear_pred, mortes, .pred)
 linear_wflow_fit |> tidy()
 ```
 
+```{r}
+metricas(randforest_pred, mortes, .pred)
+randforest_wflow_fit
+```
+
 ## Visualização
 
 ```{r}
 linear_pred |> 
   ggplot(aes(x = ano, y = mortes)) +
+    geom_line() +
     geom_point() +
-    geom_point(aes(y = .pred), color = "red") +
-    geom_smooth(aes(y = .pred), color = "red")
+    geom_line(aes(y = .pred), color = "red") +
+    geom_point(aes(y = .pred), color = "red")
 
 linear_pred |> 
+  ggplot(aes(x = mortes, y = .pred)) +
+    geom_point() +
+    geom_abline(intercept = 0, slope = 1, color = "red")
+```
+
+```{r}
+randforest_pred |> 
+  ggplot(aes(x = ano, y = mortes)) +
+    geom_line() +
+    geom_point() +
+    geom_line(aes(y = .pred), color = "red") +
+    geom_point(aes(y = .pred), color = "red")
+
+randforest_pred |> 
   ggplot(aes(x = mortes, y = .pred)) +
     geom_point() +
     geom_abline(intercept = 0, slope = 1, color = "red")
