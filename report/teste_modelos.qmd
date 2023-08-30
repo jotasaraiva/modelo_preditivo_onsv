@@ -1,0 +1,135 @@
+---
+title: "Teste de Modelos"
+format: html
+editor: visual
+---
+
+Testar diferentes modelos e receitas de pré-processamento para melhorar o desempenho
+
+## Setup e Importação
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(here)
+library(knitr)
+tidymodels_prefer()
+options(scipen = 999)
+```
+
+```{r}
+load(here("data","tabela_total.rda"))
+```
+
+## Receitas
+
+```{r}
+receita_1 <- df_total |> 
+  recipe(mortes ~ 
+           automovel +
+           motocicleta +
+           veiculos_total +
+           pib +
+           populacao +
+           qnt_acidentes +
+           qnt_feridos +
+           qnt_acidentes_fatais +
+           condutores
+  ) |> 
+  step_naomit(all_numeric()) |>
+  step_normalize(all_numeric_predictors())
+
+receita_2 <- df_total |> 
+  recipe(mortos_por_pop ~ 
+           automovel +
+           motocicleta +
+           veiculos_total +
+           pib +
+           populacao
+  ) |> 
+  step_naomit(all_numeric()) |>
+  step_normalize(all_numeric_predictors())
+
+receita_3 <- df_total |> 
+  recipe(mortes ~
+           qnt_acidentes +
+           qnt_acidentes_fatais +
+           qnt_mortos + 
+           qnt_feridos +
+           condutores +
+           quilometragem_10_bilhoes
+  ) |> 
+  step_naomit(all_numeric()) |>
+  step_normalize(all_numeric_predictors())
+
+receita_4 <- df_total |> 
+  recipe(mortos_por_pop ~
+           qnt_acidentes +
+           qnt_acidentes_fatais +
+           qnt_mortos + 
+           qnt_feridos +
+           condutores +
+           quilometragem_10_bilhoes
+  ) |> 
+  step_naomit(all_numeric()) |>
+  step_normalize(all_numeric_predictors())
+```
+
+## Métricas
+
+```{r}
+metricas <- metric_set(rmse, mae, rsq)
+```
+
+## Modelos
+
+```{r}
+modelo_linear_lm <- linear_reg() |> set_engine("lm")
+```
+
+## Workflows
+
+```{r}
+linear_wflow_1 <- workflow() |> 
+  add_recipe(receita_1) |> 
+  add_model(modelo_linear_lm)
+```
+
+## Treinamento
+
+```{r}
+linear_wflow_1_fit <- linear_wflow_1 |> 
+  fit(df_total)
+```
+
+## Predição
+
+```{r}
+linear_pred <- linear_wflow_1_fit |> 
+  predict(df_total) |> 
+  cbind(df_total)
+```
+
+## Avaliação
+
+```{r}
+metricas(linear_pred, mortes, .pred)
+
+linear_wflow_1_fit |> tidy()
+```
+
+## Visualização
+
+```{r}
+linear_pred |> 
+  ggplot(aes(x = ano, y = mortes)) +
+    geom_point() +
+    geom_point(aes(y = .pred), color = "red") +
+    geom_smooth(aes(y = .pred), color = "red")
+
+linear_pred |> 
+  ggplot(aes(x = mortes, y = .pred)) +
+    geom_point() +
+    geom_abline(intercept = 0, slope = 1, color = "red")
+```
+

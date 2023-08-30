@@ -129,8 +129,7 @@ receita_norm <- df_total |>
            motocicleta + 
            veiculos_total + 
            pib + 
-           populacao +
-           ano
+           populacao
   ) |>
   step_naomit(all_numeric()) |> 
   step_normalize()
@@ -170,5 +169,56 @@ metricas(df_pred_norm, mortes, mortes_previstas)
 
 ```{r}
 lm_wflow_norm_fit |> tidy()
+```
+
+```{r}
+metricas <- metric_set(rmse, mae, rsq)
+
+receita_norm <- df_total |> 
+  recipe(mortos_por_pop ~ 
+           automovel + 
+           motocicleta + 
+           veiculos_total + 
+           pib + 
+           populacao
+  ) |>
+  step_naomit(all_numeric()) |> 
+  step_normalize()
+
+modelo_linear_norm <- 
+  linear_reg() |> 
+  set_engine("lm")
+
+lm_wflow_norm <- 
+  workflow() |> 
+  add_recipe(receita_norm) |> 
+  add_model(modelo_linear_norm)
+
+lm_wflow_norm_fit <- fit(lm_wflow_norm, df_total)
+
+pred_norm <-
+  lm_wflow_norm_fit |> 
+  predict(df_total) |> 
+  rename(mortes_previstas = .pred)
+
+df_pred_norm <- 
+  cbind(df_total, pred_norm)
+
+df_pred_norm |> 
+  ggplot(aes(x = ano)) +
+    geom_text(aes(label = ano, y = mortos_por_pop), size = 2.5) +
+    geom_point(aes(y = mortos_por_pop)) +
+    geom_line(aes(y = mortos_por_pop)) +
+    geom_point(aes(y = mortes_previstas), color = "red") +
+    geom_smooth(aes(y = mortes_previstas))
+```
+
+```{r}
+lm_wflow_norm_fit |> tidy()
+```
+
+
+```{r}
+metricas(df_pred_norm, mortos_por_pop, mortes_previstas)
 ```
 
