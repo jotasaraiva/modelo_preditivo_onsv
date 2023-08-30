@@ -85,37 +85,52 @@ metricas <- metric_set(rmse, mae, rsq)
 
 ```{r}
 modelo_linear_lm <- linear_reg() |> set_engine("lm")
+
+modelo_randforest <- rand_forest(
+  mode = "regression",
+  mtry = 3,
+  trees = 1000
+) |> set_engine("ranger")
 ```
 
 ## Workflows
 
 ```{r}
-linear_wflow_1 <- workflow() |> 
+linear_wflow <- workflow() |> 
   add_recipe(receita_1) |> 
   add_model(modelo_linear_lm)
+
+randforest_wflow <- workflow() |> 
+  add_recipe(receita_1) |> 
+  add_model(modelo_randforest)
 ```
 
 ## Treinamento
 
 ```{r}
-linear_wflow_1_fit <- linear_wflow_1 |> 
+linear_wflow_fit <- linear_wflow |> 
+  fit(df_total)
+
+randforest_wflow_fit <- randforest_wflow |> 
   fit(df_total)
 ```
 
 ## Predição
 
 ```{r}
-linear_pred <- linear_wflow_1_fit |> 
+linear_pred <- linear_wflow_fit |> 
   predict(df_total) |> 
   cbind(df_total)
+
+randforest_pred <- randforest_wflow_fit |> 
+  predict(df_total |> drop_na())
 ```
 
 ## Avaliação
 
 ```{r}
 metricas(linear_pred, mortes, .pred)
-
-linear_wflow_1_fit |> tidy()
+linear_wflow_fit |> tidy()
 ```
 
 ## Visualização
