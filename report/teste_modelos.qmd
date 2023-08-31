@@ -27,17 +27,7 @@ load(here("data","tabela_total.rda"))
 receita_mortes <- df_total |> 
   recipe(
     mortes ~ 
-      automovel +
-      motocicleta +
-      veiculos_total +
-      pib +
-      populacao +
-      qnt_acidentes +
-      qnt_feridos +
-      qnt_acidentes_fatais +
-      qnt_mortos +
-      condutores +
-      quilometragem_10_bilhoes
+      qnt_acidentes
   ) |> 
   step_naomit(all_numeric()) |>
   step_normalize(all_numeric_predictors())
