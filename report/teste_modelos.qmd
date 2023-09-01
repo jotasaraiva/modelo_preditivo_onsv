@@ -1,10 +1,10 @@
 ---
-title: "Teste de Modelos"
+title: "Análise e Teste de Modelos"
 format: html
 editor: visual
 ---
 
-Testar diferentes modelos e receitas de pré-processamento para melhorar o desempenho
+Testar diferentes métodos de regressão e técnicas de pré-processamento para melhorar o desempenho do modelo final
 
 ## Setup e Importação
 
@@ -19,14 +19,37 @@ options(scipen = 999)
 
 ```{r}
 load(here("data","tabela_total.rda"))
+load("metricas_de_erro.rda")
+load("pvalores.rda")
 ```
+
+## Análise das métricas e p-valores
+
+O script calcula RMSE, MAE, R2 e p-valores para modelos lineares simples afim de demonstrar quais variáveis têm maior grau de influência sobre as mortes
+
+```{r}
+pvalores |> 
+  ggplot(aes(x = term, y = p.value)) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = 0.05) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    xlab("Variáveis") +
+    ylab("P-valores") +
+    coord_flip()
+```
+
+```{r}
+
+```
+
+
 
 ## Receitas
 
 ```{r}
 receita_mortes <- df_total |> 
   recipe(
-    mortes ~ quilometragem_10_bilhoes
+    mortes ~ automovel
   ) |> 
   step_naomit(all_numeric()) |>
   step_normalize(all_numeric_predictors())
@@ -143,4 +166,3 @@ randforest_pred |>
     geom_point() +
     geom_abline(intercept = 0, slope = 1, color = "red")
 ```
-

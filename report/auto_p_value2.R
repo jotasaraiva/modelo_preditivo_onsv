@@ -53,3 +53,7 @@ erros_pivot <- erros |>
 pvalores <- pvalores |> 
   filter(term != "(Intercept)") |> 
   arrange(p.value)
+
+save(erros_pivot, file = here("report","metricas_de_erro.rda"))
+
+save(pvalores, file = here("report","pvalores.rda"))
