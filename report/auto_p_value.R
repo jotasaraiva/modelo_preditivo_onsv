@@ -33,7 +33,7 @@ for (i in colnames(df_total)) {
 }
 
 
-p_valores <- filter(p_valores, term != "(Intercept)") |> arrange(p.value)
+p_valores <- filter(p_valores, term != "(Intercept)")
 
 menor_pvalor <- filter(p_valores, p.value == min(p.value))
 

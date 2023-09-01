@@ -26,8 +26,7 @@ load(here("data","tabela_total.rda"))
 ```{r}
 receita_mortes <- df_total |> 
   recipe(
-    mortes ~ 
-      qnt_acidentes
+    mortes ~ quilometragem_10_bilhoes
   ) |> 
   step_naomit(all_numeric()) |>
   step_normalize(all_numeric_predictors())
