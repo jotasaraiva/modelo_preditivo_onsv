@@ -13,6 +13,7 @@ library(tidyverse)
 library(tidymodels)
 library(here)
 library(knitr)
+library(onsvplot)
 tidymodels_prefer()
 options(scipen = 999)
 ```
@@ -28,21 +29,21 @@ load("pvalores.rda")
 O script calcula RMSE, MAE, R2 e p-valores para modelos lineares simples afim de demonstrar quais variáveis têm maior grau de influência sobre as mortes
 
 ```{r}
-pvalores |> 
-  ggplot(aes(x = term, y = p.value)) +
-    geom_bar(stat = "identity") +
-    geom_hline(yintercept = 0.05) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    xlab("Variáveis") +
-    ylab("P-valores") +
-    coord_flip()
+df_metricas <- rbind(erros_pivot, pvalores) |> 
+  group_by(.metric) |> 
+  arrange(valor, .by_group = TRUE)
+
+df_metricas |>
+  ggplot(aes(x = valor, y = variavel)) +
+    facet_wrap(vars(.metric), scales = "free_x") +
+    geom_bar(stat = "identity", fill = "lightblue", color = "blue")
 ```
+
+## Colinearidade
 
 ```{r}
 
 ```
-
-
 
 ## Receitas
 

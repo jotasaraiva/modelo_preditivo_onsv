@@ -25,9 +25,18 @@ for (i in colnames(df_total)[-5]){
     fit(df_total)
 
   if (i == "ano") {
-    pvalores <- wflow_fit |> tidy()
+    pvalores <- wflow_fit |> 
+      tidy() |> 
+      mutate(.metric = "pvalor", variavel = i) |> 
+      rename(valor = p.value)
   } else {
-    pvalores <- rbind(pvalores, wflow_fit |> tidy())
+    pvalores <- rbind(
+      pvalores,
+      wflow_fit |> 
+        tidy() |> 
+        mutate(.metric = "pvalor", variavel = i) |> 
+        rename(valor = p.value)
+    )
   }
   
   predicao <- wflow_fit |> 
@@ -48,11 +57,12 @@ for (i in colnames(df_total)[-5]){
 
 erros_pivot <- erros |> 
   select(!.estimator) |> 
-  pivot_wider(names_from = variavel, values_from = .estimate)
+  rename(valor = .estimate)
 
 pvalores <- pvalores |> 
+  arrange(valor) |> 
   filter(term != "(Intercept)") |> 
-  arrange(p.value)
+  select(.metric, valor, variavel)
 
 save(erros_pivot, file = here("report","metricas_de_erro.rda"))
 
