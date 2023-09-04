@@ -1,6 +1,9 @@
 ---
 title: "Análise e Teste de Modelos"
-format: html
+format: 
+  html:
+    toc: true
+    toc-depth: 3
 editor: visual
 ---
 
@@ -14,6 +17,7 @@ library(tidymodels)
 library(here)
 library(knitr)
 library(onsvplot)
+library(car)
 tidymodels_prefer()
 options(scipen = 999)
 ```
@@ -39,45 +43,37 @@ df_metricas |>
     geom_bar(stat = "identity", fill = "lightblue", color = "blue")
 ```
 
-## Colinearidade
+## Multicolinearidade
 
 ```{r}
+vif_modelo <- lm(
+  mortes ~
+    quilometragem_10_bilhoes +
+    qnt_mortos +
+    qnt_feridos +
+    qnt_acidentes +
+    populacao +
+    pib +
+    motocicleta +
+    condutores +
+    automovel,
+  data = df_total |> drop_na()
+)
 
+summary(vif_modelo)
 ```
 
-## Receitas
-
 ```{r}
-receita_mortes <- df_total |> 
-  recipe(
-    mortes ~ automovel
-  ) |> 
-  step_naomit(all_numeric()) |>
-  step_normalize(all_numeric_predictors())
-
-receita_taxa <- df_total |> 
-  recipe(
-    mortos_por_pop ~ 
-      automovel +
-      motocicleta +
-      veiculos_total +
-      pib +
-      populacao +
-      qnt_acidentes +
-      qnt_feridos +
-      qnt_acidentes_fatais +
-      qnt_mortos +
-      condutores +
-      quilometragem_10_bilhoes
-  ) |> 
-  step_naomit(all_numeric()) |>
-  step_normalize(all_numeric_predictors())
+vif(vif_modelo) |> kable()
 ```
 
-## Métricas
-
 ```{r}
-metricas <- metric_set(rmse, mae, rsq)
+vif(vif_modelo) |> 
+  barplot(
+    main = "Valores VIF",
+    horiz = TRUE
+  )
+abline(v = 1000, lwd = 3, lty = 2)
 ```
 
 ## Modelos
@@ -92,78 +88,293 @@ modelo_randforest <- rand_forest(
 ) |> set_engine("ranger")
 ```
 
-## Workflows
+## Metricas
 
 ```{r}
-linear_wflow <- workflow() |> 
-  add_recipe(receita_mortes) |> 
-  add_model(modelo_linear_lm)
-
-randforest_wflow <- workflow() |> 
-  add_recipe(receita_mortes) |> 
-  add_model(modelo_randforest)
+metricas <- metric_set(rmse, mae, rsq)
 ```
 
-## Treinamento
+## Regressão Linear Multivariada
+
+### Teste 1
 
 ```{r}
-linear_wflow_fit <- linear_wflow |> 
+receita_1 <- df_total |> 
+  recipe(
+    mortes ~ qnt_acidentes_fatais
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
+
+linear_wflow_1 <- workflow() |> 
+  add_recipe(receita_1) |> 
+  add_model(modelo_linear_lm) |> 
   fit(df_total)
 
-randforest_wflow_fit <- randforest_wflow |> 
-  fit(df_total)
-```
-
-## Predição
-
-```{r}
-linear_pred <- linear_wflow_fit |> 
+linear_pred_1 <- linear_wflow_1 |> 
   predict(df_total) |> 
   cbind(df_total)
 
-randforest_pred <- randforest_wflow_fit |> 
-  predict(df_total |> drop_na())
-randforest_pred <- cbind(randforest_pred, df_total |> drop_na())
+metricas(linear_pred_1, truth = mortes, estimate = .pred) |> kable()
 ```
 
-## Avaliação
+### Teste 2
 
 ```{r}
-metricas(linear_pred, mortes, .pred)
-linear_wflow_fit |> tidy()
+receita_2 <- df_total |> 
+  recipe(
+    mortes ~ qnt_acidentes_fatais + qnt_acidentes
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
+
+linear_wflow_2 <- workflow() |> 
+  add_recipe(receita_2) |> 
+  add_model(modelo_linear_lm) |> 
+  fit(df_total)
+
+linear_pred_2 <- linear_wflow_2 |> 
+  predict(df_total) |> 
+  cbind(df_total)
+
+metricas(linear_pred_2, truth = mortes, estimate = .pred) |> kable()
 ```
 
+### Teste 3
+
 ```{r}
-metricas(randforest_pred, mortes, .pred)
-randforest_wflow_fit
+receita_3 <- df_total |> 
+  recipe(
+    mortes ~ qnt_acidentes_fatais + qnt_acidentes + qnt_feridos
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
+
+linear_wflow_3 <- workflow() |> 
+  add_recipe(receita_3) |> 
+  add_model(modelo_linear_lm) |> 
+  fit(df_total)
+
+linear_pred_3 <- linear_wflow_3 |> 
+  predict(df_total) |> 
+  cbind(df_total)
+
+metricas(linear_pred_3, truth = mortes, estimate = .pred) |> kable()
 ```
 
-## Visualização
+### Teste 4
 
 ```{r}
-linear_pred |> 
-  ggplot(aes(x = ano, y = mortes)) +
-    geom_line() +
-    geom_point() +
-    geom_line(aes(y = .pred), color = "red") +
-    geom_point(aes(y = .pred), color = "red")
+receita_4 <- df_total |> 
+  recipe(
+    mortes ~ 
+      qnt_acidentes_fatais + 
+      qnt_acidentes + 
+      qnt_feridos +
+      condutores
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
 
-linear_pred |> 
-  ggplot(aes(x = mortes, y = .pred)) +
-    geom_point() +
-    geom_abline(intercept = 0, slope = 1, color = "red")
+linear_wflow_4 <- workflow() |> 
+  add_recipe(receita_4) |> 
+  add_model(modelo_linear_lm) |> 
+  fit(df_total)
+
+linear_pred_4 <- linear_wflow_4 |> 
+  predict(df_total) |> 
+  cbind(df_total)
+
+metricas(linear_pred_4, truth = mortes, estimate = .pred) |> kable()
 ```
 
-```{r}
-randforest_pred |> 
-  ggplot(aes(x = ano, y = mortes)) +
-    geom_line() +
-    geom_point() +
-    geom_line(aes(y = .pred), color = "red") +
-    geom_point(aes(y = .pred), color = "red")
+### Teste 5
 
-randforest_pred |> 
-  ggplot(aes(x = mortes, y = .pred)) +
-    geom_point() +
-    geom_abline(intercept = 0, slope = 1, color = "red")
+```{r}
+receita_5 <- df_total |> 
+  recipe(
+    mortes ~ 
+      qnt_acidentes_fatais + 
+      qnt_acidentes + 
+      qnt_feridos +
+      condutores +
+      populacao
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
+
+linear_wflow_5 <- workflow() |> 
+  add_recipe(receita_5) |> 
+  add_model(modelo_linear_lm) |> 
+  fit(df_total)
+
+linear_pred_5 <- linear_wflow_5 |> 
+  predict(df_total) |> 
+  cbind(df_total)
+
+metricas(linear_pred_5, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 6
+
+```{r}
+receita_6<- df_total |> 
+  recipe(
+    mortes ~ 
+      qnt_acidentes_fatais + 
+      qnt_acidentes + 
+      qnt_feridos +
+      condutores +
+      populacao +
+      veiculos_total
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
+
+linear_wflow_6 <- workflow() |> 
+  add_recipe(receita_6) |> 
+  add_model(modelo_linear_lm) |> 
+  fit(df_total)
+
+linear_pred_6 <- linear_wflow_6 |> 
+  predict(df_total) |> 
+  cbind(df_total)
+
+metricas(linear_pred_6, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 7 
+
+```{r}
+receita_7 <- df_total |> 
+  recipe(
+    mortes ~ 
+      qnt_acidentes_fatais + 
+      qnt_acidentes + 
+      qnt_feridos +
+      condutores +
+      populacao +
+      veiculos_total +
+      pib
+  ) |> 
+  step_naomit(all_numeric()) |> 
+  step_normalize(all_numeric_predictors())
+
+linear_wflow_7 <- workflow() |> 
+  add_recipe(receita_7) |> 
+  add_model(modelo_linear_lm) |> 
+  fit(df_total)
+
+linear_pred_7 <- linear_wflow_7 |> 
+  predict(df_total) |> 
+  cbind(df_total)
+
+metricas(linear_pred_7, truth = mortes, estimate = .pred) |> kable()
+```
+
+## Regressão por Random Forest
+
+### Teste 1
+
+```{r}
+rf_wflow_1 <- workflow() |> 
+  add_recipe(receita_1) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_1 <- rf_wflow_1 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_1, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 2
+
+```{r}
+rf_wflow_2 <- workflow() |> 
+  add_recipe(receita_2) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_2 <- rf_wflow_2 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_2, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 3
+
+```{r}
+rf_wflow_3 <- workflow() |> 
+  add_recipe(receita_3) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_3 <- rf_wflow_3 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_3, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 4
+
+```{r}
+rf_wflow_4 <- workflow() |> 
+  add_recipe(receita_4) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_4 <- rf_wflow_4 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_4, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 5
+
+```{r}
+rf_wflow_5 <- workflow() |> 
+  add_recipe(receita_5) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_5 <- rf_wflow_5 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_5, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 6
+
+```{r}
+rf_wflow_6 <- workflow() |> 
+  add_recipe(receita_6) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_6 <- rf_wflow_6 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_6, truth = mortes, estimate = .pred) |> kable()
+```
+
+### Teste 7
+
+```{r}
+rf_wflow_7 <- workflow() |> 
+  add_recipe(receita_7) |> 
+  add_model(modelo_randforest) |> 
+  fit(df_total)
+
+rf_pred_7 <- rf_wflow_7 |> 
+  predict(df_total |> drop_na()) |> 
+  cbind(df_total |> drop_na())
+
+metricas(rf_pred_7, truth = mortes, estimate = .pred) |> kable()
 ```
