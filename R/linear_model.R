@@ -27,26 +27,28 @@ lm_model <- function(df) {
 }
 
 lm_extract <- function(model, input) {
+  
   metricas <- metric_set(rmse, mae, rsq)
   
   pred <- predict(model, input) |> 
-    cbind(df_total) |> 
-    rename(mortes.pred = .pred) |> 
-    as.data.frame()
+    bind_cols(df_total) |> 
+    rename(mortes.pred = .pred)
   
-  erros <- metricas(pred, truth = mortes, estimate = mortes.pred) |> 
-    as.data.frame()
+  pred <- predict(model, input, type = "conf_int") |> 
+    bind_cols(pred) 
+  
+  erros <- metricas(pred, truth = mortes, estimate = mortes.pred)
   
   specs <- model |> 
-    tidy() |> 
-    as.data.frame()
+    tidy() 
   
-  res <- list("pred" = pred, "metric" = erros, "coef" = specs)
+  res <- list("pred" = pred, "erros" = erros, "specs" = specs)
   
   return(res)
 }
 
 lm_complete <- function(df) {
+  
   model <- lm_model(df)
   
   extrac <- lm_extract(model, df)
@@ -59,4 +61,5 @@ lm_complete <- function(df) {
   )
   
   return(res)
-} 
+}
+
