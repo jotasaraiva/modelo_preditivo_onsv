@@ -434,3 +434,58 @@ rf_pred_7 <- rf_wflow_7 |>
 
 metricas(rf_pred_7, truth = mortes, estimate = .pred) |> kable()
 ```
+
+## Seleção de Atributos
+
+```{r}
+load(here("data/tabela_total.rda"))
+
+metricas <- metric_set(rmse, mae, rsq)
+
+df_preprocess <- df_total |> 
+  select(
+    ano,
+    mortes,
+    veiculos_total,
+    qnt_feridos,
+    qnt_acidentes_fatais,
+    condutores,
+    qnt_acidentes,
+    qnt_mortos
+  ) |> drop_na()
+
+lm_recipe <- df_preprocess |> recipe(
+  mortes ~
+    veiculos_total +
+    qnt_feridos +
+    qnt_acidentes +
+    qnt_acidentes_fatais +
+    qnt_mortos +
+    condutores
+) |> step_normalize(all_numeric_predictors())
+
+lm_reg <- linear_reg() |> set_engine("lm")
+
+lm_wflow <- workflow() |> 
+  add_recipe(lm_recipe) |> 
+  add_model(lm_reg) |> 
+  fit(df_preprocess)
+
+coefs <- tidy(lm_wflow) |> arrange(p.value)
+
+obs2022 <- list(
+  "ano" = 2022,
+  "qnt_acidentes" = 64547,
+  "qnt_acidentes_fatais" = 4662,
+  "qnt_mortos" = 5439,
+  "qnt_feridos" = 72971,
+  "condutores" = 79921178,
+  "veiculos_total" = 115116532
+) |> as.data.frame()
+
+df_preprocess_2022 <- bind_rows(df_preprocess, obs2022)
+
+df_pred <- lm_wflow |> 
+  predict(df_preprocess_2022) |> 
+  cbind(df_preprocess_2022)
+```
