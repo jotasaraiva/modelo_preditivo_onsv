@@ -25,64 +25,7 @@ options(scipen = 999999)
 ## Carregando dados
 
 ```{r}
-enderecos_data <- paste(
- here("data/"),
- "/",
- list.files(here("data/")),
- sep = ""
-)
-
-for (k in enderecos_data) {
-  load(k)
-}
-```
-
-## Preparando labels para junção dos dataframes
-
-```{r}
-frota_veiculos <- frota_veiculos |> 
-   rename(
-     veiculos_total = total,
-     ano = anos
-   )
-
-pib <- pib |> 
-  rename(
-    pib = total
-  )
-```
-
-## Juntando os dataframes
-
-```{r}
-df_list <- list(
-  frota_veiculos,
-  obitos_transito,
-  pib,
-  populacao,
-  sinistros_prf,
-  tabela_condutores,
-  quilometragem
-)
-
-df_total <- df_list |> 
-  reduce(full_join, by = "ano") |> 
-  relocate(ano) |> 
-  arrange(ano)
-```
-
-## Calculando mortes por 100.000 habitantes e juntando ao dataframe
-
-```{r}
-mortes_hab <- df_total |> 
-  select(ano, mortes, populacao) |> 
-  drop_na() |> 
-  mutate(mortos_por_pop = mortes / populacao * 100000) |> 
-  select(ano, mortos_por_pop)
-
-df_total <- left_join(df_total, mortes_hab, by = "ano")
-
-save(df_total, file = here("data","tabela_total.rda"))
+load(here("data/tabela_total.rda"))
 ```
 
 ## Iniciando EDA

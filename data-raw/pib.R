@@ -13,13 +13,8 @@ import_pib <- function(path) {
       trim = str_sub(trim_ano,1,1) |> as.numeric(),
       total = pib |> as.numeric()
     ) |> 
-    filter(
-      trim == 4
-    ) |> 
-    select(
-      total,
-      ano
-    )
+    group_by(ano) |> 
+    summarise(pib = sum(total))
   
   return(municipios)
 }
