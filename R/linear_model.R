@@ -1,26 +1,29 @@
 lm_model <- function(df) {
+  
   modelo_lm <- linear_reg() |> set_engine("lm")
   
-  rec <- df |> 
+  df_preproc <- df |> 
+    select(
+      ano,
+      mortes,
+      qnt_acidentes_fatais,
+      qnt_acidentes,
+      condutores,
+      veiculos_total
+    ) |> drop_na()
+  
+  rec_preproc <- df_preproc |> 
     recipe(
-      mortes ~
-        qnt_acidentes_fatais + 
-        qnt_acidentes + 
-        qnt_feridos +
-        condutores +
-        populacao +
-        veiculos_total +
-        pib
+      mortes ~ qnt_acidentes + qnt_acidentes_fatais + condutores + veiculos_total
     ) |> 
-    step_naomit(all_numeric()) |> 
     step_normalize(all_numeric_predictors())
   
-  linear_wflow <- workflow() |> 
-    add_recipe(rec) |> 
+  lm_wflow <- workflow() |> 
     add_model(modelo_lm) |> 
-    fit(df)
+    add_recipe(rec_preproc) |> 
+    fit(df_preproc)
   
-  return(linear_wflow)
+  return(lm_wflow)
 }
 
 lm_extract <- function(model, input) {

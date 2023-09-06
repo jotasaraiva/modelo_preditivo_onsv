@@ -8,5 +8,3 @@ options(scipen = 999)
 load(here("data/tabela_total.rda"))
 
 source("R/linear_model.R")
-
-res <- lm_complete(df_total) 
