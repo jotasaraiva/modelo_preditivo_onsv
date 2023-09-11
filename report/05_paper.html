@@ -20,7 +20,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="05_paper_files/libs/clipboard/clipboard.min.js"></script>
@@ -37,18 +56,10 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body>
+<body class="fullcontent">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-  <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a></li>
-  </ul>
-</nav>
-</div>
+
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -70,9 +81,38 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="introdução" class="level2">
 <h2 class="anchored" data-anchor-id="introdução">Introdução</h2>
+<p>O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que este cenário perdura pelo futuro observável <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública.</p>
+<p>A segurança viária é profundamente correlacionada com o estado de desenvolvimento de uma sociedade, visto que é uma característica da mobilidade urbana, entende-se que as mortes viárias dependem de diversos fatores estruturais, socioeconômicos e ambientais <span class="citation" data-cites="zhong-xiang2014">(<a href="#ref-zhong-xiang2014" role="doc-biblioref">Zhong-xiang et al. 2014</a>)</span>. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública, estimulando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos. Enquanto o desenvolimento econômico certamente beneficia a segurança viária, observa-se que os países da Assembléia Geral das Nações Unidas têm dificuldade em atingir as metas estabelecidas pelos Objetivos de Desenvolvimento Sustentável em 2015. Como previsto por Blumenberg <em>et al</em> <span class="citation" data-cites="blumenberg2018">(<a href="#ref-blumenberg2018" role="doc-biblioref">2018</a>)</span>, o Brasil falhou em reduzir sua mortalidade viária pela metade, como previa a meta.</p>
+<p>A busca pela funamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>; <a href="#ref-cai2015" role="doc-biblioref">Cai, Zhu, and Yan 2015</a>)</span>, assim como modelos preditivos baseados em cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#ref-seneta1996" role="doc-biblioref">Seneta 1996</a>; <a href="#ref-jin2020" role="doc-biblioref">Jin, Zheng, and Geng 2020</a>)</span>. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA <span class="citation" data-cites="al-ghamdi1995">(<a href="#ref-al-ghamdi1995" role="doc-biblioref">Al-Ghamdi 1995</a>)</span> e redes neurais artificiais para confeccionar modelos temporais <span class="citation" data-cites="jafari2015">(<a href="#ref-jafari2015" role="doc-biblioref">Jafari et al. 2015</a>)</span>.</p>
+
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-al-ghamdi1995" class="csl-entry" role="listitem">
+Al-Ghamdi, Ali S. 1995. <span>“Time Series Forecasts for Traffic Accidents, Injuries, and Fatalities in Saudi Arabia.”</span> <em>Journal of King Saud University - Engineering Sciences</em> 7 (2): 199–217. <a href="https://doi.org/10.1016/S1018-3639(18)30627-5">https://doi.org/10.1016/S1018-3639(18)30627-5</a>.
+</div>
+<div id="ref-blumenberg2018" class="csl-entry" role="listitem">
+Blumenberg, Cauane, Rafaela C Martins, Janaína Calu Costa, and Luiza I C Ricardo. 2018. <span>“Is Brazil Going to Achieve the Road Traffic Deaths Target? An Analysis about the Sustainable Development Goals.”</span> <em>Injury Prevention</em> 24 (4): 250–55. <a href="https://doi.org/10.1136/injuryprev-2017-042473">https://doi.org/10.1136/injuryprev-2017-042473</a>.
+</div>
+<div id="ref-cai2015" class="csl-entry" role="listitem">
+Cai, Hao, Dunyao Zhu, and Lixin Yan. 2015. <span>“2015 International Conference on Transportation Information and Safety (ICTIS).”</span> In, 363–69. Wuhan, China: IEEE. <a href="https://doi.org/10.1109/ICTIS.2015.7232140">https://doi.org/10.1109/ICTIS.2015.7232140</a>.
+</div>
+<div id="ref-jafari2015" class="csl-entry" role="listitem">
+Jafari, Seyed Ali, Sepideh Jahandideh, Mina Jahandideh, and Ebrahim Barzegari Asadabadi. 2015. <span>“Prediction of Road Traffic Death Rate Using Neural Networks Optimised by Genetic Algorithm.”</span> <em>International Journal of Injury Control and Safety Promotion</em> 22 (2): 153–57. <a href="https://doi.org/10.1080/17457300.2013.857695">https://doi.org/10.1080/17457300.2013.857695</a>.
+</div>
+<div id="ref-jin2020" class="csl-entry" role="listitem">
+Jin, Xiaohua, Jiyu Zheng, and Xingyue Geng. 2020. <span>“Prediction of Road Traffic Accidents Based on Grey System Theory and Grey Markov Model.”</span> <em>International Journal of Safety and Security Engineering</em> 10 (2): 263–68. <a href="https://doi.org/10.18280/ijsse.100214">https://doi.org/10.18280/ijsse.100214</a>.
+</div>
+<div id="ref-seneta1996" class="csl-entry" role="listitem">
+Seneta, E. 1996. <span>“Markov and the Birth of Chain Dependence Theory.”</span> <em>International Statistical Review / Revue Internationale de Statistique</em> 64 (3): 255. <a href="https://doi.org/10.2307/1403785">https://doi.org/10.2307/1403785</a>.
+</div>
+<div id="ref-worldhealthorganization2018" class="csl-entry" role="listitem">
+World Health Organization. 2018. <em>Global Status Report on Road Safety 2018</em>. Geneva: World Health Organization. <a href="https://apps.who.int/iris/handle/10665/276462">https://apps.who.int/iris/handle/10665/276462</a>.
+</div>
+<div id="ref-zhong-xiang2014" class="csl-entry" role="listitem">
+Zhong-xiang, Feng, Lu Shi-sheng, Zhang Wei-hua, and Zhang Nan-nan. 2014. <span>“Combined Prediction Model of Death Toll for Road Traffic Accidents Based on Independent and Dependent Variables.”</span> <em>Computational Intelligence and Neuroscience</em> 2014: 1–7. <a href="https://doi.org/10.1155/2014/103196">https://doi.org/10.1155/2014/103196</a>.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
