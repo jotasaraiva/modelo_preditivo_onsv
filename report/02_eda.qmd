@@ -1,7 +1,11 @@
 ---
 title: "Análise Exploratória de Dados"
 author: "João Saraiva"
-format: html
+format: 
+  html:
+    execute:
+      warning: false
+editor: visual
 ---
 
 ```{r setup, include=FALSE} 

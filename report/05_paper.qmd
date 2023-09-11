@@ -1,0 +1,10 @@
+---
+title: "Modelo Preditivo de Mortes Viárias"
+format: html
+editor: visual
+bibliography: references.bib
+---
+
+## Introdução
+
+O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e modelos preditivos contemporâneos indicam que este cenário perdura pelo futuro observável [@worldhealthorganization2018].
