@@ -19,11 +19,11 @@ Enquanto o desenvolimento econômico certamente beneficia a segurança viária, 
 
 A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
-O presente estudo teve como objetivo criar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados sociocônimicos, como o PIB e a população, assim como dados viários coletados das bases de dados da Polícia Federal Rodoviária (PRF), do Registro Nacional de Carteira de Habilitação (RENACH) e do Registro Nacional de Veículos Automotores (RENAVAM)
+O presente estudo teve como objetivo criar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados sociocônimicos, como o PIB e a população, assim como dados viários coletados das bases de dados da Polícia Federal Rodoviária (PRF), do Registro Nacional de Carteira de Habilitação (RENACH), do Registro Nacional de Veículos Automotores (RENAVAM) e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde.
 
 ## Metodologia
 
-
+A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus [@microdatasus], coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado aos estudo, extraindo as observações de mortes relacionadadas a ATTs.
 
 ## Discussão e Resultados
 
