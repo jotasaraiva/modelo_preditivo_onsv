@@ -1,5 +1,6 @@
 ---
 title: "Modelo Preditivo de Mortes Viárias"
+
 format: 
   html:
     editor: visual
@@ -7,6 +8,7 @@ bibliography: references.bib
 toc: true
 toc-title: Sumário
 theme: lux
+
 ---
 
 ## Introdução
