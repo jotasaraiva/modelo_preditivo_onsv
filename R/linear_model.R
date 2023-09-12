@@ -31,7 +31,7 @@ lm_extract <- function(model, input) {
   metricas <- metric_set(rmse, mae, rsq)
   
   pred <- predict(model, input) |> 
-    bind_cols(df_total) |> 
+    bind_cols(input) |> 
     rename(mortes.pred = .pred)
   
   pred <- predict(model, input, type = "conf_int") |> 

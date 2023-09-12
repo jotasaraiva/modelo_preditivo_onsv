@@ -505,8 +505,22 @@ ggplot(data = df_pred, aes(x = ano, y = mortes)) +
                 size = 1) +
   geom_ribbon(aes(ymin = .pred_lower, ymax = .pred_upper),
               alpha = 0.1)
-
-
 ```
 
-Variação com acidentes, fatais e feridos: 5533.683 Variação com acidentes e fatais: 4878.459 Variação com fatais e feridos: 5525.722 Variação com fatais: 4932.277
+Variação com acidentes, fatais e feridos: 5533.683 
+Variação com acidentes e fatais: 4878.459 
+Variação com fatais e feridos: 5525.722 
+Variação com fatais: 4932.277
+
+```{r}
+dados2022 <- list(
+  "ano" = 2022,
+  "qnt_acidentes" = 64547,
+  "qnt_acidentes_fatais" = 4662,
+  "condutores" = 79921178,
+  "veiculos_total" = 115116532
+) |> as.data.frame()
+
+df_2022 <- bind_rows(drop_na(df_total), dados2022)
+```
+
