@@ -509,7 +509,4 @@ ggplot(data = df_pred, aes(x = ano, y = mortes)) +
 
 ```
 
-Variação com acidentes, fatais e feridos: 5533.683
-Variação com acidentes e fatais: 4878.459
-Variação com fatais e feridos: 5525.722
-Variação com fatais: 4932.277
+Variação com acidentes, fatais e feridos: 5533.683 Variação com acidentes e fatais: 4878.459 Variação com fatais e feridos: 5525.722 Variação com fatais: 4932.277

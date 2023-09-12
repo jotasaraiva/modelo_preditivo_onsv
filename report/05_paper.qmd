@@ -1,10 +1,34 @@
 ---
 title: "Modelo Preditivo de Mortes Viárias"
-format: html
-editor: visual
+
+format: 
+  html:
+    editor: visual
 bibliography: references.bib
+toc: true
+toc-title: Sumário
+theme: lux
+
 ---
 
 ## Introdução
 
-O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e modelos preditivos contemporâneos indicam que este cenário perdura pelo futuro observável [@worldhealthorganization2018].
+O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que este cenário perdura pelo futuro observável [@worldhealthorganization2018]. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública, o que estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
+
+A segurança viária é profundamente correlata ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes viárias dependem de diversos fatores estruturais, socioeconômicos e ambientais [@zhong-xiang2014]. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública, estimulando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
+
+Enquanto o desenvolimento econômico certamente beneficia a segurança viária, observa-se que os países da Assembléia Geral das Nações Unidas têm dificuldade em atingir as metas estabelecidas pelos Objetivos de Desenvolvimento Sustentável em 2015. Apesar da crescente adesão por itens de segurança veicular, acidentes de transporte terrestre (ATT) permanecem como um problema de saúde pública, visto que é uma questão que repercute por toda a sociedade [@andrade2019], sendo a oitava causa de óbitos em todas as faixas etária e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos prévios à 2020 [@blumenberg2018], o Brasil falhou em reduzir sua mortalidade viária pela metade, como previa a meta.
+
+A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
+
+O presente estudo teve como objetivo criar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados sociocônimicos, como o PIB e a população, assim como dados viários coletados das bases de dados da Polícia Federal Rodoviária (PRF), do Registro Nacional de Carteira de Habilitação (RENACH), do Registro Nacional de Veículos Automotores (RENAVAM) e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde.
+
+## Metodologia
+
+A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus [@microdatasus], coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado aos estudo, extraindo as observações de mortes relacionadadas a ATTs.
+
+## Discussão e Resultados
+
+## Conclusão
+
+## Referências

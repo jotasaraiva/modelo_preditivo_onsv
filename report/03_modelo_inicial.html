@@ -57,16 +57,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="modelo_inicial_files/libs/clipboard/clipboard.min.js"></script>
-<script src="modelo_inicial_files/libs/quarto-html/quarto.js"></script>
-<script src="modelo_inicial_files/libs/quarto-html/popper.min.js"></script>
-<script src="modelo_inicial_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="modelo_inicial_files/libs/quarto-html/anchor.min.js"></script>
-<link href="modelo_inicial_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="modelo_inicial_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="modelo_inicial_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="modelo_inicial_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="modelo_inicial_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="03_modelo_inicial_files/libs/clipboard/clipboard.min.js"></script>
+<script src="03_modelo_inicial_files/libs/quarto-html/quarto.js"></script>
+<script src="03_modelo_inicial_files/libs/quarto-html/popper.min.js"></script>
+<script src="03_modelo_inicial_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="03_modelo_inicial_files/libs/quarto-html/anchor.min.js"></script>
+<link href="03_modelo_inicial_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="03_modelo_inicial_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="03_modelo_inicial_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="03_modelo_inicial_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="03_modelo_inicial_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -100,7 +100,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ dplyr     1.1.3     ✔ readr     2.1.4
 ✔ forcats   1.0.0     ✔ stringr   1.5.0
 ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
 ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
@@ -115,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──
 ✔ broom        1.0.5     ✔ rsample      1.2.0
 ✔ dials        1.2.0     ✔ tune         1.1.2
-✔ infer        1.0.4     ✔ workflows    1.1.3
+✔ infer        1.0.5     ✔ workflows    1.1.3
 ✔ modeldata    1.2.0     ✔ workflowsets 1.0.1
 ✔ parsnip      1.1.1     ✔ yardstick    1.2.0
 ✔ recipes      1.0.8     
@@ -126,11 +126,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
+• Use tidymodels_prefer() to resolve common conflicts.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>here() starts at C:/Users/João Saraiva/Documents/JoaoSaraiva/Tratamento_Dados</code></pre>
+<pre><code>here() starts at C:/Users/João Saraiva/Documents/JoaoSaraiva/modelo_preditivo_onsv</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidymodels_prefer</span>()</span>
@@ -217,7 +217,7 @@ predictor: 13</code></pre>
 <pre><code>── Training information </code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Training data contained 27 data points and 16 incomplete rows.</code></pre>
+<pre><code>Training data contained 28 data points and 17 incomplete rows.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
@@ -274,7 +274,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">45513632</td>
 <td style="text-align: right;">17566802</td>
 <td style="text-align: right;">68024871</td>
-<td style="text-align: right;">1160805</td>
+<td style="text-align: right;">4376382</td>
 <td style="text-align: right;">192379287</td>
 <td style="text-align: right;">192326</td>
 <td style="text-align: right;">7158</td>
@@ -288,7 +288,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">48973903</td>
 <td style="text-align: right;">19412783</td>
 <td style="text-align: right;">73699403</td>
-<td style="text-align: right;">1271711</td>
+<td style="text-align: right;">4814760</td>
 <td style="text-align: right;">193976530</td>
 <td style="text-align: right;">184568</td>
 <td style="text-align: right;">7003</td>
@@ -302,7 +302,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">52638712</td>
 <td style="text-align: right;">20942530</td>
 <td style="text-align: right;">79261065</td>
-<td style="text-align: right;">1413292</td>
+<td style="text-align: right;">5331619</td>
 <td style="text-align: right;">201062789</td>
 <td style="text-align: right;">186748</td>
 <td style="text-align: right;">6887</td>
@@ -316,7 +316,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">56028615</td>
 <td style="text-align: right;">22412117</td>
 <td style="text-align: right;">84494118</td>
-<td style="text-align: right;">1508522</td>
+<td style="text-align: right;">5778953</td>
 <td style="text-align: right;">202799518</td>
 <td style="text-align: right;">169201</td>
 <td style="text-align: right;">6742</td>
@@ -330,7 +330,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">58972258</td>
 <td style="text-align: right;">23750523</td>
 <td style="text-align: right;">89080562</td>
-<td style="text-align: right;">1550940</td>
+<td style="text-align: right;">5995787</td>
 <td style="text-align: right;">204482459</td>
 <td style="text-align: right;">122161</td>
 <td style="text-align: right;">5648</td>
@@ -344,7 +344,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">61079077</td>
 <td style="text-align: right;">24898477</td>
 <td style="text-align: right;">92553570</td>
-<td style="text-align: right;">1632766</td>
+<td style="text-align: right;">6269328</td>
 <td style="text-align: right;">206114067</td>
 <td style="text-align: right;">96363</td>
 <td style="text-align: right;">5355</td>
@@ -358,7 +358,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">63106809</td>
 <td style="text-align: right;">25772008</td>
 <td style="text-align: right;">95643467</td>
-<td style="text-align: right;">1720626</td>
+<td style="text-align: right;">6585480</td>
 <td style="text-align: right;">207660929</td>
 <td style="text-align: right;">89567</td>
 <td style="text-align: right;">5184</td>
@@ -372,7 +372,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">65440975</td>
 <td style="text-align: right;">26658933</td>
 <td style="text-align: right;">99090731</td>
-<td style="text-align: right;">1819359</td>
+<td style="text-align: right;">7004141</td>
 <td style="text-align: right;">208494900</td>
 <td style="text-align: right;">69332</td>
 <td style="text-align: right;">4507</td>
@@ -386,7 +386,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">68048424</td>
 <td style="text-align: right;">27685249</td>
 <td style="text-align: right;">103016009</td>
-<td style="text-align: right;">1927386</td>
+<td style="text-align: right;">7389131</td>
 <td style="text-align: right;">210147125</td>
 <td style="text-align: right;">67556</td>
 <td style="text-align: right;">4597</td>
@@ -400,7 +400,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">70144529</td>
 <td style="text-align: right;">28576665</td>
 <td style="text-align: right;">106289700</td>
-<td style="text-align: right;">2048979</td>
+<td style="text-align: right;">7609597</td>
 <td style="text-align: right;">211755692</td>
 <td style="text-align: right;">63576</td>
 <td style="text-align: right;">4525</td>
@@ -414,7 +414,7 @@ predictor: 13</code></pre>
 <td style="text-align: right;">72331723</td>
 <td style="text-align: right;">29684894</td>
 <td style="text-align: right;">109961381</td>
-<td style="text-align: right;">2309564</td>
+<td style="text-align: right;">8898727</td>
 <td style="text-align: right;">213317639</td>
 <td style="text-align: right;">64539</td>
 <td style="text-align: right;">4664</td>
@@ -486,50 +486,50 @@ stats::glm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> mortes)) <span class="sc">+</span></span>
 <span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> mortes_pred), <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_text()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_text()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 row containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_line()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 16 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 17 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="modelo_inicial_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<p><img src="03_modelo_inicial_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>mortes_wflow_ajustado <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 5
-   term                         estimate std.error statistic p.value
-   &lt;chr&gt;                           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
- 1 (Intercept)              30485.             NaN       NaN     NaN
- 2 automovel                   -0.0646         NaN       NaN     NaN
- 3 motocicleta                 -0.0486         NaN       NaN     NaN
- 4 veiculos_total               0.0555         NaN       NaN     NaN
- 5 pib                         -0.0648         NaN       NaN     NaN
- 6 populacao                   -0.000809       NaN       NaN     NaN
- 7 qnt_acidentes                0.328          NaN       NaN     NaN
- 8 qnt_acidentes_fatais        19.9            NaN       NaN     NaN
- 9 qnt_feridos                 -0.496          NaN       NaN     NaN
-10 qnt_mortos                 -14.6            NaN       NaN     NaN
-11 condutores                   0.00431        NaN       NaN     NaN
-12 quilometragem_10_bilhoes    NA               NA        NA      NA</code></pre>
+   term                          estimate std.error statistic p.value
+   &lt;chr&gt;                            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+ 1 (Intercept)              1272068.            NaN       NaN     NaN
+ 2 automovel                      0.803         NaN       NaN     NaN
+ 3 motocicleta                    0.676         NaN       NaN     NaN
+ 4 veiculos_total                -0.690         NaN       NaN     NaN
+ 5 pib                            0.124         NaN       NaN     NaN
+ 6 populacao                      0.00198       NaN       NaN     NaN
+ 7 qnt_acidentes                 -3.25          NaN       NaN     NaN
+ 8 qnt_acidentes_fatais          17.8           NaN       NaN     NaN
+ 9 qnt_feridos                   -1.94          NaN       NaN     NaN
+10 qnt_mortos                    83.0           NaN       NaN     NaN
+11 condutores                    -0.0684        NaN       NaN     NaN
+12 quilometragem_10_bilhoes      NA              NA        NA      NA</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metricas</span>(<span class="at">data =</span> mortes_previsto, <span class="at">truth =</span> mortes, <span class="at">estimate =</span> mortes_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
-  .metric .estimator     .estimate
-  &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;
-1 rmse    standard   0.00000000188
-2 mae     standard   0.00000000169
-3 rsq     standard   1            </code></pre>
+  .metric .estimator    .estimate
+  &lt;chr&gt;   &lt;chr&gt;             &lt;dbl&gt;
+1 rmse    standard   0.0000000255
+2 mae     standard   0.0000000236
+3 rsq     standard   1           </code></pre>
 </div>
 </div>
 </section>
@@ -590,22 +590,22 @@ stats::glm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(
 <pre><code>`geom_smooth()` using method = 'loess' and formula = 'y ~ x'</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 5 rows containing non-finite values (`stat_smooth()`).</code></pre>
+<pre><code>Warning: Removed 6 rows containing non-finite values (`stat_smooth()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_text()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_text()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 row containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_line()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 5 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 6 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="modelo_inicial_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+<p><img src="03_modelo_inicial_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -614,23 +614,23 @@ stats::glm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(
 <pre><code># A tibble: 3 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard    1834.   
-2 mae     standard    1394.   
-3 rsq     standard       0.828</code></pre>
+1 rmse    standard    1838.   
+2 mae     standard    1383.   
+3 rsq     standard       0.827</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>lm_wflow_norm_fit <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 5
-  term                estimate    std.error statistic p.value
-  &lt;chr&gt;                  &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-1 (Intercept)    58718.        29941.           1.96   0.0675
-2 automovel         -0.0269        0.0165      -1.63   0.122 
-3 motocicleta       -0.0154        0.0144      -1.07   0.302 
-4 veiculos_total     0.0215        0.0150       1.44   0.170 
-5 pib               -0.00424       0.0123      -0.346  0.734 
-6 populacao          0.0000995     0.000176     0.566  0.579 </code></pre>
+  term               estimate    std.error statistic p.value
+  &lt;chr&gt;                 &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)    59277.       29955.           1.98   0.0653
+2 automovel         -0.0252       0.0168      -1.50   0.153 
+3 motocicleta       -0.0139       0.0148      -0.941  0.361 
+4 veiculos_total     0.0199       0.0153       1.31   0.210 
+5 pib               -0.000640     0.00330     -0.194  0.849 
+6 populacao          0.000101     0.000179     0.563  0.581 </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -677,22 +677,22 @@ stats::glm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(
 <pre><code>`geom_smooth()` using method = 'loess' and formula = 'y ~ x'</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 5 rows containing non-finite values (`stat_smooth()`).</code></pre>
+<pre><code>Warning: Removed 6 rows containing non-finite values (`stat_smooth()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 2 rows containing missing values (`geom_text()`).</code></pre>
+<pre><code>Warning: Removed 3 rows containing missing values (`geom_text()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 2 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 3 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 2 rows containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 3 rows containing missing values (`geom_line()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 5 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 6 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="modelo_inicial_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+<p><img src="03_modelo_inicial_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -701,12 +701,12 @@ stats::glm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(
 <pre><code># A tibble: 6 × 5
   term                estimate     std.error statistic p.value
   &lt;chr&gt;                  &lt;dbl&gt;         &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-1 (Intercept)    47.0          14.9              3.15  0.00626
-2 automovel      -0.0000138     0.00000822      -1.67  0.113  
-3 motocicleta    -0.00000795    0.00000720      -1.10  0.286  
-4 veiculos_total  0.0000110     0.00000747       1.48  0.159  
-5 pib            -0.00000166    0.00000611      -0.272 0.789  
-6 populacao      -0.0000000355  0.0000000877    -0.404 0.691  </code></pre>
+1 (Intercept)    47.2          14.9              3.16  0.00605
+2 automovel      -0.0000133     0.00000835      -1.59  0.132  
+3 motocicleta    -0.00000750    0.00000735      -1.02  0.323  
+4 veiculos_total  0.0000106     0.00000761       1.39  0.185  
+5 pib            -0.000000291   0.00000164      -0.177 0.862  
+6 populacao      -0.0000000355  0.0000000891    -0.398 0.696  </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -715,9 +715,9 @@ stats::glm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(
 <pre><code># A tibble: 3 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.915
-2 mae     standard       0.698
-3 rsq     standard       0.837</code></pre>
+1 rmse    standard       0.916
+2 mae     standard       0.693
+3 rsq     standard       0.836</code></pre>
 </div>
 </div>
 </section>
