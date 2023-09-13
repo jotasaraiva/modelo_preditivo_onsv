@@ -1,0 +1,30 @@
+---
+title: "Modelo Preditivo de Mortes Viárias Anuais"
+format: gfm
+editor: visual
+toc: true
+toc-depth: 2
+---
+
+```{r include=FALSE}
+# library(here)
+library(knitr)
+library(tidyverse)
+load("data/tabela_total.rda")
+```
+
+## Descrição
+
+Este projeto é um modelo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com uma resolução temporal anual, confeccionado a fim de gerar um estudo científico para o Observatório Nacional de Segurança Viária (ONSV).
+
+## Como usar
+
+Os dados brutos e *scripts* de tratamento se encontram em `data-raw/`, utilizados para extração de dados tratados encontrados em `data/`. 
+
+```{r echo=FALSE}
+df_total |> drop_na() |> kable()
+```
+
+As funções para o modelo criado se encontram em `R/main.R`, onde demonstram a previsão para 2022. Para futuras previsões, basta imputar novos dados ao *dataset* de entrada e chamar o modelo com `lm_model()` e `lm_extract()`
+
+

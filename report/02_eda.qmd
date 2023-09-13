@@ -231,9 +231,16 @@ ggcorrplot(
   lab_size = 2
 )
 
+cor_spearman <- df_total |> 
+  drop_na() |>
+  select(-quilometragem_10_bilhoes) |> 
+  cor(method = c("spearman"))
+
 ggcorrplot(cor_spearman, type = "lower",
            lab = TRUE, hc.order = TRUE,
-           lab_size = 2)
+           lab_size = 2, tl.srt = 60,
+           tl.cex = 8, legend.title = "Correlação",
+           colors = c(onsv_palette$red, onsv_palette$yellow, onsv_palette$green))
 
 ggcorrplot(cor_kendall, type = "lower",
            lab = TRUE, hc.order = TRUE,
