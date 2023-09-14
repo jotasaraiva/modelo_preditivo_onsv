@@ -9,22 +9,75 @@ toc-depth: 2
 ```{r include=FALSE}
 # library(here)
 library(knitr)
-library(tidyverse)
-load("data/tabela_total.rda")
+library(plotly)
+source("R/main.R")
 ```
 
-## Descrição
+## Objetivo
 
 Este projeto é um modelo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com uma resolução temporal anual, confeccionado a fim de gerar um estudo científico para o Observatório Nacional de Segurança Viária (ONSV).
 
-## Como usar
+## Método
 
-Os dados brutos e *scripts* de tratamento se encontram em `data-raw/`, utilizados para extração de dados tratados encontrados em `data/`. 
+Os dados brutos e *scripts* de tratamento se encontram em `data-raw/`, utilizados para extração de dados tratados encontrados em `data/`.
 
 ```{r echo=FALSE}
 df_total |> drop_na() |> kable()
 ```
 
-As funções para o modelo criado se encontram em `R/main.R`, onde demonstram a previsão para 2022. Para futuras previsões, basta imputar novos dados ao *dataset* de entrada e chamar o modelo com `lm_model()` e `lm_extract()`
+O modelo ajustado é uma regressão linear multivariada, construída após um processo de seleção de atributos manual:
+
+As funções para o modelo criado se encontram em `R/main.R`, onde demonstram a previsão para 2022. Para futuras previsões, basta imputar novos dados ao *dataset* de entrada e chamar o modelo com `lm_model()` e `lm_extract()`.
+
+## Estrutura dos Arquivos
+
+-   `report/` contém relatórios sobre o processo de criação do modelo
+-   `data-raw/` possui dados brutos e scripts de extração deles
+-   `data/` possui os dados tratados utilizados no modelo
+-   `R/` possui o modelo e as funções criadas para previsão
+
+## Principais resultados
+
+O modelo contemplou um intervalo de dez anos (2011 à 2021) e foi testado com os dados de 2022. Avaliando as métricas com o pacote `yardstick`, têm-se:
+
+```{r echo=FALSE}
+res2$erros |> 
+  rename(metricas = .metric, valores = .estimate) |> 
+  select(-.estimator) |> 
+  kable()
+```
+
+Seus coeficientes podem ser observados:
+
+```{r echo=FALSE}
+res2$specs |> 
+  rename(variavel = term, pvalor = p.value, valor = estimate) |> 
+  select(-std.error, -statistic) |> 
+  kable()
+```
+
+Visualizando as osbervações e seus intervalos de confiança:
+
+```{r include=FALSE}
+fig <- plot_ly(data = res2$pred, x = ~ano) |>
+  add_trace(y = ~mortes.pred,
+            name = "Mortes Previstas",
+            mode = "markers") |>
+  add_trace(y = ~mortes,
+            name = "Mortes Observadas",
+            mode = "markers") |>
+  add_ribbons(ymin = ~.pred_lower,
+              ymax = ~.pred_upper,
+              name = "Intervalo de Confiança",
+              line = list(color = 'rgba(7, 164, 181, 0.05)'),
+              fillcolor = 'rgba(7, 164, 181, 0.2)')
+
+fig |> htmlwidgets::saveWidget(file = "widget.html")
+```
+
+
+```{=html}
+<a href="widget.html">grafico</a><br>
+```
 
 

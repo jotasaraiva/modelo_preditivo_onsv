@@ -1,16 +1,18 @@
 # Modelo Preditivo de Mortes Viárias Anuais
 
-- [Descrição](#descrição)
-- [Como usar](#como-usar)
+- [Objetivo](#objetivo)
+- [Método](#método)
+- [Estrutura dos Arquivos](#estrutura-dos-arquivos)
+- [Principais resultados](#principais-resultados)
 
-## Descrição
+## Objetivo
 
 Este projeto é um modelo baseado em dados viários para previsão de
 mortes relacionadas à segurança viária e veicular no Brasil com uma
 resolução temporal anual, confeccionado a fim de gerar um estudo
 científico para o Observatório Nacional de Segurança Viária (ONSV).
 
-## Como usar
+## Método
 
 Os dados brutos e *scripts* de tratamento se encontram em `data-raw/`,
 utilizados para extração de dados tratados encontrados em `data/`.
@@ -29,7 +31,43 @@ utilizados para extração de dados tratados encontrados em `data/`.
 | 2020 |  70144529 |    28576665 |      106289700 |  32716 | 7609597 | 211755692 |         63576 |                 4525 |       71511 |       5293 |   75028871 |                 98.72076 |       15.44988 |
 | 2021 |  72331723 |    29684894 |      109961381 |  33813 | 8898727 | 213317639 |         64539 |                 4664 |       71846 |       5396 |   77122865 |                110.15627 |       15.85101 |
 
+O modelo ajustado é uma regressão linear multivariada, construída após
+um processo de seleção de atributos manual:
+
 As funções para o modelo criado se encontram em `R/main.R`, onde
 demonstram a previsão para 2022. Para futuras previsões, basta imputar
 novos dados ao *dataset* de entrada e chamar o modelo com `lm_model()` e
-`lm_extract()`
+`lm_extract()`.
+
+## Estrutura dos Arquivos
+
+- `report/` contém relatórios sobre o processo de criação do modelo
+- `data-raw/` possui dados brutos e scripts de extração deles
+- `data/` possui os dados tratados utilizados no modelo
+- `R/` possui o modelo e as funções criadas para previsão
+
+## Principais resultados
+
+O modelo contemplou um intervalo de dez anos (2011 à 2021) e foi testado
+com os dados de 2022. Avaliando as métricas com o pacote `yardstick`,
+têm-se:
+
+| metricas |     valores |
+|:---------|------------:|
+| rmse     | 687.6800884 |
+| mae      | 607.8646399 |
+| rsq      |   0.9786708 |
+
+Seus coeficientes podem ser observados:
+
+| variavel             |      valor |    pvalor |
+|:---------------------|-----------:|----------:|
+| (Intercept)          |  37874.000 | 0.0000000 |
+| qnt_acidentes        |  -4689.250 | 0.2372921 |
+| qnt_acidentes_fatais |   8158.733 | 0.0433187 |
+| condutores           | -15133.569 | 0.2292492 |
+| veiculos_total       |  13851.817 | 0.2157495 |
+
+Visualizando as osbervações e seus intervalos de confiança:
+
+<a href="widget.html">grafico</a><br>
