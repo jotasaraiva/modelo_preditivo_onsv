@@ -56,8 +56,6 @@ res2$specs |>
   kable()
 ```
 
-Visualizando as osbervações e seus intervalos de confiança:
-
 ```{r include=FALSE}
 fig <- plot_ly(data = res2$pred, x = ~ano) |>
   add_trace(y = ~mortes.pred,
@@ -71,13 +69,5 @@ fig <- plot_ly(data = res2$pred, x = ~ano) |>
               name = "Intervalo de Confiança",
               line = list(color = 'rgba(7, 164, 181, 0.05)'),
               fillcolor = 'rgba(7, 164, 181, 0.2)')
-
-fig |> htmlwidgets::saveWidget(file = "widget.html")
 ```
-
-
-```{=html}
-<a href="widget.html">grafico</a><br>
-```
-
 

@@ -67,7 +67,3 @@ Seus coeficientes podem ser observados:
 | qnt_acidentes_fatais |   8158.733 | 0.0433187 |
 | condutores           | -15133.569 | 0.2292492 |
 | veiculos_total       |  13851.817 | 0.2157495 |
-
-Visualizando as osbervações e seus intervalos de confiança:
-
-<a href="widget.html">grafico</a><br>
