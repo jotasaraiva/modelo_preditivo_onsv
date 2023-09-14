@@ -82,16 +82,19 @@ for (i in colnames(df_total_sem_taxa)[-5]){
 
 erros_pivot <- erros |> 
   select(!.estimator) |> 
-  rename(valor = .estimate)
+  rename(valor = .estimate) |> 
+  filter(variavel != "quilometragem_10_bilhoes")
 
 pvalores <- pvalores |> 
   arrange(valor) |> 
   filter(term != "(Intercept)") |> 
-  select(.metric, valor, variavel)
+  select(.metric, valor, variavel) |> 
+  filter(variavel != "quilometragem_10_bilhoes")
 
 df_metricas <- rbind(erros_pivot, pvalores) |> 
   group_by(.metric) |> 
-  arrange(valor, .by_group = TRUE)
+  arrange(valor, .by_group = TRUE) |> 
+  mutate(.metric = toupper(.metric))
 
 df_metricas |>
   ggplot(aes(x = valor, y = variavel)) +
@@ -507,10 +510,7 @@ ggplot(data = df_pred, aes(x = ano, y = mortes)) +
               alpha = 0.1)
 ```
 
-Variação com acidentes, fatais e feridos: 5533.683 
-Variação com acidentes e fatais: 4878.459 
-Variação com fatais e feridos: 5525.722 
-Variação com fatais: 4932.277
+Variação com acidentes, fatais e feridos: 5533.683 Variação com acidentes e fatais: 4878.459 Variação com fatais e feridos: 5525.722 Variação com fatais: 4932.277
 
 ```{r}
 dados2022 <- list(
@@ -523,4 +523,3 @@ dados2022 <- list(
 
 df_2022 <- bind_rows(drop_na(df_total), dados2022)
 ```
-

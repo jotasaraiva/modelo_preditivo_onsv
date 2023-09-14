@@ -9,6 +9,14 @@ toc-title: Sumário
 theme: lux
 ---
 
+```{r include=FALSE}
+library(tidyverse)
+library(ggcorrplot)
+library(onsvplot)
+library(here)
+load(here("data","tabela_total.rda"))
+```
+
 ## Introdução
 
 O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que este cenário perdura pelo futuro observável [@worldhealthorganization2018]. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública, o que estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
@@ -25,9 +33,30 @@ O presente estudo teve como objetivo criar um modelo linear de melhor ajuste par
 
 A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus [@microdatasus], coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadadas a ATTs. As demais variáveis, coletadas dos portais abertos, foram tratadas e imputadas em um único *dataframe*. Entre elas, a quantidade de automóveis, a quantidade de motocicletas, a quantidade total de veículos, o PIB, a população, a quantidade de acidentes, a quantidade de acidentes fatais, a quantidade de feridos em acidente, a quantidade de mortos em acidentes e a quantidade de condutores, todas em âmbito nacional.
 
-Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura X, apresentam as correlações elevadas para a maioria dos atributos:
+Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura X, apresentam correlações elevadas para a maioria dos atributos:
+
+```{r echo=FALSE}
+cor_spearman <- df_total |> 
+  drop_na() |>
+  select(-quilometragem_10_bilhoes) |> 
+  cor(method = c("spearman"))
+
+ggcorrplot(cor_spearman, type = "lower",
+              lab = TRUE, hc.order = T,
+              lab_size = 2, tl.srt = 60,
+              tl.cex = 8, legend.title = "Correlação",
+              colors = c(onsv_palette$red,
+                         onsv_palette$yellow,
+                         onsv_palette$green))
+```
+
+As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.
+
+Desta forma, o próximo passo inclue a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, devidamente atribuída as relações reais que um dado viário considerado têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente dependente da quantidade de acidentes fatais, que por sua vez depende da quantidade de acidentes totais.
 
 ## Discussão e Resultados
+
+
 
 ## Conclusão
 
