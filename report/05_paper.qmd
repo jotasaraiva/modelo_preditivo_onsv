@@ -13,6 +13,7 @@ theme: lux
 library(tidyverse)
 library(ggcorrplot)
 library(onsvplot)
+library(knitr)
 library(here)
 load(here("data","tabela_total.rda"))
 ```
@@ -52,11 +53,35 @@ ggcorrplot(cor_spearman, type = "lower",
 
 As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.
 
-Desta forma, o próximo passo inclue a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, devidamente atribuída as relações reais que um dado viário considerado têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente dependente da quantidade de acidentes fatais, que por sua vez depende da quantidade de acidentes totais.
+Desta forma, o próximo passo inclue a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado viário têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente dependente da quantidade de acidentes fatais, que por sua vez é resultante da quantidade de acidentes totais.
+
+```{r echo=FALSE}
+labels <- c(qnt_acidentes = "Acidentes", qnt_acidentes_fatais = "Acidentes Fatais",
+            qnt_feridos = "Feridos")
+
+prf_plot1 <- df_total |> 
+  select(ano, qnt_acidentes_fatais, qnt_acidentes, qnt_feridos) |> 
+  pivot_longer(-1) |>
+  drop_na() |> 
+  ggplot(aes(x = ano, y = value, color = name)) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+    geom_line(linewidth = 1, alpha = 0.25) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(breaks = seq(2006, 2021, 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    ylab(label = "")
+
+theme_set(theme_onsv())
+
+prf_plot1 + scale_color_manual(labels = labels,
+                               values = c(onsv_palette$red,
+                                          onsv_palette$yellow,
+                                          onsv_palette$blue))
+```
+
+Após a seleção das variáveis de melhor desempenho, o *dataframe* é padronizado a fim de otimizar sua performance e estabilidade no momento de ajuste.
 
 ## Discussão e Resultados
-
-
 
 ## Conclusão
 
