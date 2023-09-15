@@ -55,7 +55,7 @@ ggcorrplot(cor_spearman, type = "lower",
               tl.cex = 8, legend.title = "Correlação",
               colors = c(onsv_palette$red,
                          onsv_palette$yellow,
-                         onsv_palette$green))
+                         onsv_palette$blue))
 ```
 
 As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.
@@ -177,13 +177,21 @@ mortes_previsao |>
   ggplot(aes(x = ano)) +
     geom_text(aes(label = ano, y = mortes), nudge_y = 750, size = 2.5) +
     geom_point(aes(y = mortes), color = onsv_palette$blue) +
-    geom_line(aes(y = mortes), alpha = 0.50) +
-    geom_point(aes(y = .pred), color = onsv_palette$yellow) +
+    geom_line(aes(y = mortes), color = onsv_palette$blue, alpha = 0.75) +
+    geom_point(aes(y = .pred), color = onsv_palette$red) +
     ylab("Mortes") +
     xlab("Ano")
 ```
 
 O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança. 
+
+```{r}
+ggplot(data = df_pred, aes(x = ano, y = mortes)) +
+  geom_point(color = onsv_palette$blue) +
+  geom_point(aes(y = .pred), color = onsv_palette$red) +
+  scale_x_continuous(breaks = seq(2006, 2022, 1))
+```
+
 
 ## Conclusão
 
