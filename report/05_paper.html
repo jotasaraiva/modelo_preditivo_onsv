@@ -115,9 +115,57 @@ div.csl-indent {
 <p><img src="05_paper_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Após a seleção das variáveis de melhor desempenho, o <em>dataframe</em> é padronizado a fim de otimizar sua performance e estabilidade no momento de ajuste. A expressão baseada na modelagem de uma regressão linear multivariada é feita e pode ser observada a partir dos coeficientes encontrados:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Variavel</th>
+<th style="text-align: right;">Coeficiente</th>
+<th style="text-align: right;">P-valor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: right;">37874.000</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Acidentes fatais</td>
+<td style="text-align: right;">8158.733</td>
+<td style="text-align: right;">0.0433187</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Veiculos</td>
+<td style="text-align: right;">13851.817</td>
+<td style="text-align: right;">0.2157495</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Condutores</td>
+<td style="text-align: right;">-15133.569</td>
+<td style="text-align: right;">0.2292492</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Acidentes</td>
+<td style="text-align: right;">-4689.250</td>
+<td style="text-align: right;">0.2372921</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="discussão-e-resultados" class="level2">
 <h2 class="anchored" data-anchor-id="discussão-e-resultados">Discussão e Resultados</h2>
+<p>Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada. Por outro lado, a capacidade do algoritmo regressor pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança.</p>
 </section>
 <section id="conclusão" class="level2">
 <h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
