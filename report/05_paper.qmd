@@ -31,7 +31,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ## Introdução
 
-O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que este cenário perdura pelo futuro observável [@worldhealthorganization2018]. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública, o que estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
+O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que esta realidade perdura pelo futuro observável [@worldhealthorganization2018]. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública, o que estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
 
 A segurança viária é profundamente correlata ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes viárias dependem de diversos fatores estruturais, socioeconômicos e ambientais [@zhong-xiang2014]. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública, estimulando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
 
@@ -217,7 +217,8 @@ df_pred |>
     geom_ribbon(aes(ymin = .pred_lower, 
                     ymax = .pred_upper), 
                 fill = "grey",
-                alpha = 0.25) +
+                alpha = 0.25,
+                color = "grey") +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
     scale_x_continuous(breaks = seq(1996, 2022, 1)) +
     scale_discrete_onsv()
@@ -244,6 +245,8 @@ A valor obtido da previsão implica uma leve queda de 7,4% no número de mortes 
 
 ## Conclusão
 
+O algoritmo desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a curvatura do modelo linear ajustado está substancialmente distante do número de casos em 2019. Isto revela um potencial relaxamento no sistema de segurança viária nacional, desencadeiando em uma redução em sua eficiência e  propiciando um aumento na mortalidade.
 
+É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores infraestruturais e socioeconômicos que afetam a saúde deste sistema, sendo diretamente dependente do estado de desenvolvimento e maturidade tecnológica do país. O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas sustentáveis estabelecidas em âmbito nacional e, caso este cenário não seja amenizado com antecedência, é improvável que hajam avanços significativos nas metas da Agenda 2023.
 
 ## Referências
