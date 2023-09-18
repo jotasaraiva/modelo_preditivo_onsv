@@ -45,7 +45,7 @@ O presente estudo teve como objetivo criar um modelo linear de melhor ajuste par
 
 A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus [@microdatasus], coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadadas a ATTs. As demais variáveis, coletadas dos portais abertos, foram tratadas e imputadas em um único *dataframe*. Entre elas, a quantidade de automóveis, a quantidade de motocicletas, a quantidade total de veículos, o PIB, a população, a quantidade de acidentes, a quantidade de acidentes fatais, a quantidade de feridos em acidente, a quantidade de mortos em acidentes e a quantidade de condutores, todas em âmbito nacional.
 
-Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura X, apresentam correlações elevadas para a maioria dos atributos:
+Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura 1, apresentam correlações elevadas para a maioria dos atributos:
 
 ```{r echo=FALSE}
 cor_spearman <- df_total |> 
@@ -176,38 +176,54 @@ coefs |>
 Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada. Por outro lado, a capacidade do algoritmo regressor pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo.
 
 ```{r echo=FALSE}
-mortes_previsao <- lm_wflow |> predict(df_total)
+modelo_linear <- 
+  linear_reg() |> 
+  set_engine("lm")
+
+mortes_wflow <- 
+  workflow() |> 
+  add_recipe(lm_recipe) |> 
+  add_model(modelo_linear)
+
+mortes_wflow_ajustado <- mortes_wflow |> fit(df_total)
+  
+mortes_previsao <- mortes_wflow_ajustado |> predict(df_total) |> rename(mortes_pred = .pred)
+
 mortes_previsao <- cbind(df_total, mortes_previsao)
 
 mortes_previsao |> 
-  ggplot(aes(x = ano)) +
-    geom_point(aes(y = mortes), color = onsv_palette$blue) +
-    geom_line(aes(y = mortes), color = onsv_palette$blue, alpha = 0.75) +
-    geom_point(aes(y = .pred), color = onsv_palette$red) +
-    scale_x_continuous(breaks = seq(1996, 2022, 1)) +
+  select(mortes, mortes_pred, ano) |> 
+  rename(Ano = ano, Previsto = mortes_pred, Real = mortes) |> 
+  pivot_longer(cols = c(Previsto, Real), names_to = "Tipo", values_to = "Mortes") |> 
+  ggplot(aes(x = Ano, y = Mortes, color = Tipo)) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+    geom_line(linewidth = 1, alpha = 0.25) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    theme_onsv() +
-    ylab("Mortes") +
-    xlab("Ano")
+    scale_x_continuous(breaks = seq(1996, 2021, 1)) +
+    scale_discrete_onsv()
 ```
 
 O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança. 
 
 ```{r echo=FALSE}
-ggplot(data = df_pred, aes(x = ano, y = mortes)) +
-  geom_point(color = onsv_palette$blue) +
-  geom_point(aes(y = .pred), color = onsv_palette$red) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) + 
-  geom_ribbon(aes(ymin = .pred_lower, ymax = .pred_upper),
-              alpha = 0.1) +
-  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper),
-                width  = 0.25,
+df_pred |> 
+  select(ano, .pred_lower, .pred_upper, .pred, mortes) |> 
+  rename(Ano = ano, Previsto = .pred, Real = mortes) |> 
+  pivot_longer(cols = c(Previsto, Real),
+               names_to = "Tipo", values_to = "Mortes") |> 
+  ggplot(aes(x = Ano, y = Mortes)) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5, aes(color = Tipo)) +
+    geom_line(linewidth = 1, alpha = 0.25, aes(color = Tipo)) +
+    geom_ribbon(aes(ymin = .pred_lower, 
+                    ymax = .pred_upper), 
+                fill = "grey",
                 alpha = 0.25) +
-  scale_x_continuous(breaks = seq(2006, 2022, 1)) +
-  xlab("Ano") + ylab("Mortes")
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    scale_x_continuous(breaks = seq(1996, 2022, 1)) +
+    scale_discrete_onsv()
 ```
 
-Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:
+Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (Root Mean Squared Error - RMSE), o Erro Médio Absoluto (Mean Squared Error - MAE) e o R-quadrado. Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:
 
 ```{r echo=FALSE}
 erros |> 
@@ -224,7 +240,10 @@ erros |>
   kable()
 ```
 
+A valor obtido da previsão implica uma leve queda de 7,4% no número de mortes em relação ao ano anterior, que teria registrado 33813 casos. Conforme a análise dos dados, 2021 teria sido o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlação dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargálo para a análise dos sinistros viários já que a disponibilidade de dados é reduzida. 
 
 ## Conclusão
+
+
 
 ## Referências

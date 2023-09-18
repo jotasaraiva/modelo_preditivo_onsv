@@ -102,7 +102,7 @@ div.csl-indent {
 <section id="metodologia" class="level2">
 <h2 class="anchored" data-anchor-id="metodologia">Metodologia</h2>
 <p>A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus <span class="citation" data-cites="microdatasus">(<a href="#ref-microdatasus" role="doc-biblioref">Saldanha 2023</a>)</span>, coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadadas a ATTs. As demais variáveis, coletadas dos portais abertos, foram tratadas e imputadas em um único <em>dataframe</em>. Entre elas, a quantidade de automóveis, a quantidade de motocicletas, a quantidade total de veículos, o PIB, a população, a quantidade de acidentes, a quantidade de acidentes fatais, a quantidade de feridos em acidente, a quantidade de mortos em acidentes e a quantidade de condutores, todas em âmbito nacional.</p>
-<p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura X, apresentam correlações elevadas para a maioria dos atributos:</p>
+<p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura 1, apresentam correlações elevadas para a maioria dos atributos:</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="05_paper_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="576"></p>
@@ -171,7 +171,7 @@ div.csl-indent {
 <p><img src="05_paper_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="576"></p>
 </div>
 </div>
-<p>Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:</p>
+<p>Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (Root Mean Squared Error - RMSE), o Erro Médio Absoluto (Mean Squared Error - MAE) e o R-quadrado. Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -198,6 +198,7 @@ div.csl-indent {
 </table>
 </div>
 </div>
+<p>A valor obtido da previsão implica uma leve queda de 7,4% no número de mortes em relação ao ano anterior, que teria registrado 33813 casos. Conforme a análise dos dados, 2021 teria sido o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, vê-se que apesar da intensidade das correlação dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargálo para a análise dos sinistros viários, já que a disponibilidade de dados é reduzida.</p>
 </section>
 <section id="conclusão" class="level2">
 <h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
