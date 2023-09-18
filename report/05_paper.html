@@ -105,14 +105,14 @@ div.csl-indent {
 <p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e, como indica a Figura X, apresentam correlações elevadas para a maioria dos atributos:</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<p><img src="05_paper_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="576"></p>
 </div>
 </div>
 <p>As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.</p>
 <p>Desta forma, o próximo passo inclue a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado viário têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente dependente da quantidade de acidentes fatais, que por sua vez é resultante da quantidade de acidentes totais.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<p><img src="05_paper_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="576"></p>
 </div>
 </div>
 <p>Após a seleção das variáveis de melhor desempenho, o <em>dataframe</em> é padronizado a fim de otimizar sua performance e estabilidade no momento de ajuste. A expressão baseada na modelagem de uma regressão linear multivariada é feita e pode ser observada a partir dos coeficientes encontrados:</p>
@@ -121,14 +121,14 @@ div.csl-indent {
 <table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: left;">Variavel</th>
+<th style="text-align: left;">Variável</th>
 <th style="text-align: right;">Coeficiente</th>
 <th style="text-align: right;">P-valor</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Intercept</td>
+<td style="text-align: left;">Interceptação</td>
 <td style="text-align: right;">37874.000</td>
 <td style="text-align: right;">0.0000000</td>
 </tr>
@@ -162,10 +162,42 @@ div.csl-indent {
 <p>Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada. Por outro lado, a capacidade do algoritmo regressor pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<p><img src="05_paper_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="576"></p>
 </div>
 </div>
 <p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="576"></p>
+</div>
+</div>
+<p>Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RMSE</td>
+<td style="text-align: right;">687.6800884</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MAE</td>
+<td style="text-align: right;">607.8646399</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R²</td>
+<td style="text-align: right;">0.9786708</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="conclusão" class="level2">
 <h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>

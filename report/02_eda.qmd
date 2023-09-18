@@ -248,10 +248,6 @@ correlograma <-
 ggcorrplot(cor_kendall, type = "lower",
            lab = TRUE, hc.order = TRUE,
            lab_size = 2)
-
-ggsave("correlograma.png", 
-       plot = correlograma,
-       path = here("plots"))
 ```
 
 ### Distribuição

@@ -3,6 +3,10 @@ title: "Modelo Preditivo de Mortes Viárias"
 format: 
   html:
     editor: visual
+    fig-width: 6
+    fig-height: 3.5
+    fig-align: center
+    dpi: 300
 bibliography: references.bib
 toc: true
 toc-title: Sumário
@@ -56,6 +60,8 @@ ggcorrplot(cor_spearman, type = "lower",
               colors = c(onsv_palette$red,
                          onsv_palette$yellow,
                          onsv_palette$blue))
+
+## 6in x 3.5in
 ```
 
 As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.
@@ -148,14 +154,14 @@ erros <- metricas(data =df_pred, truth = mortes, estimate = .pred)
 
 ```{r echo=FALSE}
 coefs |>
-  rename(Variavel = term,
+  rename(Variável = term,
          Coeficiente = estimate,
          'P-valor' = p.value) |> 
   select(-std.error, -statistic)|> 
   mutate(
-    Variavel = case_match(
-      Variavel,
-      "(Intercept)" ~ "Intercept",
+    Variável = case_match(
+      Variável,
+      "(Intercept)" ~ "Interceptação",
       "qnt_acidentes_fatais" ~ "Acidentes fatais",
       "veiculos_total" ~ "Veiculos",
       "condutores" ~ "Condutores",
@@ -175,21 +181,47 @@ mortes_previsao <- cbind(df_total, mortes_previsao)
 
 mortes_previsao |> 
   ggplot(aes(x = ano)) +
-    geom_text(aes(label = ano, y = mortes), nudge_y = 750, size = 2.5) +
     geom_point(aes(y = mortes), color = onsv_palette$blue) +
     geom_line(aes(y = mortes), color = onsv_palette$blue, alpha = 0.75) +
     geom_point(aes(y = .pred), color = onsv_palette$red) +
+    scale_x_continuous(breaks = seq(1996, 2022, 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    theme_onsv() +
     ylab("Mortes") +
     xlab("Ano")
 ```
 
 O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança. 
 
-```{r}
+```{r echo=FALSE}
 ggplot(data = df_pred, aes(x = ano, y = mortes)) +
   geom_point(color = onsv_palette$blue) +
   geom_point(aes(y = .pred), color = onsv_palette$red) +
-  scale_x_continuous(breaks = seq(2006, 2022, 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) + 
+  geom_ribbon(aes(ymin = .pred_lower, ymax = .pred_upper),
+              alpha = 0.1) +
+  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper),
+                width  = 0.25,
+                alpha = 0.25) +
+  scale_x_continuous(breaks = seq(2006, 2022, 1)) +
+  xlab("Ano") + ylab("Mortes")
+```
+
+Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:
+
+```{r echo=FALSE}
+erros |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
+  kable()
 ```
 
 
