@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Modelo Preditivo de Mortes Viárias</title>
+<title>Modelo Preditivo de Mortes Viárias Anuais no Brasil</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,11 +64,11 @@ div.csl-indent {
     <h2 id="toc-title">Sumário</h2>
    
   <ul>
-  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a></li>
-  <li><a href="#metodologia" id="toc-metodologia" class="nav-link" data-scroll-target="#metodologia">Metodologia</a></li>
-  <li><a href="#discussão-e-resultados" id="toc-discussão-e-resultados" class="nav-link" data-scroll-target="#discussão-e-resultados">Discussão e Resultados</a></li>
-  <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão">Conclusão</a></li>
-  <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução"><span class="header-section-number">1</span> Introdução</a></li>
+  <li><a href="#metodologia" id="toc-metodologia" class="nav-link" data-scroll-target="#metodologia"><span class="header-section-number">2</span> Metodologia</a></li>
+  <li><a href="#discussão-e-resultados" id="toc-discussão-e-resultados" class="nav-link" data-scroll-target="#discussão-e-resultados"><span class="header-section-number">3</span> Discussão e Resultados</a></li>
+  <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão"><span class="header-section-number">4</span> Conclusão</a></li>
+  <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências"><span class="header-section-number">5</span> Referências</a></li>
   </ul>
 </nav>
 </div>
@@ -76,7 +76,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Modelo Preditivo de Mortes Viárias</h1>
+<h1 class="title">Modelo Preditivo de Mortes Viárias Anuais no Brasil</h1>
 </div>
 
 
@@ -91,35 +91,44 @@ div.csl-indent {
 
 </header>
 
-<section id="introdução" class="level2">
-<h2 class="anchored" data-anchor-id="introdução">Introdução</h2>
+<section id="introdução" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introdução"><span class="header-section-number">1</span> Introdução</h2>
 <p>O presente cenário mundial acerca de mortes e lesões relacionadas a sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que esta realidade perdura pelo futuro observável <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral <span class="citation" data-cites="rodríguez2020">(<a href="#ref-rodríguez2020" role="doc-biblioref">Rodríguez, Jattin, and Soracipa 2020</a>)</span>.</p>
 <p>A segurança viária é profundamente correlata ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes viárias dependem de diversos fatores estruturais, socioeconômicos e ambientais <span class="citation" data-cites="zhong-xiang2014">(<a href="#ref-zhong-xiang2014" role="doc-biblioref">Zhong-xiang et al. 2014</a>)</span>. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.</p>
 <p>Enquanto o desenvolvimento econômico certamente beneficia a segurança viária, observa-se que os países da Assembleia Geral das Nações Unidas têm dificuldade em atingir as metas estabelecidas em 2015 pelos Objetivos de Desenvolvimento Sustentável. Apesar da crescente adesão por itens de segurança veicular, acidentes de transporte terrestre (ATTs) permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade <span class="citation" data-cites="andrade2019">(<a href="#ref-andrade2019" role="doc-biblioref">Andrade and Antunes 2019</a>)</span>, sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Como previsto por modelos prévios à 2020 <span class="citation" data-cites="blumenberg2018">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>)</span>, o Brasil falhou em reduzir sua mortalidade viária pela metade, como ditava a meta.</p>
 <p>A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>; <a href="#ref-cai2015" role="doc-biblioref">Cai, Zhu, and Yan 2015</a>)</span>, assim como modelos preditivos baseados em cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#ref-seneta1996" role="doc-biblioref">Seneta 1996</a>; <a href="#ref-jin2020" role="doc-biblioref">Jin, Zheng, and Geng 2020</a>)</span>. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA <span class="citation" data-cites="al-ghamdi1995">(<a href="#ref-al-ghamdi1995" role="doc-biblioref">Al-Ghamdi 1995</a>)</span> e redes neurais artificiais <span class="citation" data-cites="jafari2015">(<a href="#ref-jafari2015" role="doc-biblioref">Jafari et al. 2015</a>)</span>.</p>
 <p>O presente estudo teve como objetivo criar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o PIB e a população, extraídos pelo IBGE, assim como dados viários coletados das bases de dados da Polícia Federal Rodoviária (PRF), do Registro Nacional de Carteira de Habilitação (RENACH), do Registro Nacional de Veículos Automotores (RENAVAM) e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde.</p>
 </section>
-<section id="metodologia" class="level2">
-<h2 class="anchored" data-anchor-id="metodologia">Metodologia</h2>
+<section id="metodologia" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="metodologia"><span class="header-section-number">2</span> Metodologia</h2>
 <p>A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus <span class="citation" data-cites="microdatasus">(<a href="#ref-microdatasus" role="doc-biblioref">Saldanha 2023</a>)</span>, coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadas a sinistros.</p>
 <p>As demais variáveis, coletadas dos portais abertos, foram tratadas e imputadas em um único <em>dataframe</em>. Entre elas, a quantidade de automóveis, a quantidade de motocicletas, a quantidade total de veículos, o PIB, a população, a quantidade de acidentes, a quantidade de acidentes fatais, a quantidade de feridos em acidentes, a quantidade de mortos em acidentes e a quantidade de condutores. Em razão da ausência de dados prévios à 2011 de certas fontes, o intervalo de estudo foi reduzido para 2011 a 2021.</p>
 <p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e apresentam correlações elevadas para a maioria dos atributos.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="576"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.</p>
 <p>Desta forma, a próxima etapa inclui a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado viário têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente dependente da quantidade de acidentes fatais, que por sua vez é resultante da quantidade de acidentes totais.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="576"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Após a seleção das variáveis de melhor desempenho, o <em>dataframe</em> é padronizado a fim de otimizar sua performance e estabilidade no momento de ajuste. A expressão baseada na modelagem de uma regressão linear multivariada é feita e pode ser observada a partir dos coeficientes encontrados:</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Coeficientes</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Variável</th>
@@ -158,24 +167,33 @@ div.csl-indent {
 </div>
 </div>
 </section>
-<section id="discussão-e-resultados" class="level2">
-<h2 class="anchored" data-anchor-id="discussão-e-resultados">Discussão e Resultados</h2>
+<section id="discussão-e-resultados" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="discussão-e-resultados"><span class="header-section-number">3</span> Discussão e Resultados</h2>
 <p>Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="576"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança.</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="05_paper_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="576"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
 </div>
 </div>
-<p>Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (<em>Root Mean Squared Error</em> - RMSE), o Erro Médio Absoluto (<em>Mean Squared Error</em> - MAE) e o R-quadrado. Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:</p>
-<div class="cell">
+</div>
+<p>Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (<em>Root Mean Squared Error</em> - RMSE), o Erro Médio Absoluto (<em>Mean Squared Error</em> - MAE) e o R-quadrado. Investigando as métricas de erros com base na comparação do conjunto de dados gerado ao inicial, têm-se:</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Métricas de Erros</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Métrica</th>
@@ -198,20 +216,27 @@ div.csl-indent {
 </tbody>
 </table>
 </div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>A valor obtido da previsão implica uma leve queda de 7,4% no número de mortes em relação ao ano anterior, que teria registrado 33813 casos. Conforme a análise dos dados, 2021 teria sido o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlação dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargálo para a análise dos sinistros viários já que a disponibilidade de dados é reduzida.</p>
 </section>
-<section id="conclusão" class="level2">
-<h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
+<section id="conclusão" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="conclusão"><span class="header-section-number">4</span> Conclusão</h2>
 <p>O algoritmo desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a curvatura do modelo linear ajustado está substancialmente distante do número de casos de 2019, que foi o ano com a maior redução desde o pico de mortes em 2012. Isto revela um potencial relaxamento no sistema de segurança viária nacional, desencadeiando em uma redução em sua eficiência e propiciando um aumento na mortalidade. Por outro lado, há a hipótese de que este é o efeito direto da pandemia e do processo de reintegração da população ao trânsito após o período de isolamento social e <em>lockdown</em>.</p>
 <p>É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores infraestruturais e socioeconômicos que afetam a saúde deste sistema, sendo diretamente dependente do estado de desenvolvimento e maturidade tecnológica do país. O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas sustentáveis estabelecidas em âmbito nacional e, caso este cenário não seja amenizado com antecedência, é improvável haverem avanços significativos nos objetivos da Agenda 2030.</p>
 </section>
-<section id="referências" class="level2 unnumbered">
+<section id="referências" class="level2 unnumbered" data-number="5">
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Referências</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">5 Referências</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-al-ghamdi1995" class="csl-entry" role="listitem">
 Al-Ghamdi, Ali S. 1995. <span>“Time Series Forecasts for Traffic Accidents, Injuries, and Fatalities in Saudi Arabia.”</span> <em>Journal of King Saud University - Engineering Sciences</em> 7 (2): 199–217. <a href="https://doi.org/10.1016/S1018-3639(18)30627-5">https://doi.org/10.1016/S1018-3639(18)30627-5</a>.
 </div>

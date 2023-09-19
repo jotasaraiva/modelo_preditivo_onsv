@@ -1,13 +1,16 @@
 ---
-title: "Modelo Preditivo de Mortes Viárias"
+title: "Modelo Preditivo de Mortes Viárias Anuais no Brasil"
 format: 
   html:
     editor: visual
     fig-width: 6
     fig-height: 3.5
-    fig-align: center
     dpi: 300
+knitr: 
+  opts_chunk: 
+    fig.align: center
 bibliography: references.bib
+number-sections: true
 toc: true
 toc-title: Sumário
 theme: lux
@@ -173,7 +176,7 @@ coefs |>
       "qnt_acidentes" ~ "Acidentes"
     )
   ) |> 
-  kable()
+  kable(caption = "Coeficientes")
 ```
 
 ## Discussão e Resultados
@@ -231,7 +234,7 @@ df_pred |>
     scale_discrete_onsv()
 ```
 
-Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (*Root Mean Squared Error* - RMSE), o Erro Médio Absoluto (*Mean Squared Error* - MAE) e o R-quadrado. Investigando as métricas de erros com base no conjunto de dados inicial, têm-se:
+Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (*Root Mean Squared Error* - RMSE), o Erro Médio Absoluto (*Mean Squared Error* - MAE) e o R-quadrado. Investigando as métricas de erros com base na comparação do conjunto de dados gerado ao inicial, têm-se:
 
 ```{r echo=FALSE}
 erros |> 
@@ -245,7 +248,16 @@ erros |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  kable()
+  kable(caption = "Métricas de Erros")
+
+df_pred |> 
+  select(.pred, mortes, ano) |> 
+  rename(Previsto = .pred, Real = mortes) |> 
+  ggplot(aes(x = Real, y = Previsto)) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+    geom_text(aes(label = ano), vjust = 1.5, size = 3) + 
+    geom_abline(linewidth = 1, alpha = 0.25, color = onsv_palette$blue) +
+    labs(title = "Mortes Previstas x Reais")
 ```
 
 A valor obtido da previsão implica uma leve queda de 7,4% no número de mortes em relação ao ano anterior, que teria registrado 33813 casos. Conforme a análise dos dados, 2021 teria sido o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlação dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargálo para a análise dos sinistros viários já que a disponibilidade de dados é reduzida.
