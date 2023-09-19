@@ -13,6 +13,8 @@ library(plotly)
 source("R/main.R")
 ```
 
+![](figures/onsv.png){fig-align="center" width="308"}
+
 ## Objetivo
 
 Este projeto é um modelo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com uma resolução temporal anual, confeccionado a fim de gerar um estudo científico para o Observatório Nacional de Segurança Viária (ONSV).
@@ -70,4 +72,3 @@ fig <- plot_ly(data = res2$pred, x = ~ano) |>
               line = list(color = 'rgba(7, 164, 181, 0.05)'),
               fillcolor = 'rgba(7, 164, 181, 0.2)')
 ```
-

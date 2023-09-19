@@ -5,6 +5,8 @@
 - [Estrutura dos Arquivos](#estrutura-dos-arquivos)
 - [Principais resultados](#principais-resultados)
 
+<img src="figures/onsv.png" data-fig-align="center" width="308" />
+
 ## Objetivo
 
 Este projeto é um modelo baseado em dados viários para previsão de
