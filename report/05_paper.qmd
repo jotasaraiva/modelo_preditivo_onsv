@@ -13,7 +13,9 @@ bibliography: references.bib
 number-sections: true
 toc: true
 toc-title: Sumário
-theme: lux
+theme: 
+  - cosmo
+  - style.scss
 ---
 
 ```{r include=FALSE}
