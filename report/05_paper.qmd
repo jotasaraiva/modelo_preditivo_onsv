@@ -1,12 +1,15 @@
 ---
 title: "Modelo Preditivo de Mortes no Trânsito no Brasil"
+
 format: 
   html:
     editor: visual
     dpi: 300
+
 knitr: 
   opts_chunk: 
     fig.align: center
+
 bibliography: references.bib
 number-sections: true
 toc: true
