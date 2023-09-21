@@ -1,0 +1,19 @@
+project: 
+  output-dir: docs
+
+title: "Modelo Preditivo de Mortes no Trânsito no Brasil"
+
+format: 
+  html: 
+    dpi: 300
+    
+knitr: 
+  opts_chunk: 
+    fig.align: center
+    
+bibliography: references.bib
+
+number-sections: true
+toc: true
+toc-title: Sumário
+lang: pt
