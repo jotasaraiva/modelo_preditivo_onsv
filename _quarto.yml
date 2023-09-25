@@ -1,0 +1,5 @@
+project: 
+  type: website
+  render: 
+    - "report/05_paper.qmd"
+  output-dir: docs
