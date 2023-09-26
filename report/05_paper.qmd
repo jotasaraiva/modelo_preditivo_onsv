@@ -16,12 +16,12 @@ title-block-banner: true
 format: 
   html:
     editor: visual
-    fig-width: 6
-    fig-height: 3.5
     dpi: 300
+
 knitr: 
   opts_chunk: 
     fig.align: center
+
 bibliography: references.bib
 number-sections: true
 toc: true
@@ -52,76 +52,102 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ## Introdução
 
-O presente cenário mundial acerca de mortes e lesões relacionadas a sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que esta realidade perdura pelo futuro observável [@worldhealthorganization2018]. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
+O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros de trânsito posam sérios desafios à saúde pública global, e as tendências evidenciadas pelos dados atuais indicam que esta realidade deve continuar a se manter pelo futuro próximo [@worldhealthorganization2018]. Sendo uma das causas de mortes mais comuns no mundo, as ocorrências de sinistros de trânsito afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes no trânsito e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
 
-A segurança viária é profundamente correlata ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes viárias dependem de diversos fatores estruturais, socioeconômicos e ambientais [@zhong-xiang2014]. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
+A segurança viária pode se correlacionar ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais [@zhong-xiang2014]. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
 
-Enquanto o desenvolvimento econômico certamente beneficia a segurança viária, observa-se que os países da Assembleia Geral das Nações Unidas têm dificuldade em atingir as metas estabelecidas em 2015 pelos Objetivos de Desenvolvimento Sustentável. Apesar da crescente adesão por itens de segurança veicular, acidentes de transporte terrestre (ATTs) permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade [@andrade2019], sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos prévios à 2020 [@blumenberg2018], o Brasil falhou em reduzir sua mortalidade viária pela metade, como ditava a meta.
+Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade [@andrade2019], sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos prévios à 2020 [@blumenberg2018], o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Por conseguinte, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) é desenvolvido como uma ferramenta para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito (2021 - 2023), na intenção de aprimorar seus empenhos em relação a década passada se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU).
 
-A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
+A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
-O presente estudo teve como objetivo criar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o PIB e a população, extraídos pelo IBGE, assim como dados viários coletados das bases de dados da Polícia Federal Rodoviária (PRF), do Registro Nacional de Carteira de Habilitação (RENACH), do Registro Nacional de Veículos Automotores (RENAVAM) e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde.
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) [@institutobrasileirodegeografiaeestatística2023] e pelo Ministério da Saúde [@ministériodasaúde2023b], assim como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) [@políciarodoviáriafederal2023], do Registro Nacional de Condutores Habilitados (RENACH) [@ministériodostransporte2023], do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023] e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde [@ministériodasaúde2023a].
 
 ## Metodologia
 
-A obtenção e tratamento dos dados de mortalidade foram efetuados a partir da API Microdatasus [@microdatasus], coletando dados a partir de 1996 até 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadas a sinistros.
+A obtenção dos dados de mortalidade foram efetuados através do pacote `microdatasus` [@microdatasus], elaborado para a linguagem R. Coletou-se dados oriundos do período entre 1996 e 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadas a sinistros, ou seja, aquelas que se encaixam entre os códigos "V01" à "V89".
 
-As demais variáveis, coletadas dos portais abertos, foram tratadas e imputadas em um único *dataframe*. Entre elas, a quantidade de automóveis, a quantidade de motocicletas, a quantidade total de veículos, o PIB, a população, a quantidade de acidentes, a quantidade de acidentes fatais, a quantidade de feridos em acidentes, a quantidade de mortos em acidentes e a quantidade de condutores. Em razão da ausência de dados prévios à 2011 de certas fontes, o intervalo de estudo foi reduzido para 2011 a 2021.
+As demais variáveis foram tratadas e imputadas em uma única tabela:
 
-Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade e, consequentemente, superajuste. As correlações de Pearson, Spearman e Kendall são testadas e apresentam correlações elevadas para a maioria dos atributos.
+-   Frota de veículos (RENAVAM);
+-   Frota de motocicletas (RENAVAM);
+-   Frota de automóveis (RENAVAM);
+-   PIB (IBGE);
+-   População (DATASUS);
+-   Quantidade de sinistros em rodovias federais (PRF);
+-   Quantidade de sinistros fatais em rodovias federais (PRF);
+-   Feridos em sinistros ocorridos em rodovias federais (PRF);
+-   Mortos em sinistros ocorridos em rodovias federais (PRF);
+-   Quantidade de condutores habilitados (RENACH).
 
-```{r echo=FALSE}
+Em razão da ausência de dados prévios à 2011 de certas fontes, o intervalo de estudo foi reduzido para 2011 a 2021.
+
+Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na @fig-corr
+
+```{r}
+#| echo: false
+#| label: fig-corr
+#| fig.cap: Correlograma dos atributos
+#| fig.width: 8
+#| fig.height: 6
+#| fig.dpi: 300
+
 cor_spearman <- df_total |> 
   drop_na() |>
   select(-quilometragem_10_bilhoes) |> 
   cor(method = c("spearman"))
 
-ggcorrplot(cor_spearman, type = "lower",
-              lab = TRUE, hc.order = T,
-              lab_size = 2, tl.srt = 60,
-              tl.cex = 8, legend.title = "Correlação",
-              colors = c(onsv_palette$red,
-                         onsv_palette$yellow,
-                         onsv_palette$blue),
-           title = "Correlograma dos atributos")
+ggcorrplot(
+  cor_spearman,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 3, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
 
-## 6in x 3.5in
 ```
 
-As variáveis foram avaliadas em relação a sua frequência e densidade e foi considerado que, em geral, possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não paramétrica. Em seguida, cada variável é testada com um modelo linear, tendo a quantidade de mortes como variável dependente para encontrar seus p-valores e métricas de erro quando investigadas individualmente.
+As variáveis foram avaliadas em relação a sua frequência e densidade. Considerou-se que, em geral, elas possuem comportamentos que devaneiam da normalidade em questão de suas distribuições de probabilidade. Por este motivo, o método mais adequado utilizado para o cálculo dos coeficientes de correlação foi o de Spearman, visto que é uma medida não-paramétrica. Em seguida, cada variável foi testada com um modelo linear, considerando a quantidade de mortes como variável dependente para encontrar seus $p$-valores e métricas de erro quando investigadas individualmente.
 
-Desta forma, a próxima etapa inclui a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado viário têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente dependente da quantidade de acidentes fatais, que por sua vez é resultante da quantidade de acidentes totais.
+Desta forma, a próxima etapa inclui a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente correlacionada com a quantidade de sinistros fatais, que por sua vez é correlacionada com a quantidade de sinistros totais. As três variáveis, em adição à quantidade de feridos, estão apresentadas na série temporal da @fig-prf à seguir.
 
-```{r echo=FALSE}
-labels <- c(qnt_acidentes = "Acidentes", qnt_acidentes_fatais = "Acidentes Fatais",
-            qnt_feridos = "Feridos")
-
-prf_plot1 <- df_total |> 
-  select(ano, qnt_acidentes_fatais, qnt_acidentes, qnt_feridos) |> 
-  pivot_longer(-1) |>
-  drop_na() |> 
-  ggplot(aes(x = ano, y = value, color = name)) +
-    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
-    geom_line(linewidth = 1, alpha = 0.25) +
-    scale_y_continuous(limits = c(0, NA)) +
-    scale_x_continuous(breaks = seq(2006, 2021, 1)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    ylab(label = "") +
-    xlab("Ano")
+```{r}
+#| echo: false
+#| label: fig-prf
+#| fig.cap: Sinistros e óbitos ocorridos em rodovias federais
+#| fig.width: 7
+#| fig.height: 5
 
 theme_set(theme_onsv())
 
-prf_plot1 + 
-  labs(title = "Série Temporal de Acidentes") +
-  scale_color_manual(labels = labels,
-                               values = c(onsv_palette$red,
-                                          onsv_palette$yellow,
-                                          onsv_palette$blue))
+df_total %>% 
+  select(ano, qnt_acidentes_fatais, qnt_acidentes, qnt_feridos, qnt_mortos) %>%
+  pivot_longer(-1, names_to = "variavel", values_to = "n") %>% 
+  ggplot(aes(x = ano, y = n, color = variavel)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+  geom_line(linewidth = 1, alpha = 0.25) +
+  labs(x = NULL, y = NULL) +
+  scale_x_continuous(limits = c(2007, 2021), breaks = seq(2006, 2021, 1)) +
+  scale_color_manual(
+    labels = c("Sinistros", "Sinistros fatais", "Feridos", "Mortes"),
+    values = c(
+      onsv_palette$red, 
+      onsv_palette$yellow, 
+      onsv_palette$blue, 
+      onsv_palette$green
+    )
+  )
 ```
 
-Após a seleção das variáveis de melhor desempenho, o *dataframe* é padronizado a fim de otimizar sua performance e estabilidade no momento de ajuste. A expressão baseada na modelagem de uma regressão linear multivariada é feita e pode ser observada a partir dos coeficientes encontrados:
+Após a seleção das variáveis de melhor desempenho, a base de dados é padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. A expressão baseada na modelagem de uma regressão linear multivariada é feita e pode ser observada a partir dos coeficientes encontrados:
 
-```{r include=FALSE}
+```{r}
+#| include: false
+
 metricas <- metric_set(rmse, mae, rsq)
 
 df_preprocess <- df_total |> 
@@ -132,24 +158,29 @@ df_preprocess <- df_total |>
     qnt_acidentes_fatais,
     condutores,
     qnt_acidentes
-  ) |> drop_na()
+  ) |> 
+  drop_na()
 
-lm_recipe <- df_preprocess |> recipe(
-  mortes ~
-    veiculos_total +
-    qnt_acidentes_fatais +
-    condutores +
-    qnt_acidentes
-) |> step_normalize(all_numeric_predictors())
+lm_recipe <- df_preprocess |> 
+  recipe(
+    mortes ~
+      veiculos_total +
+      qnt_acidentes_fatais +
+      condutores +
+      qnt_acidentes
+  ) |>
+  step_normalize(all_numeric_predictors())
 
-lm_reg <- linear_reg() |> set_engine("lm")
+lm_reg <- linear_reg() |> 
+  set_engine("lm")
 
 lm_wflow <- workflow() |> 
   add_recipe(lm_recipe) |> 
   add_model(lm_reg) |> 
   fit(df_preprocess)
 
-coefs <- tidy(lm_wflow) |> arrange(p.value)
+coefs <- tidy(lm_wflow) |>
+  arrange(p.value)
 
 obs2022 <- list(
   "ano" = 2022,
@@ -160,7 +191,8 @@ obs2022 <- list(
   "condutores" = 79921178,
   "veiculos_total" = 115116532
   # "pib" = 9915317
-) |> as.data.frame()
+) |> 
+  as.data.frame()
 
 df_preprocess_2022 <- bind_rows(df_preprocess, obs2022)
 
@@ -171,37 +203,43 @@ df_pred <- lm_wflow |>
 df_pred <- lm_wflow |> 
   predict(df_preprocess_2022, type = "conf_int") |> 
   cbind(df_pred) |> 
-  mutate(
-    .variation = .pred_upper - .pred_lower 
-  )
+  mutate(.variation = .pred_upper - .pred_lower)
 
-erros <- metricas(data =df_pred, truth = mortes, estimate = .pred)
+erros <- metricas(data = df_pred, truth = mortes, estimate = .pred)
 ```
 
-```{r echo=FALSE}
+```{r}
+#| echo: false
+#| label: tab-coef
+#| tbl-cap: Coeficientes resultantes
+
 coefs |>
-  rename(Variável = term,
-         Coeficiente = estimate,
-         'P-valor' = p.value) |> 
+  rename(Variável = term, Coeficiente = estimate, 'P-valor' = p.value) |> 
   select(-std.error, -statistic)|> 
   mutate(
     Variável = case_match(
       Variável,
-      "(Intercept)" ~ "Interceptação",
-      "qnt_acidentes_fatais" ~ "Acidentes fatais",
-      "veiculos_total" ~ "Veiculos",
-      "condutores" ~ "Condutores",
-      "qnt_acidentes" ~ "Acidentes"
+      "(Intercept)" ~ "Intercepto",
+      "qnt_acidentes_fatais" ~ "Sinistros fatais em rodovias federais",
+      "veiculos_total" ~ "Frota de veiculos",
+      "condutores" ~ "Condutores habilitados",
+      "qnt_acidentes" ~ "Sinistros em rodovias federais"
     )
   ) |> 
-  kable(caption = "Coeficientes")
+  kable()
 ```
 
 ## Discussão e Resultados
 
-Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (*Cross validation*). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo.
+Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (*Cross validation*). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na @fig-reg.
 
-```{r echo=FALSE}
+```{r}
+#| echo: false
+#| label: fig-reg
+#| fig.cap: Quantidade de mortes em sinistros de trânsito
+#| fig.width: 7
+#| fig.height: 4
+
 modelo_linear <- 
   linear_reg() |> 
   set_engine("lm")
@@ -211,9 +249,12 @@ mortes_wflow <-
   add_recipe(lm_recipe) |> 
   add_model(modelo_linear)
 
-mortes_wflow_ajustado <- mortes_wflow |> fit(df_total)
+mortes_wflow_ajustado <- mortes_wflow |>
+ fit(df_total)
   
-mortes_previsao <- mortes_wflow_ajustado |> predict(df_total) |> rename(mortes_pred = .pred)
+mortes_previsao <- mortes_wflow_ajustado |>
+  predict(df_total) |>
+  rename(mortes_pred = .pred)
 
 mortes_previsao <- cbind(df_total, mortes_previsao)
 
@@ -226,35 +267,45 @@ mortes_previsao |>
     geom_line(linewidth = 1, alpha = 0.25) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
     scale_x_continuous(breaks = seq(1996, 2021, 1)) +
-    labs(title = "Dados previstos e reais") +
+    labs(x = NULL, y = NULL) +
     scale_discrete_onsv()
 ```
 
-O modelo foi utilizado para prever a ocorrência de mortes relacionadas à segurança viária em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança.
+O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na @fig-pred.
 
-```{r echo=FALSE}
+```{r}
+#| fig.cap: Previsões com intervalo de confiança até 2022
+#| echo: false
+#| label: fig-pred
+#| fig.width: 7
+#| fig.height: 5
+
 df_pred |> 
   select(ano, .pred_lower, .pred_upper, .pred, mortes) |> 
   rename(Ano = ano, Previsto = .pred, Real = mortes) |> 
-  pivot_longer(cols = c(Previsto, Real),
-               names_to = "Tipo", values_to = "Mortes") |> 
+  pivot_longer(
+    cols = c(Previsto, Real),
+    names_to = "Tipo", 
+    values_to = "Mortes"
+  ) |> 
   ggplot(aes(x = Ano, y = Mortes)) +
     geom_point(shape = 21, size = 1.5, stroke = 1.5, aes(color = Tipo)) +
     geom_line(linewidth = 1, alpha = 0.25, aes(color = Tipo)) +
-    geom_ribbon(aes(ymin = .pred_lower, 
-                    ymax = .pred_upper), 
-                fill = "grey",
-                alpha = 0.25,
-                color = "grey") +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    geom_ribbon(
+      aes(ymin = .pred_lower, ymax = .pred_upper), 
+      fill = "grey",
+      alpha = 0.25,
+      color = "grey"
+    ) +
     scale_x_continuous(breaks = seq(1996, 2022, 1)) +
-    labs(title = "Previsões com intervalo de confiança até 2022") +
+    labs(x = NULL, y = NULL) +
     scale_discrete_onsv()
 ```
 
-Os métodos selecionados para aferir o modelo foram a Raiz Quadrada do Erro Médio (*Root Mean Squared Error* - RMSE), o Erro Médio Absoluto (*Mean Squared Error* - MAE) e o R-quadrado. Investigando as métricas de erros com base na comparação do conjunto de dados gerado ao inicial, têm-se:
+Os métodos selecionados para medir o desempenho do modelo foram a Raiz Quadrada do Erro Médio (*Root Mean Squared Error* - RMSE), o Erro Médio Absoluto (*Mean Squared Error* - MAE) e o R-quadrado - $R^2$. Investigando as métricas de erros com base na comparação do conjunto de dados gerado ao inicial, têm-se:
 
-```{r echo=FALSE}
+```{r}
+#| echo: false
 erros |> 
   select(-.estimator) |> 
   mutate(
@@ -267,23 +318,41 @@ erros |>
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
   kable(caption = "Métricas de Erros")
+```
+
+A @fig-qq a seguir apresenta uma comparação entre os dados de mortes previstos e reais.
+
+```{r}
+#| echo: false
+#| label: fig-qq
+#| fig.cap: Comparação mortes previstas x reais
+#| fig.width: 7
+#| fig.height: 5
+
 
 df_pred |> 
   select(.pred, mortes, ano) |> 
   rename(Previsto = .pred, Real = mortes) |> 
   ggplot(aes(x = Real, y = Previsto)) +
-    geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
-    geom_text(aes(label = ano), vjust = 1.5, size = 3) + 
-    geom_abline(linewidth = 1, alpha = 0.25, color = onsv_palette$blue) +
-    labs(title = "Mortes Previstas x Reais")
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_text(aes(label = ano), vjust = 2, size = 3) + 
+  geom_abline(
+    linewidth = 1, 
+    alpha = 0.5, 
+    color = onsv_palette$blue, 
+    lty = "dashed"
+  ) +
+  coord_obs_pred()
 ```
 
-A valor obtido da previsão implica uma leve queda de 7,4% no número de mortes em relação ao ano anterior, que teria registrado 33813 casos. Conforme a análise dos dados, 2021 teria sido o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlação dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargálo para a análise dos sinistros viários já que a disponibilidade de dados é reduzida.
+O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlações dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é reduzida.
 
 ## Conclusão
 
-O algoritmo desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a curvatura do modelo linear ajustado está substancialmente distante do número de casos de 2019, que foi o ano com a maior redução desde o pico de mortes em 2012. Isto revela um potencial relaxamento no sistema de segurança viária nacional, desencadeiando em uma redução em sua eficiência e propiciando um aumento na mortalidade. Por outro lado, há a hipótese de que este é o efeito direto da pandemia e do processo de reintegração da população ao trânsito após o período de isolamento social e *lockdown*.
+O modelo de regressão desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a predição do modelo linear ajustado está substancialmente distante do número de casos de 2019, este sendo o ano com a maior redução nas mortes desde o pico em 2012. Isto revela um potencial relaxamento no desempenho da segurança viária e mobilidadea segura à nível nacional, desencadeiando em uma redução em sua eficiência e causando um aumento na mortalidade em trânsito.
 
-É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores infraestruturais e socioeconômicos que afetam a saúde deste sistema, sendo diretamente dependente do estado de desenvolvimento e maturidade tecnológica do país. O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas sustentáveis estabelecidas em âmbito nacional e, caso este cenário não seja amenizado com antecedência, é improvável haverem avanços significativos nos objetivos da Agenda 2030.
+É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores de infraestrutura e socioeconômicos que afetam a saúde deste sistema, podendo variar com o estado de desenvolvimento e maturidade tecnológica do país em questão. A mobilidade urbana é uma parte integral à toda civilização morderna, o que torna as ações para a segurança viária indispensáveis devido à dependência da sociedade contemporânea pelos veículos automotores.  
+
+O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos anunciam uma performance abaixo do ideal no combate da mortalidade, conferindo uma perspectiva pessimista para o início da nova década no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável haverem avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
 ## Referências
