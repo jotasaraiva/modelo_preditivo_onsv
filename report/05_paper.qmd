@@ -30,8 +30,8 @@ toc-title: Sumário
 lang: pt
 
 theme: 
-  - lux
-  - style.scss
+  - "cosmo"
+  - "style.scss"
 ---
 
 ```{r include=FALSE}
@@ -351,7 +351,7 @@ O valor obtido da previsão implica em uma leve queda de 7,4% no número de mort
 
 O modelo de regressão desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a predição do modelo linear ajustado está substancialmente distante do número de casos de 2019, este sendo o ano com a maior redução nas mortes desde o pico em 2012. Isto revela um potencial relaxamento no desempenho da segurança viária e mobilidadea segura à nível nacional, desencadeiando em uma redução em sua eficiência e causando um aumento na mortalidade em trânsito.
 
-É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores de infraestrutura e socioeconômicos que afetam a saúde deste sistema, podendo variar com o estado de desenvolvimento e maturidade tecnológica do país em questão. A mobilidade urbana é uma parte integral à toda civilização morderna, o que torna as ações para a segurança viária indispensáveis devido à dependência da sociedade contemporânea pelos veículos automotores.  
+É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores de infraestrutura e socioeconômicos que afetam a saúde deste sistema, podendo variar com o estado de desenvolvimento e maturidade tecnológica do país em questão. A mobilidade urbana é uma parte integral à toda civilização morderna, o que torna as ações para a segurança viária indispensáveis devido à dependência da sociedade contemporânea pelos veículos automotores.
 
 O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos anunciam uma performance abaixo do ideal no combate da mortalidade, conferindo uma perspectiva pessimista para o início da nova década no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável haverem avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
