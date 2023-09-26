@@ -1,0 +1,30 @@
+/*-- scss:defaults --*/
+
+$blue: #00496d;
+$yellow: #f7951d;
+$red: #d51f29;
+
+$link-color: $yellow;
+
+/*-- scss:rules --*/
+
+h1 {
+  color: white;
+}
+
+h2, h3, h4, h5, h6 {
+  color: $blue;
+}
+
+.header-section-number {
+  color: $yellow;
+}
+
+.quarto-title-banner {
+  background: $blue;
+  color: white;
+}
+
+.quarto-title-meta-heading {
+  color: $blue;
+}
