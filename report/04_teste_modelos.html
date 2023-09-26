@@ -244,21 +244,24 @@ The following object is masked from 'package:purrr':
 <span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>erros_pivot <span class="ot">&lt;-</span> erros <span class="sc">|&gt;</span> </span>
 <span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span>.estimator) <span class="sc">|&gt;</span> </span>
-<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">valor =</span> .estimate)</span>
-<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>pvalores <span class="ot">&lt;-</span> pvalores <span class="sc">|&gt;</span> </span>
-<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(valor) <span class="sc">|&gt;</span> </span>
-<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">"(Intercept)"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(.metric, valor, variavel)</span>
-<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>df_metricas <span class="ot">&lt;-</span> <span class="fu">rbind</span>(erros_pivot, pvalores) <span class="sc">|&gt;</span> </span>
-<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(.metric) <span class="sc">|&gt;</span> </span>
-<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(valor, <span class="at">.by_group =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>df_metricas <span class="sc">|&gt;</span></span>
-<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> variavel)) <span class="sc">+</span></span>
-<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(.metric), <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
-<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">valor =</span> .estimate) <span class="sc">|&gt;</span> </span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(variavel <span class="sc">!=</span> <span class="st">"quilometragem_10_bilhoes"</span>)</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>pvalores <span class="ot">&lt;-</span> pvalores <span class="sc">|&gt;</span> </span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(valor) <span class="sc">|&gt;</span> </span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">"(Intercept)"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(.metric, valor, variavel) <span class="sc">|&gt;</span> </span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(variavel <span class="sc">!=</span> <span class="st">"quilometragem_10_bilhoes"</span>)</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>df_metricas <span class="ot">&lt;-</span> <span class="fu">rbind</span>(erros_pivot, pvalores) <span class="sc">|&gt;</span> </span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(.metric) <span class="sc">|&gt;</span> </span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(valor, <span class="at">.by_group =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">.metric =</span> <span class="fu">toupper</span>(.metric))</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>df_metricas <span class="sc">|&gt;</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> variavel)) <span class="sc">+</span></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(.metric), <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="04_teste_modelos_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -800,17 +803,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">694.7833201</td>
+<td style="text-align: right;">691.6944598</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">569.5600182</td>
+<td style="text-align: right;">570.8136152</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9799059</td>
+<td style="text-align: right;">0.9801521</td>
 </tr>
 </tbody>
 </table>
@@ -846,17 +849,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">722.0359939</td>
+<td style="text-align: right;">705.0838390</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">621.4706152</td>
+<td style="text-align: right;">596.0533939</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9799274</td>
+<td style="text-align: right;">0.9811356</td>
 </tr>
 </tbody>
 </table>
@@ -889,17 +892,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">719.6421178</td>
+<td style="text-align: right;">733.5067243</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">617.3735682</td>
+<td style="text-align: right;">630.4849091</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9796067</td>
+<td style="text-align: right;">0.9783625</td>
 </tr>
 </tbody>
 </table>
@@ -932,17 +935,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">793.3474641</td>
+<td style="text-align: right;">799.2518671</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">672.0738864</td>
+<td style="text-align: right;">677.3616985</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9791313</td>
+<td style="text-align: right;">0.9791293</td>
 </tr>
 </tbody>
 </table>
@@ -975,17 +978,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">815.8200410</td>
+<td style="text-align: right;">807.8164301</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">681.1179273</td>
+<td style="text-align: right;">681.8884212</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9805438</td>
+<td style="text-align: right;">0.9796125</td>
 </tr>
 </tbody>
 </table>
@@ -1018,17 +1021,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">841.1458082</td>
+<td style="text-align: right;">799.1019496</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">702.7744712</td>
+<td style="text-align: right;">669.7126045</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9784692</td>
+<td style="text-align: right;">0.9796933</td>
 </tr>
 </tbody>
 </table>
@@ -1061,17 +1064,17 @@ will be used.</code></pre>
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">814.9065419</td>
+<td style="text-align: right;">807.7913274</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">677.2141121</td>
+<td style="text-align: right;">639.5447470</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.9797624</td>
+<td style="text-align: right;">0.9800455</td>
 </tr>
 </tbody>
 </table>
@@ -1161,6 +1164,17 @@ will be used.</code></pre>
 </div>
 </div>
 <p>Variação com acidentes, fatais e feridos: 5533.683 Variação com acidentes e fatais: 4878.459 Variação com fatais e feridos: 5525.722 Variação com fatais: 4932.277</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dados2022 <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ano"</span> <span class="ot">=</span> <span class="dv">2022</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"qnt_acidentes"</span> <span class="ot">=</span> <span class="dv">64547</span>,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"qnt_acidentes_fatais"</span> <span class="ot">=</span> <span class="dv">4662</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"condutores"</span> <span class="ot">=</span> <span class="dv">79921178</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"veiculos_total"</span> <span class="ot">=</span> <span class="dv">115116532</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>df_2022 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">drop_na</span>(df_total), dados2022)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>
