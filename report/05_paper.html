@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito">
 
 <title>Modelo Preditivo de Mortes Viárias Anuais no Brasil</title>
 <style>
@@ -58,7 +59,49 @@ div.csl-indent {
 
 <body>
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Modelo Preditivo de Mortes Viárias Anuais no Brasil</h1>
+                  <div>
+        <div class="description">
+          Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Autores</div>
+    <div class="quarto-title-meta-heading">Afiliação</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Pedro Augusto Borges dos Santos </p>
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Observatório Nacional de Segurança Viária
+            </p>
+        </div>
+        <div class="quarto-title-meta-contents">
+      <p class="author">João Pedro Melani Saraiva </p>
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Observatório Nacional de Segurança Viária
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
   <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Sumário</h2>
@@ -72,31 +115,17 @@ div.csl-indent {
   </ul>
 </nav>
 </div>
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Modelo Preditivo de Mortes Viárias Anuais no Brasil</h1>
-</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
 
 <section id="introdução" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introdução"><span class="header-section-number">1</span> Introdução</h2>
-<p>O presente cenário mundial acerca de mortes e lesões relacionadas a sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que esta realidade perdura pelo futuro observável <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral <span class="citation" data-cites="rodríguez2020">(<a href="#ref-rodríguez2020" role="doc-biblioref">Rodríguez, Jattin, and Soracipa 2020</a>)</span>.</p>
+<p>O presente cenário mundial acerca de mortes e lesões relacionadas a sinistros viários posam sérios desafios à segurança pública global, e as tendências evidenciadas pelos dados contemporâneos indicam que esta realidade perdura pelo futuro observável <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Sendo uma das causas de mortes evitáveis mais comuns no mundo, as ocorrências de acidentes afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais incomensuráveis, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes viárias e como se traduzem em custos e perdas na produtividade da sociedade em geral <span class="citation" data-cites="rodríguez2020">(<a href="#ref-rodríguez2020" role="doc-biblioref">Rodríguez, Jattin, e Soracipa 2020</a>)</span>.</p>
 <p>A segurança viária é profundamente correlata ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes viárias dependem de diversos fatores estruturais, socioeconômicos e ambientais <span class="citation" data-cites="zhong-xiang2014">(<a href="#ref-zhong-xiang2014" role="doc-biblioref">Zhong-xiang et al. 2014</a>)</span>. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.</p>
-<p>Enquanto o desenvolvimento econômico certamente beneficia a segurança viária, observa-se que os países da Assembleia Geral das Nações Unidas têm dificuldade em atingir as metas estabelecidas em 2015 pelos Objetivos de Desenvolvimento Sustentável. Apesar da crescente adesão por itens de segurança veicular, acidentes de transporte terrestre (ATTs) permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade <span class="citation" data-cites="andrade2019">(<a href="#ref-andrade2019" role="doc-biblioref">Andrade and Antunes 2019</a>)</span>, sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Como previsto por modelos prévios à 2020 <span class="citation" data-cites="blumenberg2018">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>)</span>, o Brasil falhou em reduzir sua mortalidade viária pela metade, como ditava a meta.</p>
-<p>A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>; <a href="#ref-cai2015" role="doc-biblioref">Cai, Zhu, and Yan 2015</a>)</span>, assim como modelos preditivos baseados em cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#ref-seneta1996" role="doc-biblioref">Seneta 1996</a>; <a href="#ref-jin2020" role="doc-biblioref">Jin, Zheng, and Geng 2020</a>)</span>. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA <span class="citation" data-cites="al-ghamdi1995">(<a href="#ref-al-ghamdi1995" role="doc-biblioref">Al-Ghamdi 1995</a>)</span> e redes neurais artificiais <span class="citation" data-cites="jafari2015">(<a href="#ref-jafari2015" role="doc-biblioref">Jafari et al. 2015</a>)</span>.</p>
+<p>Enquanto o desenvolvimento econômico certamente beneficia a segurança viária, observa-se que os países da Assembleia Geral das Nações Unidas têm dificuldade em atingir as metas estabelecidas em 2015 pelos Objetivos de Desenvolvimento Sustentável. Apesar da crescente adesão por itens de segurança veicular, acidentes de transporte terrestre (ATTs) permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade <span class="citation" data-cites="andrade2019">(<a href="#ref-andrade2019" role="doc-biblioref">Andrade e Antunes 2019</a>)</span>, sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Como previsto por modelos prévios à 2020 <span class="citation" data-cites="blumenberg2018">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>)</span>, o Brasil falhou em reduzir sua mortalidade viária pela metade, como ditava a meta.</p>
+<p>A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>; <a href="#ref-cai2015" role="doc-biblioref">Cai, Zhu, e Yan 2015</a>)</span>, assim como modelos preditivos baseados em cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#ref-seneta1996" role="doc-biblioref">Seneta 1996</a>; <a href="#ref-jin2020" role="doc-biblioref">Jin, Zheng, e Geng 2020</a>)</span>. Outras abordagens pretendem utilizar técnicas de análise de séries temporais, utilizando métodos como ARIMA <span class="citation" data-cites="al-ghamdi1995">(<a href="#ref-al-ghamdi1995" role="doc-biblioref">Al-Ghamdi 1995</a>)</span> e redes neurais artificiais <span class="citation" data-cites="jafari2015">(<a href="#ref-jafari2015" role="doc-biblioref">Jafari et al. 2015</a>)</span>.</p>
 <p>O presente estudo teve como objetivo criar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o PIB e a população, extraídos pelo IBGE, assim como dados viários coletados das bases de dados da Polícia Federal Rodoviária (PRF), do Registro Nacional de Carteira de Habilitação (RENACH), do Registro Nacional de Veículos Automotores (RENAVAM) e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde.</p>
 </section>
 <section id="metodologia" class="level2" data-number="2">
@@ -238,37 +267,37 @@ div.csl-indent {
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">5 Referências</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-al-ghamdi1995" class="csl-entry" role="listitem">
-Al-Ghamdi, Ali S. 1995. <span>“Time Series Forecasts for Traffic Accidents, Injuries, and Fatalities in Saudi Arabia.”</span> <em>Journal of King Saud University - Engineering Sciences</em> 7 (2): 199–217. <a href="https://doi.org/10.1016/S1018-3639(18)30627-5">https://doi.org/10.1016/S1018-3639(18)30627-5</a>.
+Al-Ghamdi, Ali S. 1995. <span>«Time Series Forecasts for Traffic Accidents, Injuries, and Fatalities in Saudi Arabia»</span>. <em>Journal of King Saud University - Engineering Sciences</em> 7 (2): 199–217. <a href="https://doi.org/10.1016/S1018-3639(18)30627-5">https://doi.org/10.1016/S1018-3639(18)30627-5</a>.
 </div>
 <div id="ref-andrade2019" class="csl-entry" role="listitem">
-Andrade, Flávia Reis De, and José Leopoldo Ferreira Antunes. 2019. <span>“Tendência Do Número de Vítimas Em Acidentes de Trânsito Nas Rodovias Federais Brasileiras Antes e Depois Da Década de Ação Pela Segurança No Trânsito.”</span> <em>Cadernos de Saúde Pública</em> 35 (8): e00250218. <a href="https://doi.org/10.1590/0102-311x00250218">https://doi.org/10.1590/0102-311x00250218</a>.
+Andrade, Flávia Reis De, e José Leopoldo Ferreira Antunes. 2019. <span>«Tendência do número de vítimas em acidentes de trânsito nas rodovias federais brasileiras antes e depois da Década de Ação pela Segurança no Trânsito»</span>. <em>Cadernos de Saúde Pública</em> 35 (8): e00250218. <a href="https://doi.org/10.1590/0102-311x00250218">https://doi.org/10.1590/0102-311x00250218</a>.
 </div>
 <div id="ref-blumenberg2018" class="csl-entry" role="listitem">
-Blumenberg, Cauane, Rafaela C Martins, Janaína Calu Costa, and Luiza I C Ricardo. 2018. <span>“Is Brazil Going to Achieve the Road Traffic Deaths Target? An Analysis about the Sustainable Development Goals.”</span> <em>Injury Prevention</em> 24 (4): 250–55. <a href="https://doi.org/10.1136/injuryprev-2017-042473">https://doi.org/10.1136/injuryprev-2017-042473</a>.
+Blumenberg, Cauane, Rafaela C Martins, Janaína Calu Costa, e Luiza I C Ricardo. 2018. <span>«Is Brazil Going to Achieve the Road Traffic Deaths Target? An Analysis about the Sustainable Development Goals»</span>. <em>Injury Prevention</em> 24 (4): 250–55. <a href="https://doi.org/10.1136/injuryprev-2017-042473">https://doi.org/10.1136/injuryprev-2017-042473</a>.
 </div>
 <div id="ref-cai2015" class="csl-entry" role="listitem">
-Cai, Hao, Dunyao Zhu, and Lixin Yan. 2015. <span>“2015 International Conference on Transportation Information and Safety (ICTIS).”</span> In, 363–69. Wuhan, China: IEEE. <a href="https://doi.org/10.1109/ICTIS.2015.7232140">https://doi.org/10.1109/ICTIS.2015.7232140</a>.
+Cai, Hao, Dunyao Zhu, e Lixin Yan. 2015. <span>«2015 International Conference on Transportation Information and Safety (ICTIS)»</span>. Em, 363–69. Wuhan, China: IEEE. <a href="https://doi.org/10.1109/ICTIS.2015.7232140">https://doi.org/10.1109/ICTIS.2015.7232140</a>.
 </div>
 <div id="ref-jafari2015" class="csl-entry" role="listitem">
-Jafari, Seyed Ali, Sepideh Jahandideh, Mina Jahandideh, and Ebrahim Barzegari Asadabadi. 2015. <span>“Prediction of Road Traffic Death Rate Using Neural Networks Optimised by Genetic Algorithm.”</span> <em>International Journal of Injury Control and Safety Promotion</em> 22 (2): 153–57. <a href="https://doi.org/10.1080/17457300.2013.857695">https://doi.org/10.1080/17457300.2013.857695</a>.
+Jafari, Seyed Ali, Sepideh Jahandideh, Mina Jahandideh, e Ebrahim Barzegari Asadabadi. 2015. <span>«Prediction of Road Traffic Death Rate Using Neural Networks Optimised by Genetic Algorithm»</span>. <em>International Journal of Injury Control and Safety Promotion</em> 22 (2): 153–57. <a href="https://doi.org/10.1080/17457300.2013.857695">https://doi.org/10.1080/17457300.2013.857695</a>.
 </div>
 <div id="ref-jin2020" class="csl-entry" role="listitem">
-Jin, Xiaohua, Jiyu Zheng, and Xingyue Geng. 2020. <span>“Prediction of Road Traffic Accidents Based on Grey System Theory and Grey Markov Model.”</span> <em>International Journal of Safety and Security Engineering</em> 10 (2): 263–68. <a href="https://doi.org/10.18280/ijsse.100214">https://doi.org/10.18280/ijsse.100214</a>.
+Jin, Xiaohua, Jiyu Zheng, e Xingyue Geng. 2020. <span>«Prediction of Road Traffic Accidents Based on Grey System Theory and Grey Markov Model»</span>. <em>International Journal of Safety and Security Engineering</em> 10 (2): 263–68. <a href="https://doi.org/10.18280/ijsse.100214">https://doi.org/10.18280/ijsse.100214</a>.
 </div>
 <div id="ref-rodríguez2020" class="csl-entry" role="listitem">
-Rodríguez, Javier, Jairo Jattin, and Yolanda Soracipa. 2020. <span>“Probabilistic Temporal Prediction of the Deaths Caused by Traffic in Colombia. Mortality Caused by Traffic Prediction.”</span> <em>Accident Analysis &amp; Prevention</em> 135 (February): 105332. <a href="https://doi.org/10.1016/j.aap.2019.105332">https://doi.org/10.1016/j.aap.2019.105332</a>.
+Rodríguez, Javier, Jairo Jattin, e Yolanda Soracipa. 2020. <span>«Probabilistic Temporal Prediction of the Deaths Caused by Traffic in Colombia. Mortality Caused by Traffic Prediction»</span>. <em>Accident Analysis &amp; Prevention</em> 135 (fevereiro): 105332. <a href="https://doi.org/10.1016/j.aap.2019.105332">https://doi.org/10.1016/j.aap.2019.105332</a>.
 </div>
 <div id="ref-microdatasus" class="csl-entry" role="listitem">
-Saldanha, Raphael. 2023. <em>Microdatasus: Pacote Para Download e Pré-Processamento de Microdados Do Departamento de Informática Do SUS (DATASUS)</em>. <a href="https://github.com/rfsaldanha/microdatasus">https://github.com/rfsaldanha/microdatasus</a>.
+Saldanha, Raphael. 2023. <em>Microdatasus: pacote para download e pré-processamento de microdados do Departamento de Informática do SUS (DATASUS)</em>. <a href="https://github.com/rfsaldanha/microdatasus">https://github.com/rfsaldanha/microdatasus</a>.
 </div>
 <div id="ref-seneta1996" class="csl-entry" role="listitem">
-Seneta, E. 1996. <span>“Markov and the Birth of Chain Dependence Theory.”</span> <em>International Statistical Review / Revue Internationale de Statistique</em> 64 (3): 255. <a href="https://doi.org/10.2307/1403785">https://doi.org/10.2307/1403785</a>.
+Seneta, E. 1996. <span>«Markov and the Birth of Chain Dependence Theory»</span>. <em>International Statistical Review / Revue Internationale de Statistique</em> 64 (3): 255. <a href="https://doi.org/10.2307/1403785">https://doi.org/10.2307/1403785</a>.
 </div>
 <div id="ref-worldhealthorganization2018" class="csl-entry" role="listitem">
 World Health Organization. 2018. <em>Global Status Report on Road Safety 2018</em>. Geneva: World Health Organization. <a href="https://apps.who.int/iris/handle/10665/276462">https://apps.who.int/iris/handle/10665/276462</a>.
 </div>
 <div id="ref-zhong-xiang2014" class="csl-entry" role="listitem">
-Zhong-xiang, Feng, Lu Shi-sheng, Zhang Wei-hua, and Zhang Nan-nan. 2014. <span>“Combined Prediction Model of Death Toll for Road Traffic Accidents Based on Independent and Dependent Variables.”</span> <em>Computational Intelligence and Neuroscience</em> 2014: 1–7. <a href="https://doi.org/10.1155/2014/103196">https://doi.org/10.1155/2014/103196</a>.
+Zhong-xiang, Feng, Lu Shi-sheng, Zhang Wei-hua, e Zhang Nan-nan. 2014. <span>«Combined Prediction Model of Death Toll for Road Traffic Accidents Based on Independent and Dependent Variables»</span>. <em>Computational Intelligence and Neuroscience</em> 2014: 1–7. <a href="https://doi.org/10.1155/2014/103196">https://doi.org/10.1155/2014/103196</a>.
 </div>
 </div></section></div></main>
 <!-- /main column -->
@@ -326,12 +355,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
+    button.setAttribute("title", "Copiada");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
+      button.setAttribute("data-bs-title", "Copiada");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
