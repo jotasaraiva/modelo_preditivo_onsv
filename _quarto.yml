@@ -1,5 +1,11 @@
 project:
   type: website
+  output-dir: docs
   render:
     - "report/05_paper.qmd"
-  output-dir: docs
+    
+format:
+  html: 
+    theme: 
+      - cosmo
+      - style.scss

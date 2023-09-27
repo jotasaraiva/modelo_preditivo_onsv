@@ -15,6 +15,7 @@ title-block-banner: true
 
 format: 
   html:
+    theme: style.scss
     editor: visual
     dpi: 300
 
@@ -28,10 +29,6 @@ toc: true
 toc-title: Sumário
 
 lang: pt
-
-theme: 
-  - "cosmo"
-  - "style.scss"
 ---
 
 ```{r include=FALSE}
