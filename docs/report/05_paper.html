@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito">
+<meta name="description" content="Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito com resolução anual">
 
-<title>Modelo Preditivo de Mortes Viárias Anuais no Brasil</title>
+<title>Modelo Preditivo de Mortes Anuais no Trânsito no Brasil</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -49,6 +49,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../figures/onsv_icon.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -78,6 +79,7 @@ div.csl-indent {
     "search-label": "Procurar"
   }
 }</script>
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -91,40 +93,26 @@ div.csl-indent {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Modelo Preditivo de Mortes Viárias Anuais no Brasil</h1>
+      <h1 class="title">Modelo Preditivo de Mortes Anuais no Trânsito no Brasil</h1>
                   <div>
         <div class="description">
-          Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito
+          Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito com resolução anual
         </div>
       </div>
                 </div>
   </div>
     
-  <div class="quarto-title-meta-author">
-    <div class="quarto-title-meta-heading">Autores</div>
-    <div class="quarto-title-meta-heading">Afiliação</div>
-    
-      <div class="quarto-title-meta-contents">
-      <p class="author">Pedro Augusto Borges dos Santos </p>
-    </div>
-      <div class="quarto-title-meta-contents">
-          <p class="affiliation">
-              Observatório Nacional de Segurança Viária
-            </p>
-        </div>
-        <div class="quarto-title-meta-contents">
-      <p class="author">João Pedro Melani Saraiva </p>
-    </div>
-      <div class="quarto-title-meta-contents">
-          <p class="affiliation">
-              Observatório Nacional de Segurança Viária
-            </p>
-        </div>
-      </div>
-
+  
   <div class="quarto-title-meta">
 
-        
+      <div>
+      <div class="quarto-title-meta-heading">Autores</div>
+      <div class="quarto-title-meta-contents">
+               <p>João Pedro Melani Saraiva </p>
+               <p>Pedro Augusto Borges dos Santos </p>
+            </div>
+    </div>
+      
     
       
     </div>
@@ -138,11 +126,11 @@ div.csl-indent {
     <h2 id="toc-title">Sumário</h2>
    
   <ul>
-  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução"><span class="header-section-number">1</span> Introdução</a></li>
-  <li><a href="#metodologia" id="toc-metodologia" class="nav-link" data-scroll-target="#metodologia"><span class="header-section-number">2</span> Metodologia</a></li>
-  <li><a href="#discussão-e-resultados" id="toc-discussão-e-resultados" class="nav-link" data-scroll-target="#discussão-e-resultados"><span class="header-section-number">3</span> Discussão e Resultados</a></li>
-  <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão"><span class="header-section-number">4</span> Conclusão</a></li>
-  <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências"><span class="header-section-number">5</span> Referências</a></li>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a></li>
+  <li><a href="#metodologia" id="toc-metodologia" class="nav-link" data-scroll-target="#metodologia">Metodologia</a></li>
+  <li><a href="#discussão-e-resultados" id="toc-discussão-e-resultados" class="nav-link" data-scroll-target="#discussão-e-resultados">Discussão e Resultados</a></li>
+  <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão">Conclusão</a></li>
+  <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
   </ul>
 </nav>
     </div>
@@ -152,16 +140,16 @@ div.csl-indent {
 
 
 
-<section id="introdução" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="introdução"><span class="header-section-number">1</span> Introdução</h2>
+<section id="introdução" class="level2">
+<h2 class="anchored" data-anchor-id="introdução">Introdução</h2>
 <p>O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros de trânsito posam sérios desafios à saúde pública global, e as tendências evidenciadas pelos dados atuais indicam que esta realidade deve continuar a se manter pelo futuro próximo <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Sendo uma das causas de mortes mais comuns no mundo, as ocorrências de sinistros de trânsito afetam principalmente pedestres, ciclistas e motociclistas, além de induzir danos materiais, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes no trânsito e como se traduzem em custos e perdas na produtividade da sociedade em geral <span class="citation" data-cites="rodríguez2020">(<a href="#ref-rodríguez2020" role="doc-biblioref">Rodríguez, Jattin, e Soracipa 2020</a>)</span>.</p>
 <p>A segurança viária pode se correlacionar ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais <span class="citation" data-cites="zhong-xiang2014">(<a href="#ref-zhong-xiang2014" role="doc-biblioref">Zhong-xiang et al. 2014</a>)</span>. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.</p>
 <p>Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade <span class="citation" data-cites="andrade2019">(<a href="#ref-andrade2019" role="doc-biblioref">Andrade e Antunes 2019</a>)</span>, sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Como previsto por modelos prévios à 2020 <span class="citation" data-cites="blumenberg2018">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>)</span>, o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Por conseguinte, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) é desenvolvido como uma ferramenta para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito (2021 - 2023), na intenção de aprimorar seus empenhos em relação a década passada se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU).</p>
 <p>A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>; <a href="#ref-cai2015" role="doc-biblioref">Cai, Zhu, e Yan 2015</a>)</span>, assim como modelos preditivos baseados em cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#ref-seneta1996" role="doc-biblioref">Seneta 1996</a>; <a href="#ref-jin2020" role="doc-biblioref">Jin, Zheng, e Geng 2020</a>)</span>. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis <span class="citation" data-cites="al-ghamdi1995">(<a href="#ref-al-ghamdi1995" role="doc-biblioref">Al-Ghamdi 1995</a>)</span> e redes neurais artificiais <span class="citation" data-cites="jafari2015">(<a href="#ref-jafari2015" role="doc-biblioref">Jafari et al. 2015</a>)</span>.</p>
 <p>Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) <span class="citation" data-cites="institutobrasileirodegeografiaeestatística2023">(<a href="#ref-institutobrasileirodegeografiaeestatística2023" role="doc-biblioref">Instituto Brasileiro de Geografia e Estatística 2023</a>)</span> e pelo Ministério da Saúde <span class="citation" data-cites="ministériodasaúde2023b">(<a href="#ref-ministériodasaúde2023b" role="doc-biblioref">Ministério da Saúde 2023b</a>)</span>, assim como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) <span class="citation" data-cites="políciarodoviáriafederal2023">(<a href="#ref-políciarodoviáriafederal2023" role="doc-biblioref">Polícia Rodoviária Federal 2023</a>)</span>, do Registro Nacional de Condutores Habilitados (RENACH) <span class="citation" data-cites="ministériodostransporte2023">(<a href="#ref-ministériodostransporte2023" role="doc-biblioref">Ministério dos Transportes 2023b</a>)</span>, do Registro Nacional de Veículos Automotores (RENAVAM) <span class="citation" data-cites="ministériodostransportes2023">(<a href="#ref-ministériodostransportes2023" role="doc-biblioref">Ministério dos Transportes 2023a</a>)</span> e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde <span class="citation" data-cites="ministériodasaúde2023a">(<a href="#ref-ministériodasaúde2023a" role="doc-biblioref">Ministério da Saúde 2023a</a>)</span>.</p>
 </section>
-<section id="metodologia" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="metodologia"><span class="header-section-number">2</span> Metodologia</h2>
+<section id="metodologia" class="level2">
+<h2 class="anchored" data-anchor-id="metodologia">Metodologia</h2>
 <p>A obtenção dos dados de mortalidade foram efetuados através do pacote <code>microdatasus</code> <span class="citation" data-cites="microdatasus">(<a href="#ref-microdatasus" role="doc-biblioref">Saldanha 2023</a>)</span>, elaborado para a linguagem R. Coletou-se dados oriundos do período entre 1996 e 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadas a sinistros, ou seja, aquelas que se encaixam entre os códigos “V01” à “V89”.</p>
 <p>As demais variáveis foram tratadas e imputadas em uma única tabela:</p>
 <ul>
@@ -243,8 +231,8 @@ div.csl-indent {
 </div>
 </div>
 </section>
-<section id="discussão-e-resultados" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="discussão-e-resultados"><span class="header-section-number">3</span> Discussão e Resultados</h2>
+<section id="discussão-e-resultados" class="level2">
+<h2 class="anchored" data-anchor-id="discussão-e-resultados">Discussão e Resultados</h2>
 <p>Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na <a href="#fig-reg">Figura&nbsp;3</a>.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -308,20 +296,20 @@ div.csl-indent {
 </div>
 <p>O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlações dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é reduzida.</p>
 </section>
-<section id="conclusão" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="conclusão"><span class="header-section-number">4</span> Conclusão</h2>
+<section id="conclusão" class="level2">
+<h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
 <p>O modelo de regressão desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a predição do modelo linear ajustado está substancialmente distante do número de casos de 2019, este sendo o ano com a maior redução nas mortes desde o pico em 2012. Isto revela um potencial relaxamento no desempenho da segurança viária e mobilidadea segura à nível nacional, desencadeiando em uma redução em sua eficiência e causando um aumento na mortalidade em trânsito.</p>
 <p>É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores de infraestrutura e socioeconômicos que afetam a saúde deste sistema, podendo variar com o estado de desenvolvimento e maturidade tecnológica do país em questão. A mobilidade urbana é uma parte integral à toda civilização morderna, o que torna as ações para a segurança viária indispensáveis devido à dependência da sociedade contemporânea pelos veículos automotores.</p>
 <p>O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos anunciam uma performance abaixo do ideal no combate da mortalidade, conferindo uma perspectiva pessimista para o início da nova década no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável haverem avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.</p>
 </section>
-<section id="referências" class="level2" data-number="5">
+<section id="referências" class="level2">
 
 
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">5 Referências</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Referências</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-al-ghamdi1995" class="csl-entry" role="listitem">
 Al-Ghamdi, Ali S. 1995. <span>«Time Series Forecasts for Traffic Accidents, Injuries, and Fatalities in Saudi Arabia»</span>. <em>Journal of King Saud University - Engineering Sciences</em> 7 (2): 199–217. <a href="https://doi.org/10.1016/S1018-3639(18)30627-5">https://doi.org/10.1016/S1018-3639(18)30627-5</a>.
 </div>
@@ -611,4 +599,5 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

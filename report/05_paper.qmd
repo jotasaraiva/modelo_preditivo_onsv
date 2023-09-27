@@ -1,15 +1,13 @@
 ---
-title: "Modelo Preditivo de Mortes Viárias Anuais no Brasil"
+title: "Modelo Preditivo de Mortes Anuais no Trânsito no Brasil"
+
+smooth-scroll: true
 
 authors:
-  - name: Pedro Augusto Borges dos Santos
-    affiliations:
-      - name: Observatório Nacional de Segurança Viária
   - name: João Pedro Melani Saraiva
-    affiliations:
-      - name: Observatório Nacional de Segurança Viária
+  - name: Pedro Augusto Borges dos Santos
 
-description: Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito
+description: Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito com resolução anual
 
 title-block-banner: true
 
@@ -24,7 +22,6 @@ knitr:
     fig.align: center
 
 bibliography: references.bib
-number-sections: true
 toc: true
 toc-title: Sumário
 

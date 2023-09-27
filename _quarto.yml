@@ -9,3 +9,6 @@ format:
     theme: 
       - cosmo
       - style.scss
+
+website:
+  favicon: figures/onsv_icon.png
