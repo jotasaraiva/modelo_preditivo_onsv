@@ -12,3 +12,11 @@ format:
 
 website:
   favicon: figures/onsv_icon.png
+  search: false
+  navbar:
+    background: "#fff"
+    logo: figures/onsv_navbar.png
+    logo-href: https://www.onsv.org.br/
+    tools:
+      - icon: github
+        url: https://github.com/ONSV/modelo_preditivo_onsv
