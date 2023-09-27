@@ -17,6 +17,14 @@ website:
     background: "#fff"
     logo: figures/onsv_navbar.png
     logo-href: https://www.onsv.org.br/
-    tools:
+    tools: 
       - icon: github
         url: https://github.com/ONSV/modelo_preditivo_onsv
+      - icon: twitter
+        url: https://twitter.com/_onsv
+      - icon: facebook
+        url: https://www.facebook.com/onsv.org.br
+      - icon: instagram
+        url: https://www.instagram.com/onsvoficial/
+      - icon: linkedin
+        url: https://www.linkedin.com/company/5010244/admin/
