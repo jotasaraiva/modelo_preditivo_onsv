@@ -7,7 +7,7 @@ authors:
   - name: João Pedro Melani Saraiva
   - name: Pedro Augusto Borges dos Santos
 
-description: Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito com resolução anual
+description: Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito
 
 title-block-banner: true
 
