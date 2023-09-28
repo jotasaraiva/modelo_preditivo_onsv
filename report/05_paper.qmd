@@ -50,9 +50,9 @@ O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros
 
 A segurança viária pode se correlacionar ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais [@zhong-xiang2014]. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
 
-Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade [@andrade2019], sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos prévios à 2020 [@blumenberg2018], o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Por conseguinte, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) é desenvolvido como uma ferramenta para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito [@ministériodostransporte2018], na intenção de aprimorar seus empenhos em relação a década passada se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU). Para atingir tais metas, o Art. 3º da Resolução Contran Nº 870 relata que o PNATRANS se apoia em seis principais pilares: gestão da segurança no trânsito, vias seguras, segurança veicular, educação para o trânsito, atendimento às vítimas e normalização e fiscalização [@conselhonacionaldetrânsito2018].
+Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade [@andrade2019], sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos prévios à 2020 [@blumenberg2018], o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Neste cenário, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) foi desenvolvido para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito [@ministériodostransporte2018], na intenção de aprimorar o desempenho da segurança viária em relação a década passada e se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU). Para atingir tais metas, o Art. 3º da Resolução Contran Nº 870 relata que o PNATRANS se apoia em seis principais pilares: gestão da segurança no trânsito, vias seguras, segurança veicular, educação para o trânsito, atendimento às vítimas, e normalização e fiscalização [@conselhonacionaldetrânsito2018].
 
-A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados são ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
+A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
 Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) [@institutobrasileirodegeografiaeestatística2023] e pelo Ministério da Saúde [@ministériodasaúde2023b], assim como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) [@políciarodoviáriafederal2023], do Registro Nacional de Condutores Habilitados (RENACH) [@ministériodostransporte2023], do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023] e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde [@ministériodasaúde2023a].
 
@@ -75,7 +75,7 @@ As demais variáveis foram tratadas e imputadas em uma única tabela:
 
 Em razão da ausência de dados prévios à 2011 de certas fontes, o intervalo de estudo foi reduzido para 2011 a 2021.
 
-Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na @fig-corr
+Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, assim, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na @fig-corr
 
 ```{r}
 #| echo: false
@@ -137,7 +137,7 @@ df_total %>%
   )
 ```
 
-Após a seleção das variáveis de melhor desempenho, a base de dados é padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. A expressão baseada na modelagem de uma regressão linear multivariada é feita e pode ser observada a partir dos coeficientes encontrados:
+Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:
 
 ```{r}
 #| include: false
@@ -223,7 +223,7 @@ coefs |>
   kable()
 ```
 
-## Discussão e Resultados
+## Resultados e Discussão
 
 Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (*Cross validation*). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na @fig-reg.
 
@@ -265,7 +265,7 @@ mortes_previsao |>
     scale_discrete_onsv()
 ```
 
-O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na @fig-pred.
+O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como *input* os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na @fig-pred. O valor previsto para 2022, com base no modelo efetuado, resultou em 33.725 mortes, com um intervalo de confiança entre 31.286 e 36.164 mortes.
 
 ```{r}
 #| fig.cap: Previsões com intervalo de confiança até 2022
@@ -339,13 +339,13 @@ df_pred |>
   coord_obs_pred()
 ```
 
-O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlações dos preditores selecionados para o estudo, a resoluação temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é reduzida.
+O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a dispor de um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que apesar da intensidade das correlações dos preditores selecionados para o estudo, a resolução temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é reduzida.
 
 ## Conclusão
 
-O modelo de regressão desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito viário. Mesmo que as previsões demonstrem que há a possibilidade de redução nos anos subsequentes, é visível que a predição do modelo linear ajustado está substancialmente distante do número de casos de 2019, este sendo o ano com a maior redução nas mortes desde o pico em 2012. Isto revela um potencial relaxamento no desempenho da segurança viária e mobilidadea segura à nível nacional, desencadeiando em uma redução em sua eficiência e causando um aumento na mortalidade em trânsito.
+O modelo de regressão desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito. Mesmo que as previsões demonstrem que há a possibilidade de redução no ano subsequente, é visível que a predição do modelo linear ajustado está substancialmente distante do número de casos de 2019, este sendo o ano com a maior redução nas mortes desde o pico em 2012. Isto revela um potencial relaxamento no desempenho da segurança viária e mobilidadea segura à nível nacional, desencadeiando em uma redução em sua eficiência e causando um aumento na mortalidade em sinistros de trânsito.
 
-É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores de infraestrutura e socioeconômicos que afetam a saúde deste sistema, podendo variar com o estado de desenvolvimento e maturidade tecnológica do país em questão. A mobilidade urbana é uma parte integral à toda civilização morderna, o que torna as ações para a segurança viária indispensáveis devido à dependência da sociedade contemporânea pelos veículos automotores.
+É fundamental destacar que a abordagem de problemas de segurança viária não depende apenas de variáveis de mobilidade urbana. Existem diversos fatores de infraestrutura e socioeconômicos que afetam a saúde deste sistema, podendo variar com o estado de desenvolvimento e maturidade tecnológica do país em questão. A mobilidade urbana é uma parte integral à toda civilização moderna, o que torna as ações para a segurança viária indispensáveis.
 
 O cenário atual da segurança viária brasileira anuncia alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos anunciam uma performance abaixo do ideal no combate da mortalidade, conferindo uma perspectiva pessimista para o início da nova década no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável haverem avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
