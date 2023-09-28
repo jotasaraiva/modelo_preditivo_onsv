@@ -37,6 +37,7 @@ library(onsvplot)
 library(knitr)
 library(here)
 library(tidymodels)
+library(kableExtra)
 
 # opções de display
 options(digits = 2)
@@ -227,7 +228,8 @@ coefs |>
   ) |> 
   mutate(Coeficiente = format(Coeficiente, big.mark = ".", decimal.mark = ","),
          `P-valor` = format(round(`P-valor`, 2), decimal.mark = ",")) |> 
-  kable()
+  kable(align = c("l","r","r"), table.attr = "quarto-disable-processing=true") |> 
+  kable_styling(full_width = F)
 ```
 
 ## Resultados e Discussão
@@ -309,6 +311,7 @@ Os métodos selecionados para medir o desempenho do modelo foram a Raiz Quadrada
 
 ```{r}
 #| echo: false
+
 erros |> 
   select(-.estimator) |> 
   mutate(
@@ -321,7 +324,10 @@ erros |>
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",")) |> 
-  kable(caption = "Métricas de Erros")
+  kable(caption = "Métricas de Erros", align = c("l","r"), 
+        table.attr = "quarto-disable-processing=true") |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
 ```
 
 A @fig-qq a seguir apresenta uma comparação entre os dados de mortes previstos e reais.

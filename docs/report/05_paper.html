@@ -72,6 +72,9 @@ div.csl-indent {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+<script src="../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
@@ -216,43 +219,44 @@ div.csl-indent {
 <p>Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<caption>Coeficientes resultantes </caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Variável</th>
-<th style="text-align: left;">Coeficiente</th>
-<th style="text-align: left;">P-valor</th>
-</tr>
-</thead>
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"><caption><p>Coeficientes resultantes</p></caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variável </th>
+   <th style="text-align:right;"> Coeficiente </th>
+   <th style="text-align:right;"> P-valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">Intercepto</td>
-<td style="text-align: left;">37.874</td>
-<td style="text-align: left;">0,00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Sinistros fatais em rodovias federais</td>
-<td style="text-align: left;">8.159</td>
-<td style="text-align: left;">0,04</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Frota de veiculos</td>
-<td style="text-align: left;">13.852</td>
-<td style="text-align: left;">0,22</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Condutores habilitados</td>
-<td style="text-align: left;">-15.134</td>
-<td style="text-align: left;">0,23</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Sinistros em rodovias federais</td>
-<td style="text-align: left;">-4.689</td>
-<td style="text-align: left;">0,24</td>
-</tr>
+  <tr>
+   <td style="text-align:left;"> Intercepto </td>
+   <td style="text-align:right;"> 37.874 </td>
+   <td style="text-align:right;"> 0,00 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Sinistros fatais em rodovias federais </td>
+   <td style="text-align:right;"> 8.159 </td>
+   <td style="text-align:right;"> 0,04 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Frota de veiculos </td>
+   <td style="text-align:right;"> 13.852 </td>
+   <td style="text-align:right;"> 0,22 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Condutores habilitados </td>
+   <td style="text-align:right;"> -15.134 </td>
+   <td style="text-align:right;"> 0,23 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Sinistros em rodovias federais </td>
+   <td style="text-align:right;"> -4.689 </td>
+   <td style="text-align:right;"> 0,24 </td>
+  </tr>
 </tbody>
 </table>
+
 </div>
 </div>
 </section>
@@ -283,29 +287,31 @@ div.csl-indent {
 <p>Os métodos selecionados para medir o desempenho do modelo foram a Raiz Quadrada do Erro Médio (<em>Root Mean Squared Error</em> - RMSE), o Erro Médio Absoluto (<em>Mean Squared Error</em> - MAE) e o R-quadrado - <span class="math inline">\(R^2\)</span>. Investigando as métricas de erros com base na comparação do conjunto de dados gerado ao inicial, têm-se:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>Métricas de Erros</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Métrica</th>
-<th style="text-align: left;">Valor</th>
-</tr>
-</thead>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">RMSE</td>
-<td style="text-align: left;">687,68</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MAE</td>
-<td style="text-align: left;">607,86</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">R²</td>
-<td style="text-align: left;">0,98</td>
-</tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 687,68 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 607,86 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> R² </td>
+   <td style="text-align:right;"> 0,98 </td>
+  </tr>
 </tbody>
 </table>
+
 </div>
 </div>
 <p>A <a href="#fig-qq">Figura&nbsp;5</a> a seguir apresenta uma comparação entre os dados de mortes previstos e reais.</p>
