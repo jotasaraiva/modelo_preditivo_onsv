@@ -3,13 +3,14 @@
 $blue: #00496d;
 $yellow: #f7951d;
 $red: #d51f29;
+$white: #FFF;
 
 $link-color: $blue;
 
 /*-- scss:rules --*/
 
 h1 {
-  color: white;
+  color: $white;
 }
 
 h2, h3, h4, h5, h6 {
@@ -22,14 +23,16 @@ h2, h3, h4, h5, h6 {
 
 .quarto-title-banner {
   background: $blue;
-  color: white;
+  color: $white;
 }
 
 .quarto-title-meta-heading {
   color: $blue;
 }
 
-.table {
-  color: $blue;
-  --bs-table-striped-color: $blue;
+thead {
+  background: $blue;
+  color: $white;
 }
+
+
