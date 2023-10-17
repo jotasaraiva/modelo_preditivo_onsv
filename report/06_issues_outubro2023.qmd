@@ -12,5 +12,26 @@ load(here("data","tabela_total.rda"))
 ```
 
 ```{r}
+novos_condutores <- df_total |> 
+  mutate(novos_condutores = condutores - lag(condutores)) |> 
+  select(novos_condutores, condutores, everything()) |> 
+  drop_na()
 
+novos_condutores
+
+novos_condutores |> 
+  ggplot(aes(x = ano, y = novos_condutores)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(limits = c(2012,2021), breaks = seq(2012,2021,1))
+```
+
+```{r}
+df_total |> 
+  mutate(
+    mortes_100mil_hab = (mortes/populacao)*100000,
+    mortes_10mil_veic = (mortes/veiculos_total)*10000
+  ) |> 
+  select(mortes_100mil_hab, mortes_10mil_veic, everything()) |> 
+  ggplot(aes(x = ano, y = mortes_100mil_hab)) + geom_line() + geom_line(aes(y = mortes_10mil_veic))
 ```
