@@ -1,0 +1,16 @@
+# Ajustes - Outubro 2023
+
+## Condutores
+- Determinar quantidade de novos condutores por ano
+- Testar modelo com população novamente
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(here)
+load(here("data","tabela_total.rda"))
+```
+
+```{r}
+
+```
