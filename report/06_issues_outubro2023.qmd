@@ -77,3 +77,45 @@ taxas_pred |>
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
+## Avaliando novamente população como variável
+
+```{r}
+# limpa o global environment
+rm(list = ls())
+
+load(here("data/tabela_total.rda"))
+
+source(here("R/linear_model.R"))
+
+res <- df_total |> 
+  lm_model() |> 
+  lm_extract(df_total)
+
+prediction <- res$pred
+
+dados2022 <- list(
+  "ano" = 2022,
+  "qnt_acidentes" = 64547,
+  "qnt_acidentes_fatais" = 4662,
+  "condutores" = 79921178,
+  "veiculos_total" = 115116532,
+  "populacao" = 203062512
+) |> as.data.frame()
+
+df_2022 <- bind_rows(drop_na(df_total), dados2022)
+
+res2 <- df_total |>
+  lm_model() |>
+  lm_extract(df_2022)
+
+prediction2 <- res2$pred
+```
+
+```{r}
+res2$erros
+```
+
+```{r}
+
+```
+
