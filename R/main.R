@@ -7,7 +7,7 @@ options(scipen = 999)
 
 load(here("data/tabela_total.rda"))
 
-source("R/linear_model.R")
+source(here("R/linear_model.R"))
 
 res <- df_total |> 
   lm_model() |> 
