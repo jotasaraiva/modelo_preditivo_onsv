@@ -143,10 +143,21 @@ df_total %>%
   )
 ```
 
-Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento crescente similar. Para verificar que o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se os novos condutores por ano, como visto na figura, denotando como o ano de 2020 soferu de uma que brusca de novos indivíduos, possivelmente devido aos impactos da pandemia.
+Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento crescente similar. Para verificar que o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se os novos condutores por ano, como visto na figura, denotando como o ano de 2020 soferu de uma que brusca de novos indivíduos, possivelmente devido aos impactos da pandemia. Em comparação à população, os condutores oferecem melhores valores nas métricas de desempenho.
 
 ```{r}
-novos_condutores <- df_total |> 
+novos_condtrs <- df_total |>
+  mutate(novos_condutores = condutores - lag(condutores)) |> 
+  select(novos_condutores, condutores, everything())
+
+novos_condtrs |> 
+  ggplot(aes(x = ano, y = novos_condutores)) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+    geom_line(linewidth = 1, alpha = 0.25, color = onsv_palette$blue) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    scale_x_continuous(breaks = seq(1996, 2022, 1), limits = c(2012,2022)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    labs(x = NULL, y = NULL)
 ```
 
 Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:
