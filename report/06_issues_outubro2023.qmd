@@ -52,8 +52,10 @@ taxas |>
 ```
 
 ```{r}
-taxas_pred <- taxas |> 
+taxas_pred <- prediction2 |> 
   mutate(
+    mortes_100mil_hab = (mortes/populacao)*100000,
+    mortes_10mil_veic = (mortes/veiculos_total)*10000,
     mortes_100mil_hab_pred = (mortes.pred/populacao)*100000,
     mortes_10mil_veic_pred = (mortes.pred/veiculos_total)*10000
   ) |> 
@@ -66,7 +68,7 @@ taxas_pred |>
   pivot_longer(cols = c(mortes_100mil_hab_pred, mortes_100mil_hab)) |> 
   ggplot(aes(x = ano, y = value, color = name)) +
   geom_line() + geom_point() +
-  scale_x_continuous(limits = c(1996,2021), breaks = seq(1996,2021,1)) +
+  scale_x_continuous(limits = c(2011,2021), breaks = seq(1996,2022,1)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 taxas_pred |> 
@@ -74,7 +76,7 @@ taxas_pred |>
   pivot_longer(cols = c(mortes_10mil_veic_pred, mortes_10mil_veic)) |> 
   ggplot(aes(x = ano, y = value, color = name)) +
   geom_line() + geom_point() +
-  scale_x_continuous(limits = c(1996,2021), breaks = seq(1996,2021,1)) +
+  scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 

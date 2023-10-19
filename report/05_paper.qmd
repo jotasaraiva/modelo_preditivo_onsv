@@ -166,7 +166,7 @@ novos_condtrs |>
     labs(x = NULL, y = NULL)
 ```
 
-Os atributos altamente colineares de menos influência nas predições são deletadas do conjunto de dados a fim de preservar a capacidade de generalização do modelo, mitigando os efeitos de um possível sobreajuste. A quantidade de mortos em rodovias federais foi considerada uma variável redundante, sendo removida, assim como o PIB, a população e a quantidade de feridos, que foram consideradas menos influentes da precisão dos resultados. 
+Os atributos altamente colineares de menos influência nas predições são deletados do conjunto de dados a fim de preservar a capacidade de generalização do modelo, mitigando os efeitos de um possível sobreajuste. A quantidade de mortos em rodovias federais foi considerada uma variável redundante, sendo removida, assim como o PIB, a população e a quantidade de feridos, que foram consideradas menos atuantes na precisão dos resultados. 
 
 Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:
 
