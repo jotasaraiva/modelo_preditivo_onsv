@@ -216,6 +216,17 @@ div.csl-indent {
 </div>
 </div>
 </div>
+<p>Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na <a href="#fig-novos-cond">Figura&nbsp;3</a>, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Em relação à variável população, os condutores oferecem melhores valores nas métricas de funcionamento.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-novos-cond" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/fig-novos-cond-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figura&nbsp;3: Número de novos condutores a por ano</figcaption>
+</figure>
+</div>
+</div>
+</div>
 <p>Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -262,24 +273,24 @@ div.csl-indent {
 </section>
 <section id="resultados-e-discussão" class="level2">
 <h2 class="anchored" data-anchor-id="resultados-e-discussão">Resultados e Discussão</h2>
-<p>Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na <a href="#fig-reg">Figura&nbsp;3</a>.</p>
+<p>Devido ao fato de que a quantidade de dados é reduzida, é inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na <a href="#fig-reg">Figura&nbsp;4</a>.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-reg" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-reg-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;3: Quantidade de mortes em sinistros de trânsito</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;4: Quantidade de mortes em sinistros de trânsito</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na <a href="#fig-pred">Figura&nbsp;4</a>. O valor previsto para 2022, com base no modelo efetuado, resultou em 33.725 mortes, com um intervalo de confiança entre 31.286 e 36.164 mortes.</p>
+<p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na <a href="#fig-pred">Figura&nbsp;5</a>. O valor previsto para 2022, com base no modelo efetuado, resultou em 33.725 mortes, com um intervalo de confiança entre 31.286 e 36.164 mortes.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-pred" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-pred-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;4: Previsões com intervalo de confiança até 2022</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;5: Previsões com intervalo de confiança até 2022</figcaption>
 </figure>
 </div>
 </div>
@@ -314,13 +325,13 @@ div.csl-indent {
 
 </div>
 </div>
-<p>A <a href="#fig-qq">Figura&nbsp;5</a> a seguir apresenta uma comparação entre os dados de mortes previstos e reais.</p>
+<p>A <a href="#fig-qq">Figura&nbsp;6</a> a seguir apresenta uma comparação entre os dados de mortes previstos e reais.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-qq" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-qq-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;5: Comparação mortes previstas x reais</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;6: Comparação mortes previstas x reais</figcaption>
 </figure>
 </div>
 </div>

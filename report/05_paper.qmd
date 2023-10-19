@@ -143,9 +143,15 @@ df_total %>%
   )
 ```
 
-Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento crescente similar. Para verificar que o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se os novos condutores por ano, como visto na figura, denotando como o ano de 2020 soferu de uma que brusca de novos indivíduos, possivelmente devido aos impactos da pandemia. Em comparação à população, os condutores oferecem melhores valores nas métricas de desempenho.
+Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na @fig-novos-cond, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Em relação à variável população, os condutores oferecem melhores valores nas métricas de funcionamento.
 
 ```{r}
+#| echo: false
+#| label: fig-novos-cond
+#| fig.cap: Número de novos condutores a por ano
+#| fig.width: 7
+#| fig.height: 5
+
 novos_condtrs <- df_total |>
   mutate(novos_condutores = condutores - lag(condutores)) |> 
   select(novos_condutores, condutores, everything())
@@ -159,6 +165,8 @@ novos_condtrs |>
     scale_y_continuous(labels = comma_format(big.mark = ".")) +
     labs(x = NULL, y = NULL)
 ```
+
+Os atributos altamente colineares de menos influência nas predições são deletadas do conjunto de dados a fim de preservar a capacidade de generalização do modelo, mitigando os efeitos de um possível sobreajuste. A quantidade de mortos em rodovias federais foi considerada uma variável redundante, sendo removida, assim como o PIB, a população e a quantidade de feridos, que foram consideradas menos influentes da precisão dos resultados. 
 
 Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:
 
