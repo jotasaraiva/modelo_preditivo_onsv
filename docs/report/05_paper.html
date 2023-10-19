@@ -227,7 +227,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p>Os atributos altamente colineares de menos influência nas predições são deletados do conjunto de dados a fim de preservar a capacidade de generalização do modelo, mitigando os efeitos de um possível sobreajuste. A quantidade de mortos em rodovias federais foi considerada uma variável redundante, sendo removida, assim como o PIB, a população e a quantidade de feridos, que foram consideradas menos atuantes na precisão dos resultados.</p>
+<p>Os atributos altamente colineares de menor influência nas predições são deletados do conjunto de dados a fim de preservar a capacidade de generalização do modelo, mitigando os efeitos de um possível sobreajuste. A quantidade de mortos em rodovias federais foi considerada uma variável redundante, sendo removida tal qual o PIB, a população e a quantidade de feridos, as quais foram consideradas menos atuantes na precisão dos resultados.</p>
 <p>Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -326,7 +326,7 @@ div.csl-indent {
 
 </div>
 </div>
-<p>A gravidade das mortes e a qualidade da predição podem ser transparecidos pelo cálculo das taxas de mortos por quantidade de habitantes e de veículos, como o propósito de observar a tendência destas taxas. A <a href="#fig-mortes-hab">Figura&nbsp;6</a> explicita a crescente taxa de mortes trânsito em função da população:</p>
+<p>A gravidade do número de mortes e a qualidade da predição podem ser transparecidos pelo cálculo das taxas de mortos por habitantes e por veículos, com o propósito de observar suas tendências. A <a href="#fig-mortes-hab">Figura&nbsp;6</a> explicita a crescente taxa de mortes no trânsito em função da população:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-mortes-hab" class="quarto-figure quarto-figure-center anchored">
@@ -337,7 +337,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p>A taxa de mortes por veículos, como mostrada na <a href="#fig-mortes-veic">Figura&nbsp;7</a>, demonstra uma queda progressiva significativa, um possível indício do aumento desproporcional da frota de veículos em relação as mortes em trânsito:</p>
+<p>A taxa de mortes por veículos, como mostrada na <a href="#fig-mortes-veic">Figura&nbsp;7</a>, demonstra uma queda progressiva significativa, um possível indício do aumento desproporcional da frota de veículos em relação as mortes no trânsito:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-mortes-veic" class="quarto-figure quarto-figure-center anchored">
