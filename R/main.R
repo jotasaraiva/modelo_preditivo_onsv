@@ -20,7 +20,8 @@ dados2022 <- list(
   "qnt_acidentes" = 64547,
   "qnt_acidentes_fatais" = 4662,
   "condutores" = 79921178,
-  "veiculos_total" = 115116532
+  "veiculos_total" = 115116532,
+  "populacao" = 203062512
 ) |> as.data.frame()
 
 df_2022 <- bind_rows(drop_na(df_total), dados2022)
