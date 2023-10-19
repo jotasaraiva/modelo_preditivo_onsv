@@ -143,11 +143,11 @@ df_total %>%
   )
 ```
 
-Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na @fig-novos-cond, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Em relação à variável população, os condutores oferecem melhores valores nas métricas de funcionamento.
+Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na @fig-newcond, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Em relação à variável população, os condutores oferecem melhores valores nas métricas de funcionamento.
 
 ```{r}
 #| echo: false
-#| label: fig-novos-cond
+#| label: fig-newcond
 #| fig.cap: Número de novos condutores por ano
 #| fig.width: 7
 #| fig.height: 4
@@ -357,12 +357,12 @@ erros |>
   column_spec(1, width = "6cm", bold = T)
 ```
 
-A gravidade do número de mortes e a qualidade da predição podem ser transparecidos pelo cálculo das taxas de mortos por habitantes e por veículos, com o propósito de observar suas tendências. A @fig-mortes-hab explicita a crescente taxa de mortes no trânsito em função da população:
+A gravidade do número de mortes e a qualidade da predição podem ser transparecidos pelo cálculo das taxas de mortos por habitantes e por veículos, com o propósito de observar suas tendências. A @fig-rate1 explicita a crescente taxa de mortes no trânsito em função da população:
 
 ```{r}
 #| fig.cap: Mortes por 100.000 habitantes
 #| echo: false
-#| label: fig-mortes-hab
+#| label: fig-rate1
 #| fig.width: 7
 #| fig.height: 4
 
@@ -388,12 +388,12 @@ taxas_pred |>
                "Mortes previstas por 100.000 habitantes"))
 ```
 
-A taxa de mortes por veículos, como mostrada na @fig-mortes-veic, demonstra uma queda progressiva significativa, um possível indício do aumento desproporcional da frota de veículos em relação as mortes no trânsito:
+A taxa de mortes por veículos, como mostrada na @fig-rate2, demonstra uma queda progressiva significativa, um possível indício do aumento desproporcional da frota de veículos em relação as mortes no trânsito:
 
 ```{r}
 #| fig.cap: Mortes por 10.000 veículos
 #| echo: false
-#| label: fig-mortes-veic
+#| label: fig-rate2
 #| fig.width: 7
 #| fig.height: 4
 
