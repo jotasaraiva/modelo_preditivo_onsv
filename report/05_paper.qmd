@@ -148,9 +148,9 @@ Outra variável que deve ser analisada individualmente é o número de condutore
 ```{r}
 #| echo: false
 #| label: fig-novos-cond
-#| fig.cap: Número de novos condutores a por ano
+#| fig.cap: Número de novos condutores por ano
 #| fig.width: 7
-#| fig.height: 5
+#| fig.height: 4
 
 novos_condtrs <- df_total |>
   mutate(novos_condutores = condutores - lag(condutores)) |> 
@@ -364,7 +364,7 @@ A gravidade do número de mortes e a qualidade da predição podem ser transpare
 #| echo: false
 #| label: fig-mortes-hab
 #| fig.width: 7
-#| fig.height: 5
+#| fig.height: 4
 
 taxas_pred <- df_pred |> 
   mutate(
@@ -395,7 +395,7 @@ A taxa de mortes por veículos, como mostrada na @fig-mortes-veic, demonstra uma
 #| echo: false
 #| label: fig-mortes-veic
 #| fig.width: 7
-#| fig.height: 5
+#| fig.height: 4
 
 taxas_pred |>
   select(ano, mortes_10mil_veic_pred, mortes_10mil_veic) |>
