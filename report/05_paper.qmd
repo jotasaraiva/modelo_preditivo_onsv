@@ -382,6 +382,7 @@ taxas_pred |>
   geom_line(linewidth = 1, alpha = 0.25, aes(color = name)) +
   scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(x = NULL, y = NULL) +
   scale_discrete_onsv(
     labels = c("Mortes por 100.000 habitantes", 
                "Mortes previstas por 100.000 habitantes"))
@@ -404,6 +405,7 @@ taxas_pred |>
   geom_line(linewidth = 1, alpha = 0.25, aes(color = name)) +
   scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(x = NULL, y = NULL) +
   scale_discrete_onsv(
     labels = c("Mortes por 10.000 veículos", 
                "Mortes previstas por 10.000 veículos"))
