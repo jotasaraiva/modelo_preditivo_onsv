@@ -59,7 +59,7 @@ Apesar da crescente adesão por itens de segurança veicular, os sinistros de tr
 
 A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
-Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) [@institutobrasileirodegeografiaeestatística2023] e pelo Ministério da Saúde [@ministériodasaúde2023b], assim como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) [@políciarodoviáriafederal2023], do Registro Nacional de Condutores Habilitados (RENACH) [@ministériodostransporte2023], do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023] e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde [@ministériodasaúde2023a].
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) [@institutobrasileirodegeografiaeestatística2023] e pelo Ministério da Saúde [@ministériodasaúde2023b], tal como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) [@políciarodoviáriafederal2023], do Registro Nacional de Condutores Habilitados (RENACH) [@ministériodostransporte2023], do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023] e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde [@ministériodasaúde2023a].
 
 ## Metodologia
 
@@ -143,6 +143,31 @@ df_total %>%
   )
 ```
 
+Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na @fig-novos-cond, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Em relação à variável população, os condutores oferecem melhores valores nas métricas de funcionamento.
+
+```{r}
+#| echo: false
+#| label: fig-novos-cond
+#| fig.cap: Número de novos condutores a por ano
+#| fig.width: 7
+#| fig.height: 5
+
+novos_condtrs <- df_total |>
+  mutate(novos_condutores = condutores - lag(condutores)) |> 
+  select(novos_condutores, condutores, everything())
+
+novos_condtrs |> 
+  ggplot(aes(x = ano, y = novos_condutores)) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+    geom_line(linewidth = 1, alpha = 0.25, color = onsv_palette$blue) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    scale_x_continuous(breaks = seq(1996, 2022, 1), limits = c(2012,2022)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    labs(x = NULL, y = NULL)
+```
+
+Os atributos altamente colineares de menor influência nas predições são deletados do conjunto de dados a fim de preservar a capacidade de generalização do modelo, mitigando os efeitos de um possível sobreajuste. A quantidade de mortos em rodovias federais foi considerada uma variável redundante, sendo removida tal qual o PIB, a população e a quantidade de feridos, as quais foram consideradas menos atuantes na precisão dos resultados.
+
 Após a seleção das variáveis de melhor desempenho, a base de dados foi padronizada a fim de otimizar sua performance e estabilidade no momento de ajuste do modelo de regressão linear. Os coeficientes da regressão linear multivariada estão apresentados à seguir:
 
 ```{r}
@@ -157,7 +182,8 @@ df_preprocess <- df_total |>
     veiculos_total,
     qnt_acidentes_fatais,
     condutores,
-    qnt_acidentes
+    qnt_acidentes,
+    populacao
   ) |> 
   drop_na()
 
@@ -189,7 +215,8 @@ obs2022 <- list(
   # "qnt_mortos" = 5439,
   # "qnt_feridos" = 72971,
   "condutores" = 79921178,
-  "veiculos_total" = 115116532
+  "veiculos_total" = 115116532,
+  "populacao" = 203062512
   # "pib" = 9915317
 ) |> 
   as.data.frame()
@@ -328,6 +355,58 @@ erros |>
         table.attr = "quarto-disable-processing=true") |> 
   kable_styling(full_width = F) |> 
   column_spec(1, width = "6cm", bold = T)
+```
+
+A gravidade do número de mortes e a qualidade da predição podem ser transparecidos pelo cálculo das taxas de mortos por habitantes e por veículos, com o propósito de observar suas tendências. A @fig-mortes-hab explicita a crescente taxa de mortes no trânsito em função da população:
+
+```{r}
+#| fig.cap: Mortes por 100.000 habitantes
+#| echo: false
+#| label: fig-mortes-hab
+#| fig.width: 7
+#| fig.height: 5
+
+taxas_pred <- df_pred |> 
+  mutate(
+    mortes_100mil_hab = (mortes/populacao)*100000,
+    mortes_10mil_veic = (mortes/veiculos_total)*10000,
+    mortes_100mil_hab_pred = (.pred/populacao)*100000,
+    mortes_10mil_veic_pred = (.pred/veiculos_total)*10000
+  )
+
+taxas_pred |> 
+  select(ano, mortes_100mil_hab_pred, mortes_100mil_hab) |> 
+  pivot_longer(cols = c(mortes_100mil_hab_pred, mortes_100mil_hab)) |> 
+  ggplot(aes(x = ano, y = value, color = name)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, aes(color = name)) +
+  geom_line(linewidth = 1, alpha = 0.25, aes(color = name)) +
+  scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_discrete_onsv(
+    labels = c("Mortes por 100.000 habitantes", 
+               "Mortes previstas por 100.000 habitantes"))
+```
+
+A taxa de mortes por veículos, como mostrada na @fig-mortes-veic, demonstra uma queda progressiva significativa, um possível indício do aumento desproporcional da frota de veículos em relação as mortes no trânsito:
+
+```{r}
+#| fig.cap: Mortes por 10.000 veículos
+#| echo: false
+#| label: fig-mortes-veic
+#| fig.width: 7
+#| fig.height: 5
+
+taxas_pred |>
+  select(ano, mortes_10mil_veic_pred, mortes_10mil_veic) |>
+  pivot_longer(cols = c(mortes_10mil_veic_pred, mortes_10mil_veic)) |>
+  ggplot(aes(x = ano, y = value, color = name)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, aes(color = name)) +
+  geom_line(linewidth = 1, alpha = 0.25, aes(color = name)) +
+  scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_discrete_onsv(
+    labels = c("Mortes por 10.000 veículos", 
+               "Mortes previstas por 10.000 veículos"))
 ```
 
 A @fig-qq a seguir apresenta uma comparação entre os dados de mortes previstos e reais.

@@ -1,0 +1,223 @@
+# Ajustes - Outubro 2023
+
+## Condutores
+- Determinar quantidade de novos condutores por ano
+- Testar modelo com população novamente
+
+```{r}
+library(here)
+source(here("R/main.R"))
+conflicted::conflicts_prefer(dplyr::lag)
+```
+
+```{r}
+novos_condutores <- prediction |> 
+  mutate(novos_condutores = condutores - lag(condutores)) |> 
+  select(novos_condutores, condutores, everything())
+
+novos_condutores
+
+novos_condutores |> 
+  ggplot(aes(x = ano, y = novos_condutores)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(limits = c(2012,2021), breaks = seq(2012,2021,1))
+```
+
+Queda brusca de novos condutores em 2020, provavelmente devido à pandemia
+
+## Taxas de mortes
+
+```{r}
+taxas <- novos_condutores |> 
+  mutate(
+    mortes_100mil_hab = (mortes/populacao)*100000,
+    mortes_10mil_veic = (mortes/veiculos_total)*10000
+  ) |> 
+  select(mortes_100mil_hab, mortes_10mil_veic, everything())
+
+taxas
+
+taxas |> 
+  ggplot(aes(x = ano, y = mortes_100mil_hab)) + 
+  geom_line() +
+  scale_x_continuous(limits = c(1996,2021), breaks = seq(1996,2021,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+taxas |> 
+  ggplot(aes(x = ano, y = mortes_10mil_veic)) +
+  geom_line() +
+  scale_x_continuous(limits = c(1999,2021), breaks = seq(1996,2021,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+taxas_pred <- prediction2 |> 
+  mutate(
+    mortes_100mil_hab = (mortes/populacao)*100000,
+    mortes_10mil_veic = (mortes/veiculos_total)*10000,
+    mortes_100mil_hab_pred = (mortes.pred/populacao)*100000,
+    mortes_10mil_veic_pred = (mortes.pred/veiculos_total)*10000
+  ) |> 
+  select(mortes_100mil_hab_pred, mortes_10mil_veic_pred, everything())
+
+taxas_pred
+
+taxas_pred |> 
+  select(ano, mortes_100mil_hab_pred, mortes_100mil_hab) |> 
+  pivot_longer(cols = c(mortes_100mil_hab_pred, mortes_100mil_hab)) |> 
+  ggplot(aes(x = ano, y = value, color = name)) +
+  geom_line() + geom_point() +
+  scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+taxas_pred |> 
+  select(ano, mortes_10mil_veic_pred, mortes_10mil_veic) |> 
+  pivot_longer(cols = c(mortes_10mil_veic_pred, mortes_10mil_veic)) |> 
+  ggplot(aes(x = ano, y = value, color = name)) +
+  geom_line() + geom_point() +
+  scale_x_continuous(limits = c(2011,2022), breaks = seq(1996,2022,1)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+## Avaliando novamente população como variável
+
+```{r}
+# limpa o global environment
+rm(list = ls())
+
+load(here("data/tabela_total.rda"))
+
+source(here("R/linear_model.R"))
+
+res <- df_total |> 
+  lm_model() |> 
+  lm_extract(df_total)
+
+prediction <- res$pred
+
+dados2022 <- list(
+  "ano" = 2022,
+  "qnt_acidentes" = 64547,
+  "qnt_acidentes_fatais" = 4662,
+  "condutores" = 79921178,
+  "veiculos_total" = 115116532,
+  "populacao" = 203062512
+) |> as.data.frame()
+
+df_2022 <- bind_rows(drop_na(df_total), dados2022)
+
+res2 <- df_total |>
+  lm_model() |>
+  lm_extract(df_2022)
+
+prediction2 <- res2$pred
+```
+
+```{r}
+res2$erros
+```
+
+```{r}
+rm(list = ls())
+
+lm_model <- function(df) {
+  
+  modelo_lm <- linear_reg() |> set_engine("lm")
+  
+  df_preproc <- df |> 
+    select(
+      ano,
+      mortes,
+      qnt_acidentes_fatais,
+      qnt_acidentes,
+      condutores,
+      veiculos_total,
+      populacao
+    ) |> drop_na()
+  
+  rec_preproc <- df_preproc |> 
+    recipe(
+      mortes ~ qnt_acidentes + qnt_acidentes_fatais + condutores + veiculos_total + populacao
+    ) |> 
+    step_normalize(all_numeric_predictors())
+  
+  lm_wflow <- workflow() |> 
+    add_model(modelo_lm) |> 
+    add_recipe(rec_preproc) |> 
+    fit(df_preproc)
+  
+  return(lm_wflow)
+}
+
+lm_extract <- function(model, input) {
+  
+  metricas <- metric_set(rmse, mae, rsq)
+  
+  pred <- predict(model, input) |> 
+    bind_cols(input) |> 
+    rename(mortes.pred = .pred)
+  
+  pred <- predict(model, input, type = "conf_int") |> 
+    bind_cols(pred) 
+  
+  erros <- metricas(pred, truth = mortes, estimate = mortes.pred)
+  
+  specs <- model |> 
+    tidy() 
+  
+  res <- list("pred" = pred, "erros" = erros, "specs" = specs)
+  
+  return(res)
+}
+
+lm_complete <- function(df) {
+  
+  model <- lm_model(df)
+  
+  extrac <- lm_extract(model, df)
+  
+  res <- list(
+    "model" = model,
+    "pred" = extrac$pred,
+    "metric" = extrac$metric,
+    "coef" = extrac$coef
+  )
+  
+  return(res)
+}
+```
+
+```{r}
+load(here("data/tabela_total.rda"))
+
+res <- df_total |> 
+  lm_model() |> 
+  lm_extract(df_total)
+
+prediction <- res$pred
+
+dados2022 <- list(
+  "ano" = 2022,
+  "qnt_acidentes" = 64547,
+  "qnt_acidentes_fatais" = 4662,
+  "condutores" = 79921178,
+  "veiculos_total" = 115116532,
+  "populacao" = 203062512
+) |> as.data.frame()
+
+df_2022 <- bind_rows(drop_na(df_total), dados2022)
+
+res2 <- df_total |>
+  lm_model() |>
+  lm_extract(df_2022)
+
+prediction2 <- res2$pred
+
+res2$erros
+```
+
+```{r}
+res2$specs
+```
+População aumenta $R^2$ mas também aumenta o RMSE e o MAE, indicando que o modelo possa beneficiar de utilizar apenas os condutores
