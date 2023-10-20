@@ -374,7 +374,7 @@ taxas_pred <- df_pred |>
     mortes_10mil_veic_pred = (.pred/veiculos_total)*10000
   )
 
-taxas_pred |> 
+taxas_plot1 <- taxas_pred |> 
   select(ano, mortes_100mil_hab_pred, mortes_100mil_hab) |> 
   pivot_longer(cols = c(mortes_100mil_hab_pred, mortes_100mil_hab)) |> 
   ggplot(aes(x = ano, y = value, color = name)) +
@@ -386,6 +386,17 @@ taxas_pred |>
   scale_discrete_onsv(
     labels = c("Mortes por 100.000 habitantes", 
                "Mortes previstas por 100.000 habitantes"))
+
+taxas_plot1 +
+  geom_label(
+    data = taxas_pred |> filter(ano == 2022),
+    aes(x = ano,
+        y = mortes_100mil_hab_pred,
+        label = format(mortes_100mil_hab_pred, decimal.mark = ",", digits = 3)),
+    color = "gray20",
+    vjust = 0,
+    nudge_y = 0.20
+  )
 ```
 
 A taxa de mortes por veículos, como mostrada na @fig-veic, demonstra uma queda progressiva significativa, um possível indício do aumento desproporcional da frota de veículos em relação as mortes no trânsito:
@@ -397,7 +408,7 @@ A taxa de mortes por veículos, como mostrada na @fig-veic, demonstra uma queda 
 #| fig.width: 7
 #| fig.height: 4
 
-taxas_pred |>
+taxas_plot2 <- taxas_pred |>
   select(ano, mortes_10mil_veic_pred, mortes_10mil_veic) |>
   pivot_longer(cols = c(mortes_10mil_veic_pred, mortes_10mil_veic)) |>
   ggplot(aes(x = ano, y = value, color = name)) +
@@ -409,6 +420,17 @@ taxas_pred |>
   scale_discrete_onsv(
     labels = c("Mortes por 10.000 veículos", 
                "Mortes previstas por 10.000 veículos"))
+
+taxas_plot2 +
+  geom_label(
+    data = taxas_pred |> filter(ano == 2022),
+    aes(x = ano,
+        y = mortes_10mil_veic_pred,
+        label = format(mortes_10mil_veic_pred, decimal.mark = ",", digits = 2)),
+    color = "gray20",
+    vjust = 0,
+    nudge_y = 0.10
+  )
 ```
 
 A @fig-qq a seguir apresenta uma comparação entre os dados de mortes previstos e reais.
