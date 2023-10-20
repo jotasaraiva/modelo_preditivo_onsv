@@ -392,7 +392,7 @@ taxas_plot1 +
     data = taxas_pred |> filter(ano == 2022),
     aes(x = ano,
         y = mortes_100mil_hab_pred,
-        label = format(mortes_100mil_hab_pred, decimal.mark = ",", digits = 3)),
+        label = format(mortes_100mil_hab_pred, decimal.mark = ",", digits = 4)),
     color = "gray20",
     vjust = 0,
     nudge_y = 0.20
@@ -426,7 +426,7 @@ taxas_plot2 +
     data = taxas_pred |> filter(ano == 2022),
     aes(x = ano,
         y = mortes_10mil_veic_pred,
-        label = format(mortes_10mil_veic_pred, decimal.mark = ",", digits = 2)),
+        label = format(mortes_10mil_veic_pred, decimal.mark = ",", digits = 3)),
     color = "gray20",
     vjust = 0,
     nudge_y = 0.10
