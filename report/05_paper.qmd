@@ -373,7 +373,7 @@ erros |>
   column_spec(1, width = "6cm", bold = T)
 ```
 
-Com o valor previsto para 2022, foi possível realizar cálculo das taxas de mortos por 100 mil habitantes e por 10 mil veículos, com o propósito de observar suas tendências. A @fig-hab explicita a crescente taxa de mortes por 100 mil  habitantes, apresentando uma estimativa de 16,61 em 2022.
+Com o valor previsto para 2022, foi possível realizar cálculo das taxas de mortos por 100 mil habitantes e por 10 mil veículos, com o propósito de observar suas tendências. A @fig-hab explicita a crescente taxa de mortes por 100 mil habitantes, apresentando uma estimativa de 16,61 em 2022.
 
 ```{r}
 #| fig.cap: Mortes por 100.000 habitantes
