@@ -12,6 +12,8 @@ library(roadtrafficdeaths)
 library(here)
 ```
 
+## DataSUS
+
 ```{r}
 rtdeaths |> head()
 ```
@@ -50,6 +52,8 @@ autoplot(tseries_dec$seasonal, )
 autoplot(tseries_dec$trend, )
 autoplot(tseries_dec$random, )
 ```
+
+## PRF
 
 ```{r}
 prf_filepaths <- paste0(
@@ -91,17 +95,25 @@ prf_data <- prf |> mutate(
 ```
 
 ```{r}
-prf_data |> 
-  group_by(mes, ano) |> 
+sinistros_prf <- prf_data |> 
   summarise(
+    .by = c("mes", "ano"),
     acidentes = n(),
     acidentes_fatais = sum(classificacao_acidente == "Com Vítimas Fatais"),
     feridos = sum(feridos),
     mortes = sum(mortos)
   ) |> 
-  arrange(ano)
+  arrange(ano,mes) |> 
+  mutate(data = my(paste0(mes,"-",ano)))
+
+sinistros_prf
 ```
 
-
-
+```{r}
+sinistros_prf |> 
+  select(-c(mes,ano)) |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(x = data, y = value, color = name)) + 
+    geom_point() + geom_line()
+```
 
