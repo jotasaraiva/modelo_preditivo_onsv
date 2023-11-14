@@ -10,9 +10,10 @@ editor: visual
 library(tidyverse)
 library(roadtrafficdeaths)
 library(here)
+library(rvest)
 ```
 
-## DataSUS
+### DataSUS
 
 ```{r}
 rtdeaths |> head()
@@ -53,7 +54,7 @@ autoplot(tseries_dec$trend, )
 autoplot(tseries_dec$random, )
 ```
 
-## PRF
+### PRF
 
 ```{r}
 prf_filepaths <- paste0(
@@ -115,5 +116,19 @@ sinistros_prf |>
   pivot_longer(-data) |> 
   ggplot(aes(x = data, y = value, color = name)) + 
     geom_point() + geom_line()
+```
+
+### Frota
+
+```{r}
+page <- read_html("https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2013")
+
+page |> 
+  html_nodes("a") |> 
+  html_attr("href") |> 
+  str_subset("\\.zip") |> 
+  str_subset("tipo") |>
+  str_subset("reg") |> 
+  view()
 ```
 
