@@ -11,6 +11,7 @@ library(tidyverse)
 library(roadtrafficdeaths)
 library(here)
 library(rvest)
+library(archive)
 ```
 
 ### DataSUS
@@ -135,7 +136,7 @@ page_list <- c(
   "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"
 )
 
-page <- read_html(page_list[2])
+page <- read_html(page_list[9])
 
 file_list <- page |>  
   html_elements("a") |> 
@@ -188,27 +189,30 @@ read_fleet <- function(file) {
     
     download.file(file, destfile = name, mode = "wb")
     
-    data <- readxl::read_excel(name, sheet = 2, skip = 3)
+    data <- readxl::read_excel(name, sheet = 2, skip = 3)  
     
     unlink(name)
   }
   
-  else { data <- 0}
+  else if (ext == "xls") {
+    
+    name <- "tempfile.xls"
+    
+    download.file(file, destfile = name, mode = "wb")
+    
+    data <- readxl::read_excel(name, sheet = 1, skip = 2)
+    
+    unlink(name)
+  }
+  
+  else { data <- 0 }
   
   return(data)
 }
 ```
 
 ```{r}
-url <- file_paths[1]
 
-name <- "tempfile.xlsx"
-
-download.file(url, destfile = name, mode = "wb")
-
-data <- readxl::read_excel(name, sheet = 2, skip = 3)
-
-unlink(name)
 ```
 
 ```{r}
