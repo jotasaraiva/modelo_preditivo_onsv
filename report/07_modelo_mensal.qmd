@@ -428,3 +428,40 @@ read_fleet2012 <- function() {
 
 frota2012 <- read_fleet2012()
 ```
+
+```{r}
+read_fleet2015 <- function() {
+  folder <- here("data-raw","frota_mensal","frota_2015")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2015
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet2015() |> view()
+```
+
