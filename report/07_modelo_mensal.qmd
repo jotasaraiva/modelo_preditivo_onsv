@@ -11,7 +11,6 @@ library(tidyverse)
 library(roadtrafficdeaths)
 library(here)
 library(rvest)
-library(archive)
 ```
 
 ### DataSUS
@@ -325,7 +324,7 @@ page_list <- c(
 ```
 
 ```{r}
-num <- 9
+num <- 1
 
 read_fleet_page <- function(page) {
   links <- fleet_links(page)
@@ -337,27 +336,95 @@ read_fleet_page <- function(page) {
     frota[[i]]$ANO <- as.numeric(str_extract(page_list[num], "(1|2)\\d{3}"))
   }
   
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
   return(frota)
 }
 
-read_fleet_page(page_list[1])
+read_fleet_page(page_list[num]) |> view()
 ```
 
-### Script
+#### Script
 
 ```{r}
 read_fleet2011 <- function() {
   
-  path <- here("data-raw","frota_mensal","frota_2011","Frota Munic. 2011")
+  folder <- here("data-raw","frota_mensal","frota_2011","Frota Munic. 2011")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
   
-  links <- paste0(
-    path,
-    list.files(here("data-raw","frota_mensal","frota_2011","Frota Munic. 2011"))
+  frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
+
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2011
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
   )
   
-  return(links)
+  frota <- reduce(frota, full_join)
+
+  return(frota)
 }
 
-read_fleet2011()
+frota2011 <- read_fleet2011()
 ```
 
+```{r}
+read_fleet2012 <- function() {
+  
+  folder <- here("data-raw","frota_mensal","frota_2012","Frota Munic. 2012")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
+
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2012
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+
+  return(frota)
+}
+
+frota2012 <- read_fleet2012()
+```
