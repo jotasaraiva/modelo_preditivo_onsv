@@ -4,6 +4,35 @@ format: html
 editor: visual
 ---
 
+## Decodificador de município para UF
+
+```{r}
+table <- readODS::read_ods(here("data-raw","ibge-cod-munic","ibge_cod_municipios.ods"))
+```
+
+```{r}
+table_decod <- unique(table[c("UF", "Nome_UF")])
+table_decod
+```
+
+```{r}
+uf_decod <- function(x) {
+  table <- readODS::read_ods(here("data-raw",
+                                  "ibge-cod-munic",
+                                  "ibge_cod_municipios.ods"))
+  
+  table_decod <- unique(table[c("UF", "Nome_UF")])
+  
+  ind <- match(x,table_decod$UF)
+  
+  uf <- table_decod$Nome_UF[ind]
+  
+  return(uf)
+}
+
+uf_decod(43)
+```
+
 ## Coleta de dados
 
 ```{r}
@@ -584,17 +613,19 @@ files <- files[unlist(tools::file_ext(files) == "csv")]
 
 paths <- paste0(here("data-raw","populacao_zip"),
                 "/", files)
-pathse
+paths
 ```
 
 ```{r}
 x <- read_csv(paths[1])
-x <- 
+x |> mutate(UF = uf_decod(as.integer(MUNIC_RES/10000)))
 ```
 
-## Decodificador de município para UF
-
 ```{r}
+df <- lapply(paths, read_csv) |> 
+  reduce(full_join) |>
+  mutate(UF = uf_decod(as.integer(MUNIC_RES/10000)))
 
+df
 ```
 
