@@ -4,6 +4,13 @@ format: html
 editor: visual
 ---
 
+```{r}
+library(tidyverse)
+library(roadtrafficdeaths)
+library(here)
+library(rvest)
+```
+
 ## Decodificador de município para UF
 
 ```{r}
@@ -35,13 +42,6 @@ uf_decod(43)
 
 ## Coleta de dados
 
-```{r}
-library(tidyverse)
-library(roadtrafficdeaths)
-library(here)
-library(rvest)
-```
-
 ### DataSUS
 
 ```{r}
@@ -51,7 +51,7 @@ rtdeaths |> head()
 ```{r}
 mortes <- rtdeaths |> 
   mutate(mes_ocorrencia = month(data_ocorrencia)) |> 
-  count(mes_ocorrencia, ano_ocorrencia) |> 
+  count(mes_ocorrencia, ano_ocorrencia, nome_uf_ocor) |> 
   arrange(ano_ocorrencia) |> 
   mutate(data = paste0(as.character(mes_ocorrencia),
                        "-",
@@ -62,7 +62,9 @@ mortes
 ```
 
 ```{r}
-ggplot(mortes, aes(x = data, y = n)) + geom_line()
+ggplot(mortes, aes(x = ano_ocorrencia, y = n)) +
+  geom_point(aes(color = nome_uf_ocor), alpha = 0.4) +
+  scale_color_viridis_d()
 ```
 
 ```{r}
@@ -103,6 +105,8 @@ prf_temp <- lapply(prf_filepaths,
                                 date_format = "%d/%m/%Y"))
 
 prf_temp[[10]] <-  prf_temp[[10]] |> mutate(data_inversa = dmy(data_inversa))
+
+prf_temp
 ```
 
 ```{r}
@@ -605,6 +609,13 @@ read_fleet2021 <- function() {
 read_fleet2021() |> view()
 ```
 
+```{r}
+load(here("data/frota_mensal.rda"))
+
+frota_mensal |> 
+  pivot_wider(names_from = modal, values_from = frota) 
+```
+
 ### Condutores
 
 ```{r}
@@ -629,3 +640,25 @@ df <- lapply(paths, read_csv) |>
 df
 ```
 
+### PIB
+
+```{r}
+pib <- read_delim(
+  here("data-raw","pib_mensal","pib_bacen_dolar.csv"),
+  delim = ";", locale = locale(encoding = "latin1"),
+  col_names = c("data","pib"), skip = 1
+)
+
+pib <- pib[pib$data != "Fonte", ]
+
+pib <- pib |> 
+  mutate(
+    pib = pib |> 
+      str_replace("\\.","") |> 
+      str_replace(",",".") |> 
+      as.numeric(),
+    data = my(data)
+  )
+
+ggplot(pib, aes(x = data, y = pib)) + geom_point(size = 0.75) + geom_line() 
+```

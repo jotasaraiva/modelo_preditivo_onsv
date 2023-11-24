@@ -1,7 +1,3 @@
-library(tidyverse)
-library(here)
-library(rvest)
-
 read_fleet <- function(file) {
   
   ext <- tools::file_ext(file)
@@ -362,5 +358,16 @@ fleet_transform <- function(path) {
   return(frota)
 }
 
-frota <- lapply(page_list, fleet_transform) |> 
-  reduce(full_join)
+frota_mensal <- lapply(page_list, fleet_transform) |> 
+  reduce(full_join) |> 
+  pivot_longer(-c(UF, MES,ANO), names_to = "modal", values_to = "frota") |> 
+  rename(mes = MES,
+         ano = ANO,
+         uf = UF) |> 
+  summarise(
+    .by = c("uf","mes","ano","modal"),
+    frota = sum(frota)
+  )
+
+save(frota_mensal, file = "data/frota_mensal.rda")
+  
