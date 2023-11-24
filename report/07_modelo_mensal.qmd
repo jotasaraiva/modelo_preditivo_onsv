@@ -324,16 +324,17 @@ page_list <- c(
 ```
 
 ```{r}
-num <- 1
-
 read_fleet_page <- function(page) {
-  links <- fleet_links(page)
+  links <- rev(fleet_links(page))
   
   frota <- lapply(links, read_fleet)
   
-  for (i in seq(length(frota),1,-1)) {
-    frota[[i]]$MES <- i
-    frota[[i]]$ANO <- as.numeric(str_extract(page_list[num], "(1|2)\\d{3}"))
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- str_extract(page, "(1|2)\\d{3}")
+    x$MES <- i
+    frota[[i]] <- x 
   }
   
   frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
@@ -350,7 +351,7 @@ read_fleet_page <- function(page) {
   return(frota)
 }
 
-read_fleet_page(page_list[num]) |> view()
+read_fleet_page(page_list[1]) |> view()
 ```
 
 #### Script
@@ -462,6 +463,138 @@ read_fleet2015 <- function() {
   return(frota)
 }
 
-read_fleet2015() |> view()
+read_fleet2015()
+```
+
+```{r}
+read_fleet2016 <- function() {
+  folder <- here("data-raw","frota_mensal","frota_2016")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  swap <- function(vec, from, to) {
+    tmp <- to[ match(vec, from) ]
+    tmp[is.na(tmp)] <- vec[is.na(tmp)]
+    return(tmp)
+  }
+  
+  paths <- swap(paths, c(paths[5],paths[6]), c(paths[6],paths[5]))
+  
+  
+  readfunc <- function(path) {
+    tryCatch(
+      expr = {
+        frota <- readxl::read_excel(path, sheet = 2, skip = 3)
+        return(frota)
+      },
+      error = function(e) {
+        frota <- readxl::read_excel(path, sheet = 1, skip = 3)
+        return(frota)
+      }
+    )
+  }
+  
+  frota <- lapply(paths, readfunc)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2016
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet2016()
+```
+
+```{r}
+read_fleet2021 <- function() {
+  links <- rev(fleet_links("https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"))
+  
+  readfleet <- function(path) {
+    tryCatch(
+      expr = {
+        ext <- tools::file_ext(path)
+        name <- paste0("tempfile.",ext)
+        download.file(path, destfile = name, mode = "wb")
+        data <- readxl::read_excel(name, sheet = 2, skip = 2)
+        unlink(name)
+        return(data)
+      },
+      error = function(e) {
+        ext <- tools::file_ext(path)
+        name <- paste0("tempfile.",ext)
+        download.file(path, destfile = name, mode = "wb")
+        data <- readxl::read_excel(name, sheet = 1, skip = 2)
+        unlink(name)
+        return(data)
+      }
+    ) 
+  }
+  
+  frota <- lapply(links, readfleet)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2021
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet2021() |> view()
+```
+
+### Condutores
+
+```{r}
+files <- list.files(here("data-raw","populacao_zip"))
+files <- files[unlist(tools::file_ext(files) == "csv")]
+
+paths <- paste0(here("data-raw","populacao_zip"),
+                "/", files)
+pathse
+```
+
+```{r}
+x <- read_csv(paths[1])
+x <- 
+```
+
+## Decodificador de município para UF
+
+```{r}
+
 ```
 
