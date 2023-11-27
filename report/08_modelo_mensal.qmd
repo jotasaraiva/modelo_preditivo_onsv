@@ -1,0 +1,89 @@
+---
+title: "Início da criação do modelo mensal estadual"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(fable)
+```
+
+```{r}
+load(here("data","obitos_transito_mensal.rda"))
+```
+
+```{r}
+head(obitos_transito_mensal)
+```
+
+```{r}
+df <- obitos_transito_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = c(data),
+    mortes = sum(mortes)
+  ) |> 
+  drop_na()
+
+df
+```
+
+```{r}
+ggplot(df, aes(x = data, y = mortes)) + 
+  geom_line() +
+  geom_point(size = 0.75) +
+  scale_y_continuous(limits = c(2000,4500))
+```
+
+```{r}
+ts <- ts(df$mortes, start = c(1996,1), end = c(2021,12), frequency = 12)
+ts
+```
+
+```{r}
+decomp_ts <- decompose(ts)
+plot(decomp_ts)
+monthplot(x = ts)
+```
+
+```{r}
+arima_model <- ts |> 
+  auto.arima() |> 
+  forecast(h = 12)
+```
+
+```{r}
+arima_pred <- data.frame(arima_model)
+
+arima_pred <- arima_pred |> 
+  mutate(data = my(rownames(arima_pred)))
+
+rownames(arima_pred) <- NULL
+
+arima_pred
+```
+
+```{r}
+arima_df <- full_join(df, arima_pred)
+
+arima_df
+```
+
+```{r}
+arima_df |> 
+  tail(100) |> 
+  ggplot(aes(x = data, y = mortes)) +
+    geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "#95B8D1", alpha = 0.5) +
+    geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "#809BCE", alpha = 0.5) +
+    geom_line() + 
+    geom_point() +
+    geom_line(aes(y = Point.Forecast), color = "#EB2525") +
+    geom_point(aes(y = Point.Forecast), color = "#EB2525")
+```
+
+```{r}
+arima_df$Point.Forecast |> sum(na.rm = T)
+```
+
