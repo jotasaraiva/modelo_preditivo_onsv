@@ -4,10 +4,12 @@ format: html
 editor: visual
 ---
 
+## Pacotes
+
 ```{r}
 library(tidyverse)
 library(here)
-library(fable)
+library(forecast)
 ```
 
 ```{r}
@@ -48,9 +50,15 @@ plot(decomp_ts)
 monthplot(x = ts)
 ```
 
+## Modelo SARIMA
+
 ```{r}
 arima_model <- ts |> 
-  auto.arima() |> 
+  auto.arima(
+    stationary = FALSE,
+    seasonal = TRUE,
+    ic = c("aicc", "aic", "bic")
+  ) |> 
   forecast(h = 12)
 ```
 
@@ -68,7 +76,7 @@ arima_pred
 ```{r}
 arima_df <- full_join(df, arima_pred)
 
-arima_df
+rmarkdown::paged_table(arima_df)
 ```
 
 ```{r}
@@ -79,11 +87,55 @@ arima_df |>
     geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "#809BCE", alpha = 0.5) +
     geom_line() + 
     geom_point() +
-    geom_line(aes(y = Point.Forecast), color = "#EB2525") +
-    geom_point(aes(y = Point.Forecast), color = "#EB2525")
+    geom_line(aes(y = Point.Forecast), color = "#F74316") +
+    geom_point(aes(y = Point.Forecast), color = "#F74316")
+```
+
+```{r}
+arima_model$model$aic
 ```
 
 ```{r}
 arima_df$Point.Forecast |> sum(na.rm = T)
+```
+
+```{r}
+adf <- tseries::adf.test(ts)
+adf$p.value
+if (adf$p.value < 0.05) {
+  print("estacionária")
+} else {
+  print("não estacionária")
+}
+```
+
+```{r}
+kpss <- tseries::kpss.test(ts, null = "Trend")
+kpss$p.value
+if (kpss$p.value < 0.05) {
+  print("não estacionária")
+} else {
+  print("estacionária")
+}
+```
+
+```{r}
+ndiffs(ts)
+```
+
+```{r}
+acf(diff(ts))
+```
+
+```{r}
+pacf(diff(ts))
+```
+
+```{r}
+arima_model$method
+```
+
+```{r}
+
 ```
 
