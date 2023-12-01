@@ -157,6 +157,8 @@ ggcorrplot::ggcorrplot(
 
 ## Modelagem
 
+### Linear Regression
+
 ```{r}
 rec <-
   recipe(train, mortes ~ .) |> 
@@ -201,6 +203,109 @@ metrix(lm_pred, truth = mortes, estimate = mortes.pred)
 ```
 
 ```{r}
+lm_valid <- 
+  lm_wflow |> 
+  predict(dados_mensais, type = "conf_int") |> 
+  bind_cols(dados_mensais)
 
+lm_valid <-
+  lm_wflow |> 
+  predict(dados_mensais) |> 
+  bind_cols(lm_valid)
+
+lm_valid
 ```
 
+```{r}
+ggplot(lm_valid, aes(x = data, y = mortes)) +
+  geom_ribbon(aes(ymin = .pred_lower, ymax = .pred_upper), fill = "grey70") +
+  geom_line(size = 1) +
+  geom_line(aes(y = .pred), color = "#FF5900", size = 1)
+```
+
+```{r}
+filter(lm_valid, grepl("2021",data)) |> 
+  select(.pred) |> 
+  sum()
+
+filter(lm_valid, grepl("2021",data)) |> 
+  select(mortes) |> 
+  sum()
+```
+
+### Random Forest
+
+```{r}
+rf <- 
+  rand_forest(
+    mode = "regression",
+    mtry = 5,
+    trees = 3000
+  ) |> 
+  set_engine("ranger")
+
+rf
+```
+
+```{r}
+rf_wflow <-
+  workflow() |> 
+  add_recipe(rec) |> 
+  add_model(rf) |> 
+  fit(train)
+
+rf_wflow
+```
+
+```{r}
+rf_pred <-
+  rf_wflow |> 
+  predict(test) |> 
+  bind_cols(test)
+
+rf_pred
+```
+
+```{r}
+metrix(rf_pred, truth = mortes, estimate = .pred)
+```
+
+```{r}
+rf_valid <-
+  rf_wflow |> 
+  predict(dados_mensais) |>
+  bind_cols(dados_mensais)
+
+rf_valid
+```
+
+```{r}
+ggplot(rf_valid, aes(x = data, y = mortes)) +
+  geom_line(size = 1) +
+  geom_line(aes(y = .pred), color = "#FF5900", size = 1)
+```
+
+```{r}
+filter(rf_valid, grepl("2021",data)) |> 
+  select(.pred) |> 
+  sum()
+
+filter(rf_valid, grepl("2021",data)) |> 
+  select(mortes) |> 
+  sum()
+```
+
+### Multi-Layer Perceptron
+
+```{r}
+mlp <-
+  mlp(
+    penalty = 0,
+    epochs = 20,
+    activation = "relu"
+  ) |> 
+  set_mode("regression") |> 
+  set_engine("keras")
+
+mlp
+```
