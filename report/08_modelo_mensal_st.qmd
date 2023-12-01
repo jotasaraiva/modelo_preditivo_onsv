@@ -1,5 +1,5 @@
 ---
-title: "Início da criação do modelo mensal estadual"
+title: "Modelos mensais por meio de análise de série temporal"
 format: html
 editor: visual
 ---
@@ -61,6 +61,7 @@ monthplot(x = ts)
 ts_train <- head(ts, length(ts) - 12)
 ts_train
 ```
+
 ```{r}
 plot(ts_train)
 ```
@@ -110,7 +111,6 @@ arima_df |>
 rmse(arima_df, mortes, Point.Forecast, na_rm = T)
 rsq(arima_df, mortes, Point.Forecast, na_rm = T)
 ```
-
 
 ```{r}
 arima_model$aic

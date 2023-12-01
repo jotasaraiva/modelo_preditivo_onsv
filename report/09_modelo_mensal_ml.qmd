@@ -1,0 +1,206 @@
+---
+title: "Modelo mensal de análise de regressão"
+format: html
+editor: visual
+---
+
+## Pacotes
+
+```{r}
+library(here)
+library(tidyverse)
+library(tidymodels)
+```
+
+## Importação
+```{r}
+load(here("data","obitos_transito_mensal.rda"))
+load(here("data","frota_mensal.rda"))
+load(here("data","pib_mensal.rda"))
+load(here("data","sinistros_prf_mensal.rda"))
+```
+
+
+## Pré-processamento
+
+### Frota
+
+```{r}
+frota_mensal
+```
+
+```{r}
+df_frota <- frota_mensal |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL, CAMINHONETE, CAMIONETA, UTILITARIO,
+    motocicleta = MOTOCICLETA, CICLOMOTOR, MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    total = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+df_frota
+```
+
+```{r}
+df_frota |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(x = data, y = value, color = name)) + 
+  geom_line() +
+  geom_point()
+```
+
+### Mortes
+
+```{r}
+obitos_transito_mensal[!complete.cases(obitos_transito_mensal), ]
+```
+
+```{r}
+df_mortes <- obitos_transito_mensal |> 
+  select(-uf) |> 
+  drop_na() |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = data,
+    mortes = sum(mortes)
+  )
+
+df_mortes
+```
+
+```{r}
+df_mortes |> 
+  ggplot(aes(data, mortes)) + geom_line()
+```
+
+### PIB
+
+```{r}
+df_pib <- pib_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  select(data, pib)
+
+df_pib
+```
+
+```{r}
+df_pib |> 
+  ggplot(aes(data, pib)) +
+  geom_line() + geom_point()
+```
+
+### Sinistros (PRF)
+
+```{r}
+df_prf <- sinistros_prf_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = data,
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes)
+  )
+
+df_prf
+```
+
+```{r}
+df_prf |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(data, value, color = name)) +
+  geom_line() + geom_point()
+```
+
+### Junção
+
+```{r}
+dados_mensais <- reduce(
+  list(df_frota, df_mortes, df_pib, df_prf),
+  inner_join,
+  by = "data"
+) |> 
+  rename(veiculos = total)
+
+dados_mensais
+```
+
+## Separação
+
+```{r}
+set.seed(123)
+
+split <- initial_split(dados_mensais, prop = 0.8)
+
+train <- training(split)
+test <- testing(split)
+```
+
+## Correlograma
+
+```{r}
+ggcorrplot::ggcorrplot(
+  corr = cor(select(dados_mensais,-data)),
+  type = "lower",
+  method = "square",
+  lab = TRUE,
+  colors = c("#A3333D","#ffffff","#477998")
+)
+```
+
+## Modelagem
+
+```{r}
+rec <-
+  recipe(train, mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+rec |> prep() |> juice()
+rec |> prep() |> formula()
+```
+
+```{r}
+lm <-
+  linear_reg() |> 
+  set_engine("glm")
+
+lm
+```
+
+```{r}
+lm_wflow <-
+  workflow() |>
+  add_recipe(rec) |> 
+  add_model(lm) |> 
+  fit(train)
+
+lm_wflow
+```
+
+```{r}
+lm_pred <-
+  lm_wflow |> 
+  predict(test) |> 
+  bind_cols(test) |> 
+  rename(mortes.pred = .pred)
+
+lm_pred
+```
+
+```{r}
+metrix <- metric_set(rmse, mae, rsq)
+metrix(lm_pred, truth = mortes, estimate = mortes.pred)
+```
+
+```{r}
+
+```
+
