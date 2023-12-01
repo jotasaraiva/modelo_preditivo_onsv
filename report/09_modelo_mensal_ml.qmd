@@ -294,18 +294,3 @@ filter(rf_valid, grepl("2021",data)) |>
   select(mortes) |> 
   sum()
 ```
-
-### Multi-Layer Perceptron
-
-```{r}
-mlp <-
-  mlp(
-    penalty = 0,
-    epochs = 20,
-    activation = "relu"
-  ) |> 
-  set_mode("regression") |> 
-  set_engine("keras")
-
-mlp
-```
