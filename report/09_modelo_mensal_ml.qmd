@@ -91,7 +91,7 @@ df_pib
 ```
 
 ```{r}
-df_pib |> 
+df_pib |>
   ggplot(aes(data, pib)) +
   geom_line() + geom_point()
 ```

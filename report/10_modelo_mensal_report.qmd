@@ -1,0 +1,240 @@
+---
+title: "Relatório de Modelo Preditivo Mensal de Mortes no Trânsito Brasileiro"
+date: 2023-12-04
+
+smooth-scroll: true
+
+title-block-banner: true
+
+format: 
+  html:
+    theme: style.scss
+
+toc: true
+toc-title: "Sumário"
+lang: pt
+---
+
+## Introdução
+
+O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição anos posteriores com precisão. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:
+
+- Frota (RENAVAM);
+- PIB (Banco Central do Brasil);
+- Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);
+- Mortes em trânsito (DataSUS).
+
+## Dados
+
+```{r}
+#| echo: false
+#| warning: false
+
+library(here)
+library(tidyverse)
+library(tidymodels)
+library(forecast)
+library(onsvplot)
+theme_set(theme_onsv())
+options(digits = 2, scipen = 999)
+
+load(here("data","tabela_total_mensal.rda"))
+```
+
+### Tabela de dados
+```{r}
+#| echo: false
+
+rmarkdown::paged_table(dados_mensais)
+```
+
+### Variáveis
+
+Visualizações podem ser criadas para observar o comportamento dos atributos considerados e verificar que estão em conformidade com a realidade:
+
+::: {.panel-tabset}
+
+## Frota
+
+```{r}
+#| echo: false
+#| warning: false
+
+dados_mensais |> 
+  select(data, veiculos, automovel, motocicleta) |> 
+  pivot_longer(-data) |> 
+  rename(Data = data, Modal = name, Frota = value) |> 
+  ggplot(aes(x = Data, y = Frota, color = Modal)) +
+    geom_line(linewidth = 1) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_discrete_onsv()
+```
+
+## PIB
+
+```{r}
+#| echo: false
+#| warning: false
+
+dados_mensais |> 
+  select(data, pib) |> 
+  rename(Data = data, PIB = pib) |> 
+  ggplot(aes(x = Data, y = PIB)) +
+    geom_line(linewidth = 1, color = onsv_palette$blue) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+```
+
+## Sinistros (PRF)
+
+```{r}
+#| echo: false
+#| warning: false
+
+dados_mensais |> 
+  select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |> 
+  rename(Data = data, 
+         Acidentes = acidentes, 
+         `Acidentes fatais` = acidentes_fatais,
+         `Feridos` = feridos,
+         `Mortes (PRF)` = mortes_prf) |> 
+  pivot_longer(-Data) |>
+  ggplot(aes(x = Data, y = value, color = name)) +
+    geom_line(linewidth = 1) +
+    ylab(label = "Número de ocorrências") +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_discrete_onsv()
+```
+
+## Mortes (DataSUS)
+
+```{r}
+#| echo: false
+#| warning: false
+
+dados_mensais |> 
+  select(data, mortes) |> 
+  rename(Data = data, Mortes = mortes) |> 
+  ggplot(aes(x = Data, y = Mortes)) +
+    geom_line(linewidth =  1, color = onsv_palette$blue) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+```
+
+:::
+
+## Modelos
+
+### Análise de Série Temporal
+
+#### SARIMA
+
+O primeiro modelo avaliado é o *Seasonal Autoregressive Integrated Moving Average* (SARIMA), uma implementação do ARIMA que considerada a sazonalidade da série temporal em questão. Observando a decomposição da série temporal:
+
+```{r}
+#| include: false
+
+load(here("data", "obitos_transito_mensal.rda"))
+
+df_mortes <- obitos_transito_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = c(data),
+    mortes = sum(mortes)
+  ) |> 
+  drop_na()
+
+rm(obitos_transito_mensal)
+
+ts <- ts(df_mortes$mortes, start = c(1996,1), end = c(2021,12), frequency = 12)
+decomposed <- decompose(ts)
+```
+
+:::{.panel-tabset}
+
+## Sazonalidade
+
+```{r}
+#| echo: false
+
+autoplot(decomposed$seasonal, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+```
+
+## Tendência
+
+```{r}
+#| echo: false
+
+autoplot(decomposed$trend, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+```
+
+## Residual
+
+```{r}
+#| echo: false
+
+autoplot(decomposed$random, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+```
+
+:::
+
+Para a escolha do melhor modelo ARIMA, foi utilizada a função `auto.arima()` do pacote `forecast`.
+
+```{r}
+#| include: false
+
+ts_train <- head(ts, length(ts) - 12)
+
+arima_model <- ts_train |> 
+  auto.arima(
+    stationary = FALSE,
+    seasonal = TRUE
+  )
+
+arima_pred <- data.frame(forecast(arima_model, h = 12))
+
+arima_pred <- arima_pred |> 
+  mutate(data = my(rownames(arima_pred)))
+
+rownames(arima_pred) <- NULL
+
+arima_df <- full_join(df_mortes, arima_pred)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+arima_df |> 
+  tail(100) |> 
+  ggplot(aes(data,mortes)) +
+  geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey60", alpha = 0.75) +
+  geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey80", alpha = 0.75) +
+  geom_line(aes(color = "Mortes reais"), linewidth = 1) +
+  geom_line(aes(y = Point.Forecast, color = "Mortes previstas"), linewidth = 1) +
+  scale_color_manual(name = "Legenda", 
+                     values = c("Mortes reais" = onsv_palette$blue,
+                                "Mortes previstas" = onsv_palette$yellow))
+    
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+st_metrics <- metric_set(rmse, rsq)
+
+arima2021 <- sum(arima_df$Point.Forecast, na.rm = T)
+truth2021 <- sum(select(drop_na(arima_df), mortes))
+
+st_metrics(arima_df, mortes, Point.Forecast, na_rm = T) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric)) |> 
+  rename(Métrica = .metric, Valor = .estimate) |>
+  bind_rows(data.frame("Métrica" = "AIC", "Valor" = arima_model$aic)) |>
+  bind_rows(data.frame("Métrica" = "Erro relativo",
+                       "Valor" = abs(arima2021 - truth2021)/truth2021)) |> 
+  knitr::kable(table.attr = "quarto-disable-processing=true") |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::column_spec(1, width = "6cm", bold = T)
+```
+
+### Modelos Regressores
