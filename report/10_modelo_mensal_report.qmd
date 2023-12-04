@@ -448,8 +448,8 @@ ml_metrics(rf_pred, truth = mortes, estimate = .pred) |>
 
 A sobressaliência do modelo linear em relação ao Random Forest é possivelmente devido:
 
-- Às altas correlações e covariâncias entre as variáveis;
-- Ao número de árvores ou;
+- Às altas correlações lineares e covariâncias entre as variáveis;
+- Ao número de árvores (hiperparâmetro não otimizado) e ou;
 - Ao sobreajuste.
 
 ```{r}
