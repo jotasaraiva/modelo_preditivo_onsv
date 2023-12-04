@@ -15,9 +15,9 @@ toc-title: "Sumário"
 lang: pt
 ---
 
-## Introdução
+## Descrição
 
-O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição anos posteriores com precisão. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:
+O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:
 
 - Frota (RENAVAM);
 - PIB (Banco Central do Brasil);
@@ -127,7 +127,7 @@ dados_mensais |>
 
 #### SARIMA
 
-O primeiro modelo avaliado é o *Seasonal Autoregressive Integrated Moving Average* (SARIMA), uma implementação do ARIMA que considerada a sazonalidade da série temporal em questão. Observando a decomposição da série temporal:
+O primeiro modelo avaliado é o *Seasonal Autoregressive Integrated Moving Average* (SARIMA), uma forma de ARIMA que leva em consideração a sazonalidade da série temporal. Observando a decomposição da série temporal, têm-se:
 
 ```{r}
 #| include: false
@@ -149,6 +149,14 @@ decomposed <- decompose(ts)
 ```
 
 :::{.panel-tabset}
+
+## Série Temporal
+
+```{r}
+#| echo: false
+
+autoplot(ts, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+```
 
 ## Sazonalidade
 
@@ -176,7 +184,7 @@ autoplot(decomposed$random, color = onsv_palette$blue, ylab = "Mortes", xlab = "
 
 :::
 
-Para a escolha do melhor modelo ARIMA, foi utilizada a função `auto.arima()` do pacote `forecast`.
+Para a escolha do melhor modelo ARIMA, foi utilizada a função `auto.arima()` do pacote [`forecast`](https://pkg.robjhyndman.com/forecast/).
 
 ```{r}
 #| include: false
@@ -212,7 +220,8 @@ arima_df |>
   geom_line(aes(y = Point.Forecast, color = "Mortes previstas"), linewidth = 1) +
   scale_color_manual(name = "Legenda", 
                      values = c("Mortes reais" = onsv_palette$blue,
-                                "Mortes previstas" = onsv_palette$yellow))
+                                "Mortes previstas" = onsv_palette$yellow)) +
+  xlab("Data") + ylab("Mortes")
     
 ```
 
@@ -237,4 +246,230 @@ st_metrics(arima_df, mortes, Point.Forecast, na_rm = T) |>
   kableExtra::column_spec(1, width = "6cm", bold = T)
 ```
 
+#### Exponential Smoothing
+
+O modelo de Suavização Exponencial constitui uma família de métodos de análise e previsão de séries temporais. Os principais tipos de modelos desta categoria são:
+
+- Suavização Exponencial Simples
+- Suavização Exponencial Dupla (Holt Linear)
+- Suavização Exponencial Tripla (Método Holt-Winters)
+
+Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários.
+
+```{r}
+#| include: false
+
+es_model <- HoltWinters(ts_train)
+
+es_pred <- data.frame(forecast(es_model, h = 12))
+
+es_pred <- es_pred |> 
+  mutate(data = my(rownames(es_pred)))
+
+rownames(es_pred) <- NULL
+
+es_df <- full_join(df_mortes, es_pred)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+es_df |> 
+  tail(100) |> 
+  ggplot(aes(data,mortes)) +
+  geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey60", alpha = 0.75) +
+  geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey80", alpha = 0.75) +
+  geom_line(aes(color = "Mortes reais"), linewidth = 1) +
+  geom_line(aes(y = Point.Forecast, color = "Mortes previstas"), linewidth = 1) +
+  scale_color_manual(name = "Legenda", 
+                     values = c("Mortes reais" = onsv_palette$blue,
+                                "Mortes previstas" = onsv_palette$yellow)) +
+  xlab("Data") + ylab("Mortes")
+  
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+es2021 <- sum(es_df$Point.Forecast, na.rm = T)
+
+st_metrics(es_df, mortes, Point.Forecast, na_rm = T) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric)) |> 
+  rename(Métrica = .metric, Valor = .estimate) |>
+  bind_rows(data.frame("Métrica" = "Erro relativo",
+                       "Valor" = abs(es2021 - truth2021)/truth2021)) |> 
+  knitr::kable(table.attr = "quarto-disable-processing=true") |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::column_spec(1, width = "6cm", bold = T)
+```
+
 ### Modelos Regressores
+
+#### Regressão Linear
+
+A regressão linear múltipla ajustada neste estudo é equivalente ao seu modelo anual predecessor, mas com um número reduzido de variáveis consideradas para criação do modelo. O correlograma pode ser utilizado para confirmar as correlações lineares entre os atributos:
+
+```{r}
+#| echo: false
+#| warning: false
+
+ggcorrplot::ggcorrplot(
+  corr = cor(select(dados_mensais,-data)),
+  type = "lower",
+  method = "square",
+  lab = TRUE,
+  colors = c(onsv_palette$blue,"white",onsv_palette$red)
+)
+```
+
+
+```{r}
+#| include: false
+
+set.seed(123)
+
+split <- initial_split(dados_mensais, prop = 0.8)
+
+train <- training(split)
+test <- testing(split)
+```
+
+```{r}
+#| include: false
+
+rec <-
+  recipe(train, mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+lm <-
+  linear_reg() |> 
+  set_engine("glm")
+
+lm_wflow <-
+  workflow() |>
+  add_recipe(rec) |> 
+  add_model(lm) |> 
+  fit(train)
+
+lm_pred <-
+  lm_wflow |> 
+  predict(test) |> 
+  bind_cols(test) |> 
+  rename(mortes.pred = .pred)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+ml_metrics <- metric_set(rmse, mae, rsq)
+
+ml_metrics(lm_pred, truth = mortes, estimate = mortes.pred) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric)) |> 
+  rename(Métrica = .metric, Valor = .estimate) |>
+  knitr::kable(table.attr = "quarto-disable-processing=true") |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::column_spec(1, width = "6cm", bold = T)
+```
+
+Em geral, as métricas apresentaram maior precisão e desempenho em comparação ao modelo anual, apesar de se basear em uma quantidade menor de variáveis, obtendo maior capacidade preditiva. 
+
+```{r}
+#| include: false
+
+lm_valid <- 
+  lm_wflow |> 
+  predict(dados_mensais, type = "conf_int") |> 
+  bind_cols(dados_mensais)
+
+lm_valid <-
+  lm_wflow |> 
+  predict(dados_mensais) |> 
+  bind_cols(lm_valid)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+ggplot(lm_valid, aes(x = data, y = mortes)) +
+  geom_ribbon(aes(ymin = .pred_lower, ymax = .pred_upper), fill = "grey70") +
+  geom_line(aes(color = "Mortes"), linewidth = 1) +
+  geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
+  scale_color_manual(values = c("Mortes" = onsv_palette$blue,
+                                "Mortes previstas" = onsv_palette$yellow)) + 
+  xlab("Data") + ylab("Mortes")
+```
+
+#### Random Forest
+
+O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear. Embora suas métricas mostrem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021, possivelmente ao acaso.
+
+```{r}
+#| include: false
+
+rf <- 
+  rand_forest(
+    mode = "regression",
+    mtry = 5,
+    trees = 5000
+  ) |> 
+  set_engine("ranger")
+
+rf_wflow <-
+  workflow() |> 
+  add_recipe(rec) |> 
+  add_model(rf) |> 
+  fit(train)
+
+rf_pred <-
+  rf_wflow |> 
+  predict(test) |> 
+  bind_cols(test)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+ml_metrics(rf_pred, truth = mortes, estimate = .pred) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric)) |> 
+  rename(Métrica = .metric, Valor = .estimate) |>
+  knitr::kable(table.attr = "quarto-disable-processing=true") |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::column_spec(1, width = "6cm", bold = T)
+```
+
+A sobressaliência do modelo linear em relação ao Random Forest é possivelmente devido:
+
+- Às altas correlações e covariâncias entre as variáveis;
+- Ao número de árvores ou;
+- Ao sobreajuste.
+
+```{r}
+#| include: false
+
+rf_valid <-
+  rf_wflow |> 
+  predict(dados_mensais) |>
+  bind_cols(dados_mensais)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+ggplot(rf_valid, aes(x = data, y = mortes)) +
+  geom_line(aes(color = "Mortes"), linewidth = 1) +
+  geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
+  scale_color_manual(values = c("Mortes" = onsv_palette$blue,
+                                "Mortes previstas" = onsv_palette$yellow)) + 
+  xlab("Data") + ylab("Mortes")
+```
+

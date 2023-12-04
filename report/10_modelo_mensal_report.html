@@ -73,7 +73,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Sumário</h2>
    
   <ul>
-  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a></li>
+  <li><a href="#descrição" id="toc-descrição" class="nav-link active" data-scroll-target="#descrição">Descrição</a></li>
   <li><a href="#dados" id="toc-dados" class="nav-link" data-scroll-target="#dados">Dados</a>
   <ul class="collapse">
   <li><a href="#tabela-de-dados" id="toc-tabela-de-dados" class="nav-link" data-scroll-target="#tabela-de-dados">Tabela de dados</a></li>
@@ -92,9 +92,9 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="introdução" class="level2">
-<h2 class="anchored" data-anchor-id="introdução">Introdução</h2>
-<p>O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição anos posteriores com precisão. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:</p>
+<section id="descrição" class="level2">
+<h2 class="anchored" data-anchor-id="descrição">Descrição</h2>
+<p>O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:</p>
 <ul>
 <li>Frota (RENAVAM);</li>
 <li>PIB (Banco Central do Brasil);</li>
@@ -161,9 +161,9 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="análise-de-série-temporal">Análise de Série Temporal</h3>
 <section id="sarima" class="level4">
 <h4 class="anchored" data-anchor-id="sarima">SARIMA</h4>
-<p>O primeiro modelo avaliado é o <em>Seasonal Autoregressive Integrated Moving Average</em> (SARIMA), uma implementação do ARIMA que considerada a sazonalidade da série temporal em questão. Observando a decomposição da série temporal:</p>
+<p>O primeiro modelo avaliado é o <em>Seasonal Autoregressive Integrated Moving Average</em> (SARIMA), uma forma de ARIMA que leva em consideração a sazonalidade da série temporal. Observando a decomposição da série temporal, têm-se:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Sazonalidade</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Tendência</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Residual</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Série Temporal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Sazonalidade</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Tendência</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Residual</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
@@ -186,43 +186,93 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-</div>
-</div>
-<p>Para a escolha do melhor modelo ARIMA, foi utilizada a função <code>auto.arima()</code> do pacote <code>forecast</code>.</p>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Para a escolha do melhor modelo ARIMA, foi utilizada a função <code>auto.arima()</code> do pacote <a href="https://pkg.robjhyndman.com/forecast/"><code>forecast</code></a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<table class="table table-sm table-striped small" data-quarto-postprocess="true">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Métrica</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Valor</th>
-</tr>
-</thead>
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left; width: 6cm; font-weight: bold;">RMSE</td>
-<td style="text-align: right;">288.45</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; width: 6cm; font-weight: bold;">RSQ</td>
-<td style="text-align: right;">0.54</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; width: 6cm; font-weight: bold;">AIC</td>
-<td style="text-align: right;">3739.88</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; width: 6cm; font-weight: bold;">Erro relativo</td>
-<td style="text-align: right;">0.08</td>
-</tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 288.45 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.54 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> AIC </td>
+   <td style="text-align:right;"> 3739.88 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> Erro relativo </td>
+   <td style="text-align:right;"> 0.08 </td>
+  </tr>
 </tbody>
 </table>
 
+</div>
+</div>
+</section>
+<section id="exponential-smoothing" class="level4">
+<h4 class="anchored" data-anchor-id="exponential-smoothing">Exponential Smoothing</h4>
+<p>O modelo de Suavização Exponencial constitui uma família de métodos de análise e previsão de séries temporais. Os principais tipos de modelos desta categoria são:</p>
+<ul>
+<li>Suavização Exponencial Simples</li>
+<li>Suavização Exponencial Dupla (Holt Linear)</li>
+<li>Suavização Exponencial Tripla (Método Holt-Winters)</li>
+</ul>
+<p>Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 271.65 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.65 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> Erro relativo </td>
+   <td style="text-align:right;"> 0.08 </td>
+  </tr>
+</tbody>
+</table>
 
 </div>
 </div>
@@ -230,6 +280,92 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="modelos-regressores" class="level3">
 <h3 class="anchored" data-anchor-id="modelos-regressores">Modelos Regressores</h3>
+<section id="regressão-linear" class="level4">
+<h4 class="anchored" data-anchor-id="regressão-linear">Regressão Linear</h4>
+<p>A regressão linear múltipla ajustada neste estudo é equivalente ao seu modelo anual predecessor, mas com um número reduzido de variáveis consideradas para criação do modelo. O correlograma pode ser utilizado para confirmar as correlações lineares entre os atributos:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 131.46 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 105.34 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.94 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>Em geral, as métricas apresentaram maior precisão e desempenho em comparação ao modelo anual, apesar de se basear em uma quantidade menor de variáveis, obtendo maior capacidade preditiva.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="random-forest" class="level4">
+<h4 class="anchored" data-anchor-id="random-forest">Random Forest</h4>
+<p>O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear. Embora suas métricas mostrem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021, possivelmente ao acaso.</p>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 158.28 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 125.81 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.91 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>A sobressaliência do modelo linear em relação ao Random Forest é possivelmente devido:</p>
+<ul>
+<li>Às altas correlações e covariâncias entre as variáveis;</li>
+<li>Ao número de árvores ou;</li>
+<li>Ao sobreajuste.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 </section>
 </section>
 

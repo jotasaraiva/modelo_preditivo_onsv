@@ -13,13 +13,13 @@ library(tidymodels)
 ```
 
 ## Importação
+
 ```{r}
 load(here("data","obitos_transito_mensal.rda"))
 load(here("data","frota_mensal.rda"))
 load(here("data","pib_mensal.rda"))
 load(here("data","sinistros_prf_mensal.rda"))
 ```
-
 
 ## Pré-processamento
 
