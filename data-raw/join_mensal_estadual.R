@@ -36,9 +36,9 @@ df_frota <- frota_mensal |>
   pivot_wider(names_from = modal, values_from = frota) |> 
   mutate(automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
          motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA,
-         total = TOTAL,
+         veiculos = TOTAL,
          data = ym(paste0(ano,'-',mes))) |> 
-  select(data, uf, automovel, motocicleta, total)
+  select(data, uf, automovel, motocicleta, veiculos)
 
 df_mortes <- obitos_transito_mensal |> 
   brazil_states_acronym() |> 
