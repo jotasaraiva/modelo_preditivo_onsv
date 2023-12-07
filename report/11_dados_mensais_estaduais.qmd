@@ -1,0 +1,105 @@
+---
+title: "Modelo mensal de análise de regressão"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(here)
+```
+
+```{r}
+load(here("data","tabela_total_mes_uf.rda"))
+```
+
+```{r}
+dados_mensais_uf |> 
+  mutate(taxa_mortes = (mortes/veiculos)*100000) |> 
+  filter(uf %in% c("SP","RJ","MG","ES")) |>
+  ggplot(aes(x = data, y = taxa_mortes, color = uf)) +
+  geom_line(linewidth = 1)
+```
+
+```{r}
+dados_mensais_uf |> 
+  mutate(taxa_mortes = (mortes/veiculos)*100000) |> 
+  filter(uf %in% c("PR","RS","SC")) |>
+  ggplot(aes(x = data, y = taxa_mortes, color = uf)) +
+  geom_line(linewidth = 1)
+```
+
+```{r}
+df <- dados_mensais_uf |> 
+  mutate(regiao = case_match(
+    uf,
+    c("SP","MG","RJ","ES") ~ "sudeste",
+    c("MT","GO","MS","DF") ~ "centro-oeste",
+    c("AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE") ~ "nordeste",
+    c("AC", "AM", "AP", "PA", "RO", "RR", "TO") ~ "norte",
+    c("SC","PR","RS") ~ "sul"
+  ))
+
+df_nest <- df |> 
+  nest(.by = regiao) |> 
+  bind_rows(
+    list(
+      regiao = "brasil",
+      data = list(df)
+    )
+  )
+```
+
+```{r}
+df_nest
+```
+
+```{r}
+df_nest$data
+```
+
+```{r}
+df_nest$data[[4]] |> 
+  mutate(taxa_mortes_veiculos = (mortes/veiculos)*100000) |> 
+  ggplot(aes(x = data, y = taxa_mortes_veiculos, color = uf)) +
+  geom_point() +
+  geom_smooth(method = "loess")+
+  scale_color_manual(
+    values = c('#e41a1c','#377eb8','#4daf4a','#984ea3',
+               '#ff7f00','#ffff33','#a65628','#f781bf','#999999')
+  )
+```
+
+```{r}
+df_nest$data[[4]] |> 
+  mutate(taxa_mortes_veiculos = (mortes/veiculos)*100000) |> 
+  plotly::plot_ly(x = ~data,
+                  y = ~taxa_mortes_veiculos, 
+                  color = ~uf, 
+                  type = "scatter")
+```
+
+```{r}
+set.seed(123)
+
+df_split <- df_nest$data |> 
+  lapply(initial_split, prop = 0.8) |> 
+  tibble() |> 
+  rename(splits = everything()) |> 
+  bind_cols(df_nest) |> 
+  mutate(
+    training = lapply(splits, training),
+    testing = lapply(splits, testing)
+  ) |> 
+  relocate(c(regiao,data))
+
+df_split
+```
+
+```{r}
+
+```
+
+
+
