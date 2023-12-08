@@ -111,6 +111,6 @@ df_splits
 ```
 
 ```{r}
-df_splits$model[[1]]
+
 ```
 
