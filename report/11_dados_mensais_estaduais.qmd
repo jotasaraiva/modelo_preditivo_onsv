@@ -4,15 +4,20 @@ format: html
 editor: visual
 ---
 
+## Importaçãp
+
 ```{r}
 library(tidyverse)
 library(tidymodels)
+library(onsvplot)
 library(here)
 ```
 
 ```{r}
 load(here("data","tabela_total_mes_uf.rda"))
 ```
+
+## Pré-processamento
 
 ```{r}
 dados_mensais_uf |> 
@@ -80,13 +85,17 @@ df_nest$data[[4]] |>
                   type = "scatter")
 ```
 
+## Modelagem
+
 ```{r}
 set.seed(123)
+
+metrix <- metric_set(rmse,mae,rsq)
 
 rec <- df |> 
   select(-regiao) |> 
   recipe(formula = mortes ~ .) |> 
-  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  remove_role(c(mortes_prf, data, uf), old_role = "predictor") |> 
   step_normalize(all_numeric_predictors())
 
 lm <- 
@@ -111,6 +120,49 @@ df_splits
 ```
 
 ```{r}
+fit_models <- function(df) {
+  for(i in seq_along(df$model)) {
+    df$fit[[i]] <- fit(df$model[[i]], df$training[[i]])
+  }
+  return(df)
+}
 
+predict_models <- function(df) {
+  for(i in seq_along(df$model)) {
+    df$pred[[i]] <- bind_cols(
+      df$testing[[i]],
+      predict(df$fit[[i]],df$testing[[i]]),
+      predict(df$fit[[i]],df$testing[[i]],type = "conf_int")
+    )
+  }
+  return(df)
+}
 ```
 
+```{r}
+preds <- df_splits |> 
+  fit_models() |> 
+  predict_models() |> 
+  mutate(metric = map(pred,metrix,truth = mortes,estimate = .pred))
+
+preds$pred[[6]]
+```
+
+```{r}
+theme_set(theme_onsv())
+
+preds$pred[[6]] |> 
+  summarise(
+    .by = data,
+    mortes = sum(mortes),
+    .pred = sum(.pred),
+    .pred_lower = sum(.pred_lower),
+    .pred_upper = sum(.pred_upper)
+  ) |> 
+  ggplot(aes(data, mortes)) +
+    geom_ribbon(fill = "grey60", aes(ymin = .pred_lower, ymax = .pred_upper)) +
+    geom_line(linewidth = 1, aes(color = "Mortes reais")) +
+    geom_line(linewidth = 1, aes(y = .pred, color = "Mortes previstas")) +
+    scale_color_manual(values = c("Mortes reais" = onsv_palette$blue,
+                                  "Mortes previstas" = onsv_palette$yellow))
+```
