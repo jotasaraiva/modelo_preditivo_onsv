@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## Importaçãp
+## Importação
 
 ```{r}
 library(tidyverse)
@@ -151,7 +151,7 @@ preds$pred[[6]]
 ```{r}
 theme_set(theme_onsv())
 
-preds$pred[[6]] |> 
+preds$pred[[1]] |> 
   summarise(
     .by = data,
     mortes = sum(mortes),
@@ -166,3 +166,63 @@ preds$pred[[6]] |>
     scale_color_manual(values = c("Mortes reais" = onsv_palette$blue,
                                   "Mortes previstas" = onsv_palette$yellow))
 ```
+
+```{r}
+df |> 
+  summarise(
+    .by = c(data, regiao),
+    veiculos = sum(veiculos),
+    mortes = sum(mortes)
+  ) |> 
+  mutate(
+    mortes_100k_veiculos = (mortes/veiculos) * 100000
+  ) |> 
+  ggplot(aes(data,mortes_100k_veiculos,color = regiao)) + 
+    geom_line(size = 1) +
+    scale_discrete_onsv()
+```
+
+```{r}
+df |> 
+  filter(regiao == "nordeste") |>
+  summarise(
+    .by = c(data,uf),
+    mortes = sum(mortes),
+    veiculos = sum(veiculos)
+  ) |> 
+  mutate(
+    mortes_100k_veiculos = (mortes/veiculos) * 100000
+  ) |> 
+  ggplot(aes(data,mortes_100k_veiculos,color = uf)) +
+    geom_smooth() +
+    geom_point(size = 0.75) +
+    scale_discrete_onsv()
+```
+
+```{r}
+df |> 
+  summarise(
+    .by = c(uf,regiao),
+    mortes = sum(mortes),
+    veiculos = sum(veiculos)
+  ) |> 
+  mutate(mortos_100k_veiculos = (mortes/veiculos)*100000) |> 
+  arrange(desc(mortos_100k_veiculos)) |> 
+  ggplot(aes(regiao,mortos_100k_veiculos,fill=regiao)) +
+    geom_bar(stat = "identity") +
+    scale_discrete_onsv()
+```
+
+```{r}
+df |> 
+  summarise(
+    .by = c(uf,regiao),
+    mortes = sum(mortes),
+    veiculos = sum(veiculos)
+  ) |> 
+  mutate(mortos_100k_veiculos = (mortes/veiculos)*100000) |> 
+  arrange(desc(mortos_100k_veiculos)) |> 
+  ggplot(aes(uf,mortos_100k_veiculos,fill=uf)) +
+    geom_bar(stat = "identity")
+```
+
