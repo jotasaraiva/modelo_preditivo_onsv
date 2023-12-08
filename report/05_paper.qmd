@@ -1,5 +1,5 @@
 ---
-title: "Modelo Preditivo de Mortes Anuais no Trânsito no Brasil"
+title: "Modelo Preditivo de Mortes no Trânsito Brasileiro"
 date: 2023-09-28
 
 smooth-scroll: true
@@ -8,7 +8,7 @@ authors:
   - name: João Pedro Melani Saraiva
   - name: Pedro Augusto Borges dos Santos
 
-description: "Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito"
+description: "Modelo de aprendizado de máquina orientado a dados de segurança viária para o reconhecimento de padrões e previsão de mortes no trânsito"
 
 title-block-banner: true
 
@@ -44,6 +44,7 @@ options(digits = 2)
 
 # load dos dados
 load(here("data","tabela_total.rda"))
+load(here("data","tabela_total_mensal.rda"))
 
 # supressão dos warnings
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
@@ -59,9 +60,13 @@ Apesar da crescente adesão por itens de segurança veicular, os sinistros de tr
 
 A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
-Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) [@institutobrasileirodegeografiaeestatística2023] e pelo Ministério da Saúde [@ministériodasaúde2023b], tal como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) [@políciarodoviáriafederal2023], do Registro Nacional de Condutores Habilitados (RENACH) [@ministériodostransporte2023], do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023] e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde [@ministériodasaúde2023a].
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de Aprendizado de Máquina para a previsão de mortes no trânsito em âmbito nacional e estadual no Brasil, investigando dados socioeconômicos como o PIB (Produto Interno Bruto) anual, o PIB mensal e a população nacional, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) [@institutobrasileirodegeografiaeestatística2023], Banco Central do Brasil (BACEN) [@bancocentraldobrasil2023] e Ministério da Saúde [@ministériodasaúde2023b], tal como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) [@políciarodoviáriafederal2023], do Registro Nacional de Condutores Habilitados (RENACH) [@ministériodostransporte2023], do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023] e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde [@ministériodasaúde2023a].
 
-## Metodologia
+A partir de todos os dados reunidos e pré-processados para a modelagem, duas principais análises foram dissertadas para aferir a capacidade preditiva das técnicas em relação a janela temporal estudada: o modelo preditivo anual (por meio de modelo de Regressão Linear) e o modelo preditivo mensal, que por sua vez, pode ser destrinchado em duas abordagens, sendo a análise de série temporal (ARIMA e Suavização Exponencial) e a análise de regressão (Regressão Linear e Regressor Random Forest).
+
+## Modelo Preditivo Anual
+
+### Metodologia
 
 A obtenção dos dados de mortalidade foram efetuados através do pacote `microdatasus` [@microdatasus], elaborado para a linguagem R. Coletou-se dados oriundos do período entre 1996 e 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadas a sinistros, ou seja, aquelas que se encaixam entre os códigos "V01" à "V89".
 
@@ -71,7 +76,7 @@ As demais variáveis foram tratadas e imputadas em uma única tabela:
 -   Frota de motocicletas (RENAVAM);
 -   Frota de automóveis (RENAVAM);
 -   PIB (IBGE);
--   População (DATASUS);
+-   População (DataSUS);
 -   Quantidade de sinistros em rodovias federais (PRF);
 -   Quantidade de sinistros fatais em rodovias federais (PRF);
 -   Feridos em sinistros ocorridos em rodovias federais (PRF);
@@ -269,7 +274,7 @@ coefs |>
   kable_styling(full_width = F)
 ```
 
-## Resultados e Discussão
+### Resultados e Discussão
 
 A redução da disponibilidade de dados tornou inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (*Cross validation*). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na @fig-reg.
 
@@ -486,6 +491,112 @@ df_pred |>
 ```
 
 O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a apresentar um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que, apesar da intensidade das correlações dos preditores selecionados para o estudo, a resolução temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é limitada.
+
+## Modelo Preditivo Mensal
+
+O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados foram reprocessados e novas técnicas foram aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram apenas os seguintes:
+
+- Frota (RENAVAM);
+- Produto Interno Bruto - PIB (Banco Central do Brasil);
+- Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);
+- Mortes em trânsito (DataSUS).
+
+A fim de melhor compreender o comportamento destas variáveis em uma resolução temporal maior, as seguintes visualização demonstram a variação cada atributo considerado conforme o tempo do período disponível para estudo:
+
+::: {.panel-tabset}
+
+#### Frota (RENAVAM)
+
+```{r}
+#| echo: false
+#| label: fig-tab1
+#| fig.width: 7
+#| fig.height: 5
+#| fig.cap: Dados mensais de frota (RENAVAM)
+
+dados_mensais |> 
+  select(data, veiculos, automovel, motocicleta) |>
+  rename(Veículos = veiculos, Automóvel = automovel, Motocicleta = motocicleta) |> 
+  pivot_longer(-data) |> 
+  rename(Anos = data, Modal = name, Frota = value) |> 
+  ggplot(aes(x = Anos, y = Frota, color = Modal)) +
+  geom_line(linewidth = 1) +
+  scale_y_continuous(
+    labels = comma_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  scale_discrete_onsv()
+```
+
+#### PIB (BACEN)
+
+```{r}
+#| echo: false
+#| label: fig-tab2
+#| fig.width: 7
+#| fig.height: 5
+#| fig.cap: Dados mensais de PIB (BACEN)
+
+dados_mensais |> 
+  select(data, pib) |> 
+  rename(Anos = data, PIB = pib) |> 
+  ggplot(aes(x = Anos, y = PIB)) +
+  geom_line(linewidth = 1, color = onsv_palette$blue) +
+  scale_y_continuous(
+    labels = comma_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  labs(y = "PIB em milhões de dólares")
+```
+
+#### Sinistros (PRF)
+
+```{r}
+#| echo: false
+#| label: fig-tab3
+#| fig.width: 7
+#| fig.height: 5
+#| fig.cap: Dados mensais de sinistros em rodovias federais
+
+dados_mensais |> 
+  select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |> 
+  rename(
+    Anos = data, 
+    Sinistros = acidentes, 
+   `Sinistros fatais` = acidentes_fatais,
+   `Feridos` = feridos,
+   `Mortes (PRF)` = mortes_prf
+  ) |> 
+  pivot_longer(-Anos) |>
+  ggplot(aes(x = Anos, y = value, color = name)) +
+  geom_line(linewidth = 1) +
+  ylab(label = "Número de ocorrências") +
+  scale_y_continuous(
+    labels = comma_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  scale_discrete_onsv()
+```
+
+#### Mortes (DataSUS)
+
+```{r}
+#| echo: false
+#| label: fig-tab4
+#| fig.width: 7
+#| fig.height: 5
+#| fig.cap: Dados mensais de mortes em trânsito
+
+dados_mensais |> 
+  select(data, mortes) |> 
+  rename(Anos = data, Mortes = mortes) |> 
+  ggplot(aes(x = Anos, y = Mortes)) +
+  geom_line(linewidth =  1, color = onsv_palette$blue) +
+  scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+```
+
+### Análise de Série Temporal
+
+A análise de séries temporais é efetuada a partir da regressão de um modelo de melhor ajuste sob uma sequência de observações de um evento em um determinado intervalo de tempo de unidades uniformes, sendo estas séries representadas em função do tempo como uma variável independente.  
+
+:::
 
 ## Conclusão
 

@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito">
+<meta name="description" content="Modelo de aprendizado de máquina orientado a dados de segurança viária para o reconhecimento de padrões e previsão de mortes no trânsito">
 
-<title>Modelo Preditivo de Mortes Anuais no Trânsito no Brasil</title>
+<title>Modelo Preditivo de Mortes no Trânsito Brasileiro</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,7 +66,8 @@ div.csl-indent {
     "search-more-matches-text": "mais correspondências neste documento",
     "search-clear-button-title": "Limpar",
     "search-detached-cancel-button-title": "Cancelar",
-    "search-submit-button-title": "Enviar"
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
@@ -114,10 +115,10 @@ div.csl-indent {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Modelo Preditivo de Mortes Anuais no Trânsito no Brasil</h1>
+      <h1 class="title">Modelo Preditivo de Mortes no Trânsito Brasileiro</h1>
                   <div>
         <div class="description">
-          Modelo baseado em regressão linear multivariada para a previsão de mortes no trânsito
+          Modelo de aprendizado de máquina orientado a dados de segurança viária para o reconhecimento de padrões e previsão de mortes no trânsito
         </div>
       </div>
                 </div>
@@ -154,8 +155,12 @@ div.csl-indent {
    
   <ul>
   <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a></li>
+  <li><a href="#modelo-preditivo-anual" id="toc-modelo-preditivo-anual" class="nav-link" data-scroll-target="#modelo-preditivo-anual">Modelo Preditivo Anual</a>
+  <ul class="collapse">
   <li><a href="#metodologia" id="toc-metodologia" class="nav-link" data-scroll-target="#metodologia">Metodologia</a></li>
   <li><a href="#resultados-e-discussão" id="toc-resultados-e-discussão" class="nav-link" data-scroll-target="#resultados-e-discussão">Resultados e Discussão</a></li>
+  </ul></li>
+  <li><a href="#modelo-preditivo-mensal" id="toc-modelo-preditivo-mensal" class="nav-link" data-scroll-target="#modelo-preditivo-mensal">Modelo Preditivo Mensal</a></li>
   <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão">Conclusão</a></li>
   <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
   </ul>
@@ -173,10 +178,13 @@ div.csl-indent {
 <p>A segurança viária pode se correlacionar ao estado de desenvolvimento de uma região, visto que é uma característica da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais <span class="citation" data-cites="zhong-xiang2014">(<a href="#ref-zhong-xiang2014" role="doc-biblioref">Zhong-xiang et al. 2014</a>)</span>. Assim, elevadas taxas de sinistros colaboram no diagnóstico de problemas da segurança pública geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.</p>
 <p>Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade <span class="citation" data-cites="andrade2019">(<a href="#ref-andrade2019" role="doc-biblioref">Andrade e Antunes 2019</a>)</span>, sendo a oitava causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos <span class="citation" data-cites="worldhealthorganization2018">(<a href="#ref-worldhealthorganization2018" role="doc-biblioref">World Health Organization 2018</a>)</span>. Como previsto por modelos prévios à 2020 <span class="citation" data-cites="blumenberg2018">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>)</span>, o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Neste cenário, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) foi desenvolvido para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito <span class="citation" data-cites="ministériodostransporte2018">(<a href="#ref-ministériodostransporte2018" role="doc-biblioref">Ministério da Infraestrutura 2018</a>)</span>, na intenção de aprimorar o desempenho da segurança viária em relação a década passada e se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU). Para atingir tais metas, o Art. 3º da Resolução Contran Nº 870 relata que o PNATRANS se apoia em seis principais pilares: gestão da segurança no trânsito, vias seguras, segurança veicular, educação para o trânsito, atendimento às vítimas, e normalização e fiscalização <span class="citation" data-cites="conselhonacionaldetrânsito2018">(<a href="#ref-conselhonacionaldetrânsito2018" role="doc-biblioref">Conselho Nacional de Trânsito 2018</a>)</span>.</p>
 <p>A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas. Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#ref-blumenberg2018" role="doc-biblioref">Blumenberg et al. 2018</a>; <a href="#ref-cai2015" role="doc-biblioref">Cai, Zhu, e Yan 2015</a>)</span>, assim como modelos preditivos baseados em cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#ref-seneta1996" role="doc-biblioref">Seneta 1996</a>; <a href="#ref-jin2020" role="doc-biblioref">Jin, Zheng, e Geng 2020</a>)</span>. Outras abordagens utilizaram técnicas de análise de séries temporais, utilizando métodos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis <span class="citation" data-cites="al-ghamdi1995">(<a href="#ref-al-ghamdi1995" role="doc-biblioref">Al-Ghamdi 1995</a>)</span> e redes neurais artificiais <span class="citation" data-cites="jafari2015">(<a href="#ref-jafari2015" role="doc-biblioref">Jafari et al. 2015</a>)</span>.</p>
-<p>Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo linear de melhor ajuste para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos, como o Produto Interno Bruto (PIB) e a população, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) <span class="citation" data-cites="institutobrasileirodegeografiaeestatística2023">(<a href="#ref-institutobrasileirodegeografiaeestatística2023" role="doc-biblioref">Instituto Brasileiro de Geografia e Estatística 2023</a>)</span> e pelo Ministério da Saúde <span class="citation" data-cites="ministériodasaúde2023b">(<a href="#ref-ministériodasaúde2023b" role="doc-biblioref">Ministério da Saúde 2023b</a>)</span>, tal como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) <span class="citation" data-cites="políciarodoviáriafederal2023">(<a href="#ref-políciarodoviáriafederal2023" role="doc-biblioref">Polícia Rodoviária Federal 2023</a>)</span>, do Registro Nacional de Condutores Habilitados (RENACH) <span class="citation" data-cites="ministériodostransporte2023">(<a href="#ref-ministériodostransporte2023" role="doc-biblioref">Ministério dos Transportes 2023b</a>)</span>, do Registro Nacional de Veículos Automotores (RENAVAM) <span class="citation" data-cites="ministériodostransportes2023">(<a href="#ref-ministériodostransportes2023" role="doc-biblioref">Ministério dos Transportes 2023a</a>)</span> e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde <span class="citation" data-cites="ministériodasaúde2023a">(<a href="#ref-ministériodasaúde2023a" role="doc-biblioref">Ministério da Saúde 2023a</a>)</span>.</p>
+<p>Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de Aprendizado de Máquina para a previsão de mortes no trânsito em âmbito nacional e estadual no Brasil, investigando dados socioeconômicos como o PIB (Produto Interno Bruto) anual, o PIB mensal e a população nacional, fornecidos respectivamente pelo Instituto Brasileiro de Geografia e Estatística (IBGE) <span class="citation" data-cites="institutobrasileirodegeografiaeestatística2023">(<a href="#ref-institutobrasileirodegeografiaeestatística2023" role="doc-biblioref">Instituto Brasileiro de Geografia e Estatística 2023</a>)</span>, Banco Central do Brasil (BACEN) <span class="citation" data-cites="bancocentraldobrasil2023">(<a href="#ref-bancocentraldobrasil2023" role="doc-biblioref">Banco Central do Brasil 2023</a>)</span> e Ministério da Saúde <span class="citation" data-cites="ministériodasaúde2023b">(<a href="#ref-ministériodasaúde2023b" role="doc-biblioref">Ministério da Saúde 2023b</a>)</span>, tal como dados coletados das bases de dados da Polícia Federal Rodoviária (PRF) <span class="citation" data-cites="políciarodoviáriafederal2023">(<a href="#ref-políciarodoviáriafederal2023" role="doc-biblioref">Polícia Rodoviária Federal 2023</a>)</span>, do Registro Nacional de Condutores Habilitados (RENACH) <span class="citation" data-cites="ministériodostransporte2023">(<a href="#ref-ministériodostransporte2023" role="doc-biblioref">Ministério dos Transportes 2023b</a>)</span>, do Registro Nacional de Veículos Automotores (RENAVAM) <span class="citation" data-cites="ministériodostransportes2023">(<a href="#ref-ministériodostransportes2023" role="doc-biblioref">Ministério dos Transportes 2023a</a>)</span> e do Sistema de Informação de Mortalidade (SIM) do Ministério da Saúde <span class="citation" data-cites="ministériodasaúde2023a">(<a href="#ref-ministériodasaúde2023a" role="doc-biblioref">Ministério da Saúde 2023a</a>)</span>.</p>
+<p>A partir de todos os dados reunidos e pré-processados para a modelagem, duas principais análises foram dissertadas para aferir a capacidade preditiva das técnicas em relação a janela temporal estudada: o modelo preditivo anual (por meio de modelo de Regressão Linear) e o modelo preditivo mensal, que por sua vez, pode ser destrinchado em duas abordagens, sendo a análise de série temporal (ARIMA e Suavização Exponencial) e a análise de regressão (Regressão Linear e Regressor Random Forest).</p>
 </section>
-<section id="metodologia" class="level2">
-<h2 class="anchored" data-anchor-id="metodologia">Metodologia</h2>
+<section id="modelo-preditivo-anual" class="level2">
+<h2 class="anchored" data-anchor-id="modelo-preditivo-anual">Modelo Preditivo Anual</h2>
+<section id="metodologia" class="level3">
+<h3 class="anchored" data-anchor-id="metodologia">Metodologia</h3>
 <p>A obtenção dos dados de mortalidade foram efetuados através do pacote <code>microdatasus</code> <span class="citation" data-cites="microdatasus">(<a href="#ref-microdatasus" role="doc-biblioref">Saldanha 2023</a>)</span>, elaborado para a linguagem R. Coletou-se dados oriundos do período entre 1996 e 2021. Esta escolha de intervalo temporal visa englobar a mortalidade estimada sob o protocolo da CID-10, pelo qual o banco de dados foi adequado ao estudo extraindo apenas as observações de mortes relacionadas a sinistros, ou seja, aquelas que se encaixam entre os códigos “V01” à “V89”.</p>
 <p>As demais variáveis foram tratadas e imputadas em uma única tabela:</p>
 <ul>
@@ -184,7 +192,7 @@ div.csl-indent {
 <li>Frota de motocicletas (RENAVAM);</li>
 <li>Frota de automóveis (RENAVAM);</li>
 <li>PIB (IBGE);</li>
-<li>População (DATASUS);</li>
+<li>População (DataSUS);</li>
 <li>Quantidade de sinistros em rodovias federais (PRF);</li>
 <li>Quantidade de sinistros fatais em rodovias federais (PRF);</li>
 <li>Feridos em sinistros ocorridos em rodovias federais (PRF);</li>
@@ -193,11 +201,11 @@ div.csl-indent {
 </ul>
 <p>Em razão da ausência de dados prévios à 2011 de certas fontes, o intervalo de estudo foi reduzido para 2011 a 2021.</p>
 <p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, assim, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na <a href="#fig-corr">Figura&nbsp;1</a></p>
-<div class="cell" data-layout-align="center">
+<div class="cell" data-layout-align="center" data-fig.dpi="300">
 <div class="cell-output-display">
 <div id="fig-corr" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="05_paper_files/figure-html/fig-corr-1.png" class="img-fluid figure-img" width="2400"></p>
+<p><img src="05_paper_files/figure-html/fig-corr-1.png" class="img-fluid figure-img" width="768"></p>
 <figcaption class="figure-caption">Figura&nbsp;1: Correlograma dos atributos</figcaption>
 </figure>
 </div>
@@ -271,8 +279,8 @@ div.csl-indent {
 </div>
 </div>
 </section>
-<section id="resultados-e-discussão" class="level2">
-<h2 class="anchored" data-anchor-id="resultados-e-discussão">Resultados e Discussão</h2>
+<section id="resultados-e-discussão" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-e-discussão">Resultados e Discussão</h3>
 <p>A redução da disponibilidade de dados tornou inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na <a href="#fig-reg">Figura&nbsp;4</a>.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -360,6 +368,71 @@ div.csl-indent {
 </div>
 <p>O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a apresentar um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que, apesar da intensidade das correlações dos preditores selecionados para o estudo, a resolução temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é limitada.</p>
 </section>
+</section>
+<section id="modelo-preditivo-mensal" class="level2">
+<h2 class="anchored" data-anchor-id="modelo-preditivo-mensal">Modelo Preditivo Mensal</h2>
+<p>O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados foram reprocessados e novas técnicas foram aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram apenas os seguintes:</p>
+<ul>
+<li>Frota (RENAVAM);</li>
+<li>Produto Interno Bruto - PIB (Banco Central do Brasil);</li>
+<li>Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);</li>
+<li>Mortes em trânsito (DataSUS).</li>
+</ul>
+<p>A fim de melhor compreender o comportamento destas variáveis em uma resolução temporal maior, as seguintes visualização demonstram a variação cada atributo considerado conforme o tempo do período disponível para estudo:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Frota (RENAVAM)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">PIB (BACEN)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Sinistros (PRF)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Mortes (DataSUS)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-tab1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/fig-tab1-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figura&nbsp;9: Dados mensais de frota (RENAVAM)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-tab2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/fig-tab2-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figura&nbsp;10: Dados mensais de PIB (BACEN)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-tab3" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/fig-tab3-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figura&nbsp;11: Dados mensais de sinistros em rodovias federais</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-tab4" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="05_paper_files/figure-html/fig-tab4-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figura&nbsp;12: Dados mensais de mortes em trânsito</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="conclusão" class="level2">
 <h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
 <p>O modelo de regressão desenvolvido permite inferir que há uma tendência perceptível nas mortes causadas pelo trânsito. Mesmo que as previsões demonstrem que há a possibilidade de redução no ano subsequente, é visível que a predição do modelo linear ajustado está substancialmente distante do número de casos de 2019, este sendo o ano com a maior redução nas mortes desde o pico em 2012. Isto revela um potencial relaxamento no desempenho da segurança viária e mobilidade segura à nível nacional, desencadeiando em uma redução em sua eficiência e causando um aumento na mortalidade em sinistros de trânsito.</p>
@@ -379,6 +452,9 @@ Al-Ghamdi, Ali S. 1995. <span>«Time Series Forecasts for Traffic Accidents, Inj
 </div>
 <div id="ref-andrade2019" class="csl-entry" role="listitem">
 Andrade, Flávia Reis De, e José Leopoldo Ferreira Antunes. 2019. <span>«Tendência do número de vítimas em acidentes de trânsito nas rodovias federais brasileiras antes e depois da Década de Ação pela Segurança no Trânsito»</span>. <em>Cadernos de Saúde Pública</em> 35 (8): e00250218. <a href="https://doi.org/10.1590/0102-311x00250218">https://doi.org/10.1590/0102-311x00250218</a>.
+</div>
+<div id="ref-bancocentraldobrasil2023" class="csl-entry" role="listitem">
+Banco Central do Brasil. 2023. <span>«SGS - Sistema Gerenciador de Séries Temporais - v2.1»</span>, dezembro. <a href="https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries">https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries</a>.
 </div>
 <div id="ref-blumenberg2018" class="csl-entry" role="listitem">
 Blumenberg, Cauane, Rafaela C Martins, Janaína Calu Costa, e Luiza I C Ricardo. 2018. <span>«Is Brazil Going to Achieve the Road Traffic Deaths Target? An Analysis about the Sustainable Development Goals»</span>. <em>Injury Prevention</em> 24 (4): 250–55. <a href="https://doi.org/10.1136/injuryprev-2017-042473">https://doi.org/10.1136/injuryprev-2017-042473</a>.
