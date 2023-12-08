@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Relatório de Modelo Preditivo Mensal de Mortes no Trânsito Brasileiro</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="10_modelo_mensal_report_files/libs/clipboard/clipboard.min.js"></script>
+<script src="10_modelo_mensal_report_files/libs/quarto-html/quarto.js"></script>
+<script src="10_modelo_mensal_report_files/libs/quarto-html/popper.min.js"></script>
+<script src="10_modelo_mensal_report_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="10_modelo_mensal_report_files/libs/quarto-html/anchor.min.js"></script>
+<link href="10_modelo_mensal_report_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="10_modelo_mensal_report_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="10_modelo_mensal_report_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="10_modelo_mensal_report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="10_modelo_mensal_report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>html{ scroll-behavior: smooth; }</style>
+
+<link href="10_modelo_mensal_report_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="10_modelo_mensal_report_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="10_modelo_mensal_report_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="10_modelo_mensal_report_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Relatório de Modelo Preditivo Mensal de Mortes no Trânsito Brasileiro</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Data de Publicação</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">4 de dezembro de 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Sumário</h2>
+   
+  <ul>
+  <li><a href="#descrição" id="toc-descrição" class="nav-link active" data-scroll-target="#descrição">Descrição</a></li>
+  <li><a href="#dados" id="toc-dados" class="nav-link" data-scroll-target="#dados">Dados</a>
+  <ul class="collapse">
+  <li><a href="#tabela-de-dados" id="toc-tabela-de-dados" class="nav-link" data-scroll-target="#tabela-de-dados">Tabela de dados</a></li>
+  <li><a href="#variáveis" id="toc-variáveis" class="nav-link" data-scroll-target="#variáveis">Variáveis</a></li>
+  </ul></li>
+  <li><a href="#modelos" id="toc-modelos" class="nav-link" data-scroll-target="#modelos">Modelos</a>
+  <ul class="collapse">
+  <li><a href="#análise-de-série-temporal" id="toc-análise-de-série-temporal" class="nav-link" data-scroll-target="#análise-de-série-temporal">Análise de Série Temporal</a></li>
+  <li><a href="#modelos-regressores" id="toc-modelos-regressores" class="nav-link" data-scroll-target="#modelos-regressores">Modelos Regressores</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="descrição" class="level2">
+<h2 class="anchored" data-anchor-id="descrição">Descrição</h2>
+<p>O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:</p>
+<ul>
+<li>Frota (RENAVAM);</li>
+<li>PIB (Banco Central do Brasil);</li>
+<li>Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);</li>
+<li>Mortes em trânsito (DataSUS).</li>
+</ul>
+</section>
+<section id="dados" class="level2">
+<h2 class="anchored" data-anchor-id="dados">Dados</h2>
+<section id="tabela-de-dados" class="level3">
+<h3 class="anchored" data-anchor-id="tabela-de-dados">Tabela de dados</h3>
+<div class="cell">
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["data"],"name":[1],"type":["date"],"align":["right"]},{"label":["veiculos"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["automovel"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["motocicleta"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["mortes"],"name":[5],"type":["int"],"align":["right"]},{"label":["pib"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["acidentes"],"name":[7],"type":["int"],"align":["right"]},{"label":["acidentes_fatais"],"name":[8],"type":["int"],"align":["right"]},{"label":["feridos"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["mortes_prf"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"2011-01-01","2":"65205757","3":"37368830","4":"14063749","5":"3630","6":"195733","7":"16697","8":"620","9":"9858","10":"760"},{"1":"2011-02-01","2":"65636754","3":"37571028","4":"14185027","5":"3159","6":"199277","7":"14478","8":"525","9":"7992","10":"626"},{"1":"2011-03-01","2":"66116077","3":"37795329","4":"14320591","5":"3517","6":"214893","7":"16447","8":"602","9":"9110","10":"740"},{"1":"2011-04-01","2":"66563500","3":"38006611","4":"14443255","5":"3520","6":"223396","7":"16214","8":"582","9":"9167","10":"692"},{"1":"2011-05-01","2":"67066391","3":"38239043","4":"14585529","5":"3816","6":"228025","7":"15885","8":"641","9":"8491","10":"749"},{"1":"2011-06-01","2":"67545237","3":"38461238","4":"14721689","5":"3654","6":"228974","7":"15978","8":"579","9":"8728","10":"679"},{"1":"2011-07-01","2":"68024871","3":"38683693","4":"14857287","5":"3822","6":"234556","7":"16877","8":"651","9":"9402","10":"790"},{"1":"2011-08-01","2":"68548151","3":"38919820","4":"15010918","5":"3663","6":"234390","7":"15836","8":"572","9":"8384","10":"689"},{"1":"2011-09-01","2":"69047967","3":"39145549","4":"15157783","5":"3579","6":"211180","7":"14971","8":"566","9":"8378","10":"677"},{"1":"2011-10-01","2":"69486415","3":"39348588","4":"15279643","5":"3819","6":"216152","7":"16030","8":"625","9":"8958","10":"778"},{"1":"2011-11-01","2":"69987509","3":"39581749","4":"15418809","5":"3318","6":"218338","7":"14838","8":"532","9":"7957","10":"639"},{"1":"2011-12-01","2":"70543535","3":"39832919","4":"15579899","5":"3759","6":"209568","7":"18075","8":"663","9":"10402","10":"856"},{"1":"2012-01-01","2":"70965139","3":"40029320","4":"15697883","5":"3450","6":"203259","7":"15710","8":"521","9":"8932","10":"654"},{"1":"2012-02-01","2":"71361025","3":"40214616","4":"15807988","5":"3213","6":"213659","7":"14537","8":"508","9":"8511","10":"650"},{"1":"2012-03-01","2":"71840783","3":"40434635","4":"15944539","5":"3588","6":"221353","7":"15369","8":"549","9":"8358","10":"690"},{"1":"2012-04-01","2":"72242959","3":"40623643","4":"16052920","5":"3629","6":"207864","7":"15548","8":"550","9":"8735","10":"670"},{"1":"2012-05-01","2":"72693899","3":"40833748","4":"16175582","5":"3667","6":"202170","7":"15176","8":"573","9":"8540","10":"690"},{"1":"2012-06-01","2":"73183019","3":"41109520","4":"16277897","5":"3620","6":"192765","7":"15277","8":"617","9":"8394","10":"755"},{"1":"2012-07-01","2":"73699403","3":"41390841","4":"16392508","5":"3751","6":"201399","7":"15909","8":"611","9":"9022","10":"744"},{"1":"2012-08-01","2":"74274878","3":"41717481","4":"16506807","5":"3840","6":"206088","7":"13403","8":"567","9":"7997","10":"690"},{"1":"2012-09-01","2":"74689706","3":"41931596","4":"16598024","5":"4114","6":"198273","7":"14836","8":"597","9":"8465","10":"726"},{"1":"2012-10-01","2":"75179955","3":"42182066","4":"16704955","5":"4080","6":"212176","7":"16152","8":"621","9":"9019","10":"782"},{"1":"2012-11-01","2":"75626812","3":"42415150","4":"16801525","5":"3649","6":"205901","7":"15141","8":"584","9":"8409","10":"717"},{"1":"2012-12-01","2":"76137191","3":"42682111","4":"16910473","5":"4211","6":"198643","7":"17510","8":"705","9":"10086","10":"895"},{"1":"2013-01-01","2":"76588058","3":"42913174","4":"17011908","5":"3297","6":"200761","7":"15630","8":"540","9":"8903","10":"705"},{"1":"2013-02-01","2":"76937578","3":"43085340","4":"17091088","5":"2928","6":"201121","7":"13532","8":"479","9":"7593","10":"607"},{"1":"2013-03-01","2":"77359350","3":"43294981","4":"17186804","5":"3454","6":"218463","7":"16095","8":"560","9":"8820","10":"652"},{"1":"2013-04-01","2":"77849890","3":"43541296","4":"17299898","5":"3304","6":"222236","7":"14750","8":"507","9":"7877","10":"595"},{"1":"2013-05-01","2":"78310730","3":"43774150","4":"17403922","5":"3537","6":"216123","7":"15821","8":"608","9":"8443","10":"724"},{"1":"2013-06-01","2":"78768121","3":"44007166","4":"17502043","5":"3547","6":"199369","7":"15365","8":"585","9":"8350","10":"698"},{"1":"2013-07-01","2":"79261065","3":"44257654","4":"17608473","5":"3625","6":"200287","7":"16011","8":"584","9":"8638","10":"734"},{"1":"2013-08-01","2":"79735990","3":"44500131","4":"17710375","5":"3703","6":"193137","7":"15620","8":"595","9":"8716","10":"692"},{"1":"2013-09-01","2":"80179368","3":"44722193","4":"17804148","5":"3611","6":"196654","7":"15395","8":"590","9":"8717","10":"725"},{"1":"2013-10-01","2":"80649163","3":"44961673","4":"17902278","5":"3587","6":"216832","7":"15282","8":"564","9":"8488","10":"680"},{"1":"2013-11-01","2":"81089666","3":"45185282","4":"18000152","5":"3657","6":"204520","7":"16071","8":"604","9":"8794","10":"738"},{"1":"2013-12-01","2":"81600729","3":"45444387","4":"18114464","5":"4016","6":"198952","7":"17176","8":"671","9":"10471","10":"876"},{"1":"2014-01-01","2":"82060911","3":"45672929","4":"18221742","5":"3457","6":"190158","7":"15090","8":"497","9":"8831","10":"641"},{"1":"2014-02-01","2":"82454199","3":"45856018","4":"18315335","5":"3315","6":"191059","7":"14005","8":"465","9":"7884","10":"547"},{"1":"2014-03-01","2":"82819581","3":"46027242","4":"18403145","5":"3809","6":"205168","7":"14800","8":"604","9":"8613","10":"739"},{"1":"2014-04-01","2":"83248654","3":"46238141","4":"18499704","5":"3522","6":"214875","7":"14685","8":"574","9":"8212","10":"704"},{"1":"2014-05-01","2":"83683119","3":"46445672","4":"18600153","5":"3806","6":"216674","7":"14220","8":"588","9":"8248","10":"727"},{"1":"2014-06-01","2":"84063191","3":"46633635","4":"18682377","5":"3716","6":"206237","7":"13211","8":"574","9":"7987","10":"702"},{"1":"2014-07-01","2":"84494118","3":"46842021","4":"18778014","5":"3594","6":"218581","7":"13651","8":"570","9":"8012","10":"688"},{"1":"2014-08-01","2":"84892511","3":"47035616","4":"18865684","5":"3815","6":"212813","7":"13961","8":"581","9":"8462","10":"704"},{"1":"2014-09-01","2":"85323532","3":"47245819","4":"18959091","5":"3733","6":"209912","7":"13597","8":"608","9":"8137","10":"729"},{"1":"2014-10-01","2":"85766231","3":"47462906","4":"19053991","5":"3682","6":"206854","7":"13905","8":"523","9":"8570","10":"633"},{"1":"2014-11-01","2":"86187522","3":"47673825","4":"19141785","5":"3579","6":"194311","7":"13438","8":"557","9":"8415","10":"668"},{"1":"2014-12-01","2":"86700490","3":"47946665","4":"19242916","5":"3752","6":"188203","7":"14638","8":"601","9":"9461","10":"752"},{"1":"2015-01-01","2":"87073671","3":"48132327","4":"19328388","5":"3349","6":"178140","7":"12230","8":"466","9":"8145","10":"607"},{"1":"2015-02-01","2":"87364144","3":"48266804","4":"19401654","5":"2933","6":"163644","7":"11422","8":"415","9":"7152","10":"497"},{"1":"2015-03-01","2":"87736326","3":"48437568","4":"19498976","5":"3205","6":"161898","7":"12448","8":"497","9":"7662","10":"614"},{"1":"2015-04-01","2":"88075445","3":"48598316","4":"19584183","5":"3113","6":"160865","7":"12064","8":"447","9":"7610","10":"540"},{"1":"2015-05-01","2":"88405610","3":"48755005","4":"19667658","5":"3336","6":"158210","7":"12709","8":"501","9":"8017","10":"611"},{"1":"2015-06-01","2":"88731536","3":"48909198","4":"19748158","5":"3163","6":"155027","7":"10681","8":"453","9":"7282","10":"528"},{"1":"2015-07-01","2":"89080562","3":"49072424","4":"19833971","5":"3136","6":"154702","7":"8592","8":"464","9":"7024","10":"564"},{"1":"2015-08-01","2":"89400061","3":"49223550","4":"19912941","5":"3284","6":"140273","7":"8214","8":"473","9":"7356","10":"562"},{"1":"2015-09-01","2":"89710811","3":"49367978","4":"19988836","5":"3148","6":"125799","7":"8049","8":"451","9":"6981","10":"549"},{"1":"2015-10-01","2":"90003877","3":"49508411","4":"20057793","5":"3222","6":"132221","7":"8188","8":"454","9":"7236","10":"525"},{"1":"2015-11-01","2":"90315644","3":"49653337","4":"20129299","5":"3228","6":"133945","7":"8077","8":"466","9":"6889","10":"552"},{"1":"2015-12-01","2":"90686936","3":"49822709","4":"20216193","5":"3534","6":"131443","7":"9487","8":"561","9":"8897","10":"718"},{"1":"2016-01-01","2":"90947985","3":"49938038","4":"20278869","5":"3039","6":"117369","7":"8952","8":"421","9":"8306","10":"512"},{"1":"2016-02-01","2":"91191372","3":"50045737","4":"20337752","5":"2744","6":"122032","7":"7643","8":"396","9":"6810","10":"479"},{"1":"2016-03-01","2":"91485547","3":"50175062","4":"20406898","5":"2999","6":"141160","7":"8274","8":"453","9":"7109","10":"523"},{"1":"2016-04-01","2":"91752333","3":"50290258","4":"20470640","5":"3107","6":"144782","7":"7957","8":"424","9":"7155","10":"514"},{"1":"2016-05-01","2":"92017155","3":"50409397","4":"20533249","5":"3273","6":"144817","7":"8127","8":"502","9":"6969","10":"608"},{"1":"2016-06-01","2":"92281081","3":"50530969","4":"20593246","5":"3021","6":"151348","7":"7816","8":"447","9":"6704","10":"523"},{"1":"2016-07-01","2":"92553570","3":"50659605","4":"20654232","5":"3353","6":"158470","7":"8125","8":"485","9":"7679","10":"570"},{"1":"2016-08-01","2":"92830434","3":"50790355","4":"20716610","5":"3261","6":"164624","7":"8041","8":"464","9":"7106","10":"539"},{"1":"2016-09-01","2":"93071511","3":"50902511","4":"20770847","5":"3163","6":"160484","7":"7428","8":"401","9":"6647","10":"464"},{"1":"2016-10-01","2":"93305422","3":"51017596","4":"20821872","5":"3343","6":"168956","7":"8011","8":"476","9":"7480","10":"571"},{"1":"2016-11-01","2":"93567603","3":"51148588","4":"20876979","5":"2800","6":"163110","7":"7353","8":"391","9":"6678","10":"470"},{"1":"2016-12-01","2":"93867016","3":"51296982","4":"20942633","5":"3242","6":"162982","7":"8636","8":"495","9":"8029","10":"625"},{"1":"2017-01-01","2":"94091786","3":"51403096","4":"20995106","5":"2999","6":"160678","7":"7434","8":"427","9":"7296","10":"538"},{"1":"2017-02-01","2":"94297658","3":"51501159","4":"21041800","5":"2722","6":"164602","7":"7077","8":"404","9":"6615","10":"496"},{"1":"2017-03-01","2":"94581229","3":"51639796","4":"21106117","5":"2731","6":"179439","7":"7494","8":"385","9":"6808","10":"449"},{"1":"2017-04-01","2":"94812640","3":"51753520","4":"21156966","5":"2871","6":"171569","7":"7762","8":"427","9":"7274","10":"515"},{"1":"2017-05-01","2":"95099183","3":"51896062","4":"21219706","5":"2957","6":"171849","7":"7757","8":"437","9":"6896","10":"503"},{"1":"2017-06-01","2":"95376961","3":"52037738","4":"21275905","5":"3016","6":"164649","7":"7517","8":"439","9":"7082","10":"563"},{"1":"2017-07-01","2":"95643467","3":"52170766","4":"21330998","5":"3419","6":"171176","7":"7319","8":"485","9":"6985","10":"597"},{"1":"2017-08-01","2":"95949457","3":"52329113","4":"21391262","5":"2956","6":"176525","7":"7085","8":"443","9":"6763","10":"503"},{"1":"2017-09-01","2":"96226179","3":"52477378","4":"21443577","5":"2983","6":"173621","7":"7134","8":"427","9":"6825","10":"507"},{"1":"2017-10-01","2":"96509371","3":"52622883","4":"21497285","5":"2878","6":"178124","7":"7391","8":"427","9":"6926","10":"498"},{"1":"2017-11-01","2":"96790495","3":"52769600","4":"21548767","5":"2691","6":"175864","7":"6973","8":"419","9":"6484","10":"515"},{"1":"2017-12-01","2":"97091956","3":"52916160","4":"21608568","5":"3152","6":"175087","7":"8624","8":"464","9":"8366","10":"564"},{"1":"2018-01-01","2":"97361097","3":"53044977","4":"21667416","5":"2592","6":"171549","7":"6941","8":"363","9":"6871","10":"456"},{"1":"2018-02-01","2":"97591211","3":"53157645","4":"21715404","5":"2360","6":"165892","7":"6193","8":"345","9":"5923","10":"394"},{"1":"2018-03-01","2":"97889879","3":"53305687","4":"21776860","5":"2677","6":"178886","7":"6684","8":"376","9":"6545","10":"426"},{"1":"2018-04-01","2":"98201128","3":"53459376","4":"21840566","5":"2714","6":"171535","7":"5530","8":"385","9":"6406","10":"439"},{"1":"2018-05-01","2":"98496154","3":"53597815","4":"21903673","5":"2544","6":"153720","7":"4819","8":"334","9":"5612","10":"389"},{"1":"2018-06-01","2":"98783909","3":"53736748","4":"21961910","5":"2813","6":"153961","7":"5567","8":"404","9":"6184","10":"444"},{"1":"2018-07-01","2":"99090731","3":"53885695","4":"22021735","5":"2917","6":"153792","7":"5433","8":"401","9":"6433","10":"491"},{"1":"2018-08-01","2":"99443198","3":"54060451","4":"22090668","5":"2724","6":"151597","7":"5445","8":"390","9":"6082","10":"454"},{"1":"2018-09-01","2":"99742877","3":"54209990","4":"22148466","5":"2955","6":"139322","7":"5451","8":"405","9":"6320","10":"492"},{"1":"2018-10-01","2":"100094725","3":"54389941","4":"22214485","5":"2722","6":"162123","7":"5436","8":"339","9":"6260","10":"376"},{"1":"2018-11-01","2":"100415050","3":"54555370","4":"22274350","5":"2591","6":"159848","7":"5467","8":"366","9":"6369","10":"426"},{"1":"2018-12-01","2":"100746553","3":"54715488","4":"22339110","5":"3046","6":"153987","7":"6366","8":"399","9":"7690","10":"486"},{"1":"2019-01-01","2":"101050113","3":"54855921","4":"22407417","5":"2521","6":"154317","7":"5133","8":"344","9":"6507","10":"407"},{"1":"2019-02-01","2":"101346180","3":"54995950","4":"22471809","5":"2352","6":"154648","7":"4968","8":"338","9":"5807","10":"394"},{"1":"2019-03-01","2":"101651770","3":"55140840","4":"22536875","5":"2626","6":"156488","7":"5594","8":"349","9":"6535","10":"406"},{"1":"2019-04-01","2":"101991290","3":"55302549","4":"22608107","5":"2452","6":"157446","7":"5437","8":"328","9":"6310","10":"393"},{"1":"2019-05-01","2":"102349866","3":"55473965","4":"22681925","5":"2616","6":"153926","7":"5474","8":"423","9":"6263","10":"471"},{"1":"2019-06-01","2":"102666444","3":"55627966","4":"22742795","5":"2794","6":"154853","7":"5583","8":"404","9":"6465","10":"458"},{"1":"2019-07-01","2":"103016009","3":"55795597","4":"22811706","5":"2731","6":"167345","7":"5800","8":"420","9":"6765","10":"487"},{"1":"2019-08-01","2":"103363180","3":"55964817","4":"22880714","5":"2700","6":"156658","7":"5709","8":"396","9":"6621","10":"455"},{"1":"2019-09-01","2":"103700263","3":"56125482","4":"22948685","5":"2802","6":"150160","7":"5875","8":"384","9":"6666","10":"449"},{"1":"2019-10-01","2":"104067959","3":"56300222","4":"23023940","5":"2756","6":"158921","7":"5893","8":"380","9":"6901","10":"435"},{"1":"2019-11-01","2":"104413498","3":"56468583","4":"23092564","5":"2643","6":"153423","7":"5817","8":"412","9":"6680","10":"479"},{"1":"2019-12-01","2":"104784375","3":"56652190","4":"23165586","5":"2952","6":"154614","7":"6273","8":"419","9":"7671","10":"504"},{"1":"2020-01-01","2":"105082903","3":"56785464","4":"23235513","5":"2445","6":"147508","7":"5497","8":"344","9":"7040","10":"410"},{"1":"2020-02-01","2":"105376356","3":"56927310","4":"23295373","5":"2488","6":"141838","7":"5470","8":"328","9":"6476","10":"386"},{"1":"2020-03-01","2":"105625858","3":"57039736","4":"23352052","5":"2353","6":"129545","7":"4791","8":"341","9":"5305","10":"391"},{"1":"2020-04-01","2":"105715592","3":"57072928","4":"23373669","5":"2087","6":"105950","7":"3883","8":"307","9":"4287","10":"355"},{"1":"2020-05-01","2":"105816018","3":"57109282","4":"23395463","5":"2503","6":"101692","7":"4659","8":"340","9":"4884","10":"387"},{"1":"2020-06-01","2":"106010452","3":"57193009","4":"23431632","5":"2445","6":"116033","7":"4734","8":"320","9":"4871","10":"359"},{"1":"2020-07-01","2":"106289700","3":"57305419","4":"23497721","5":"2737","6":"120988","7":"5129","8":"391","9":"5412","10":"455"},{"1":"2020-08-01","2":"106589438","3":"57424520","4":"23572031","5":"3044","6":"115643","7":"5645","8":"389","9":"6088","10":"455"},{"1":"2020-09-01","2":"106917780","3":"57559950","4":"23648277","5":"3046","6":"118692","7":"5696","8":"417","9":"6272","10":"499"},{"1":"2020-10-01","2":"107250740","3":"57702282","4":"23721194","5":"3287","6":"118104","7":"6127","8":"416","9":"7067","10":"488"},{"1":"2020-11-01","2":"107585150","3":"57852963","4":"23788071","5":"3071","6":"123863","7":"5747","8":"454","9":"6490","10":"526"},{"1":"2020-12-01","2":"107948371","3":"58016405","4":"23862010","5":"3210","6":"135672","7":"6198","8":"478","9":"7319","10":"582"},{"1":"2021-01-01","2":"108222494","3":"58125111","4":"23925041","5":"2976","6":"125830","7":"5458","8":"388","9":"6293","10":"472"},{"1":"2021-02-01","2":"108464640","3":"58234631","4":"23967587","5":"2402","6":"129956","7":"4979","8":"314","9":"5598","10":"348"},{"1":"2021-03-01","2":"108734638","3":"58354052","4":"24013746","5":"2374","6":"135840","7":"4755","8":"356","9":"5170","10":"400"},{"1":"2021-04-01","2":"109022791","3":"58456357","4":"24087233","5":"2444","6":"131703","7":"4854","8":"334","9":"5397","10":"379"},{"1":"2021-05-01","2":"109342158","3":"58569991","4":"24171833","5":"2867","6":"136811","7":"5591","8":"411","9":"6092","10":"455"},{"1":"2021-06-01","2":"109651807","3":"58671642","4":"24251392","5":"2692","6":"143909","7":"5319","8":"379","9":"5571","10":"422"},{"1":"2021-07-01","2":"109961381","3":"58762252","4":"24334744","5":"3202","6":"146378","7":"5814","8":"463","9":"6375","10":"521"},{"1":"2021-08-01","2":"110255577","3":"58850554","4":"24412302","5":"3071","6":"143628","7":"5621","8":"401","9":"6077","10":"453"},{"1":"2021-09-01","2":"110536718","3":"58933117","4":"24494952","5":"2996","6":"141498","7":"5438","8":"382","9":"6126","10":"465"},{"1":"2021-10-01","2":"110812821","3":"59023764","4":"24568159","5":"3138","6":"136469","7":"5772","8":"438","9":"6496","10":"510"},{"1":"2021-11-01","2":"111109134","3":"59121901","4":"24648597","5":"2653","6":"138930","7":"5097","8":"362","9":"5767","10":"426"},{"1":"2021-12-01","2":"111446870","3":"59242869","4":"24732701","5":"2998","6":"138518","7":"5841","8":"436","9":"6884","10":"545"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="variáveis" class="level3">
+<h3 class="anchored" data-anchor-id="variáveis">Variáveis</h3>
+<p>Visualizações podem ser criadas para observar o comportamento dos atributos considerados e verificar que estão em conformidade com a realidade:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Frota</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">PIB</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Sinistros (PRF)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Mortes (DataSUS)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="modelos" class="level2">
+<h2 class="anchored" data-anchor-id="modelos">Modelos</h2>
+<section id="análise-de-série-temporal" class="level3">
+<h3 class="anchored" data-anchor-id="análise-de-série-temporal">Análise de Série Temporal</h3>
+<section id="sarima" class="level4">
+<h4 class="anchored" data-anchor-id="sarima">SARIMA</h4>
+<p>O primeiro modelo avaliado é o <em>Seasonal Autoregressive Integrated Moving Average</em> (SARIMA), uma forma de ARIMA que leva em consideração a sazonalidade da série temporal. Observando a decomposição da série temporal, têm-se:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Série Temporal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Sazonalidade</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Tendência</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Residual</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Para a escolha do melhor modelo ARIMA, foi utilizada a função <code>auto.arima()</code> do pacote <a href="https://pkg.robjhyndman.com/forecast/"><code>forecast</code></a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 288.45 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.54 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> AIC </td>
+   <td style="text-align:right;"> 3739.88 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> Erro relativo </td>
+   <td style="text-align:right;"> 0.08 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</section>
+<section id="exponential-smoothing" class="level4">
+<h4 class="anchored" data-anchor-id="exponential-smoothing">Exponential Smoothing</h4>
+<p>O modelo de Suavização Exponencial constitui uma família de métodos de análise e previsão de séries temporais. Os principais tipos de modelos desta categoria são:</p>
+<ul>
+<li>Suavização Exponencial Simples</li>
+<li>Suavização Exponencial Dupla (Holt Linear)</li>
+<li>Suavização Exponencial Tripla (Método Holt-Winters)</li>
+</ul>
+<p>Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 271.65 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.65 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> Erro relativo </td>
+   <td style="text-align:right;"> 0.08 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</section>
+</section>
+<section id="modelos-regressores" class="level3">
+<h3 class="anchored" data-anchor-id="modelos-regressores">Modelos Regressores</h3>
+<section id="regressão-linear" class="level4">
+<h4 class="anchored" data-anchor-id="regressão-linear">Regressão Linear</h4>
+<p>A regressão linear múltipla ajustada neste estudo é equivalente ao seu modelo anual predecessor, mas com um número reduzido de variáveis consideradas para criação do modelo. O correlograma pode ser utilizado para confirmar as correlações lineares entre os atributos:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 131.46 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 105.34 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.94 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>Em geral, as métricas apresentaram maior precisão e desempenho em comparação ao modelo anual, apesar de se basear em uma quantidade menor de variáveis, obtendo maior capacidade preditiva.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="random-forest" class="level4">
+<h4 class="anchored" data-anchor-id="random-forest">Random Forest</h4>
+<p>O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear. Embora suas métricas mostrem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021, possivelmente ao acaso.</p>
+<div class="cell">
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 158.28 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 125.81 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.91 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>A sobressaliência do modelo linear em relação ao Random Forest é possivelmente devido:</p>
+<ul>
+<li>Às altas correlações lineares e covariâncias entre as variáveis;</li>
+<li>Ao número de árvores (hiperparâmetro não otimizado) e ou;</li>
+<li>Ao sobreajuste.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="10_modelo_mensal_report_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiada");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiada");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+<script src="10_modelo_mensal_report_files/libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,664 @@
+---
+title: "Início da coleta de dados para o modelo mensal/estadual"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(roadtrafficdeaths)
+library(here)
+library(rvest)
+```
+
+## Decodificador de município para UF
+
+```{r}
+table <- readODS::read_ods(here("data-raw","ibge-cod-munic","ibge_cod_municipios.ods"))
+```
+
+```{r}
+table_decod <- unique(table[c("UF", "Nome_UF")])
+table_decod
+```
+
+```{r}
+uf_decod <- function(x) {
+  table <- readODS::read_ods(here("data-raw",
+                                  "ibge-cod-munic",
+                                  "ibge_cod_municipios.ods"))
+  
+  table_decod <- unique(table[c("UF", "Nome_UF")])
+  
+  ind <- match(x,table_decod$UF)
+  
+  uf <- table_decod$Nome_UF[ind]
+  
+  return(uf)
+}
+
+uf_decod(43)
+```
+
+## Coleta de dados
+
+### DataSUS
+
+```{r}
+rtdeaths |> head()
+```
+
+```{r}
+mortes <- rtdeaths |> 
+  mutate(mes_ocorrencia = month(data_ocorrencia)) |> 
+  count(mes_ocorrencia, ano_ocorrencia, nome_uf_ocor) |> 
+  arrange(ano_ocorrencia) |> 
+  mutate(data = paste0(as.character(mes_ocorrencia),
+                       "-",
+                       as.character(ano_ocorrencia)),
+         data = my(data))
+
+mortes
+```
+
+```{r}
+ggplot(mortes, aes(x = ano_ocorrencia, y = n)) +
+  geom_point(aes(color = nome_uf_ocor), alpha = 0.4) +
+  scale_color_viridis_d()
+```
+
+```{r}
+library(forecast)
+tseries <- ts(data = mortes$n, start = c(1996,1), end = c(2021,12), frequency = 12)
+plot(tseries)
+
+fit <- stl(tseries, s.window = "periodic")
+plot(fit)
+monthplot(tseries)
+```
+
+```{r}
+tseries_dec <- tseries |> decompose()
+
+autoplot(tseries_dec$seasonal, )
+autoplot(tseries_dec$trend, )
+autoplot(tseries_dec$random, )
+```
+
+### PRF
+
+```{r}
+prf_filepaths <- paste0(
+  here("data-raw","datatran//"),
+  list.files(here("data-raw/datatran"))
+)
+
+prf_filepaths
+```
+
+```{r}
+prf_temp <- lapply(prf_filepaths, 
+                read_delim, 
+                delim = ";", 
+                locale = locale(decimal_mark = ",",
+                                encoding = "Latin1",
+                                date_format = "%d/%m/%Y"))
+
+prf_temp[[10]] <-  prf_temp[[10]] |> mutate(data_inversa = dmy(data_inversa))
+
+prf_temp
+```
+
+```{r}
+prf <- prf_temp |> lapply(select, data_inversa, uf, causa_acidente, tipo_acidente, classificacao_acidente, pessoas, mortos, feridos)
+
+prf <- reduce(prf, full_join)
+```
+
+```{r}
+prf_data <- prf |> mutate(
+  ano = year(data_inversa),
+  mes = month(data_inversa),
+  classificacao_acidente = case_when(
+    classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos > 0 ~ "Com Vítimas Fatais",
+    classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
+    classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
+    TRUE ~ classificacao_acidente
+  )
+)
+```
+
+```{r}
+sinistros_prf <- prf_data |> 
+  summarise(
+    .by = c("mes", "ano"),
+    acidentes = n(),
+    acidentes_fatais = sum(classificacao_acidente == "Com Vítimas Fatais"),
+    feridos = sum(feridos),
+    mortes = sum(mortos)
+  ) |> 
+  arrange(ano,mes) |> 
+  mutate(data = my(paste0(mes,"-",ano)))
+
+sinistros_prf
+```
+
+```{r}
+sinistros_prf |> 
+  select(-c(mes,ano)) |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(x = data, y = value, color = name)) +
+  geom_point() +
+  geom_line()
+
+```
+
+### Frota
+
+```{r}
+page_list <- c(
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2013",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2014",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2015",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2016",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2017",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2018",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2019",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2020",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"
+)
+
+page <- read_html(page_list[10])
+
+file_list <- page |>  
+  html_elements("a") |> 
+  html_attr("href")
+
+text_list <- page |> 
+  html_elements("a") |> 
+  html_text2()
+
+ids <- text_list |> 
+  tolower() |> 
+  str_detect("por (município|municipio)") |> 
+  which(TRUE)
+  
+file_paths <- file_list[ids]
+
+files_ext <- tools::file_ext(file_paths)
+
+files_ext
+```
+
+```{r}
+read_fleet_old <- function(file) {
+  
+  ext <- tools::file_ext(file)
+  
+  if (ext == "zip") {
+    
+    temp <- tempfile()
+    
+    download.file(file, destfile = temp)
+    
+    file_name <- unzip(temp, list = T)$Name
+    
+    unzip(temp, exdir = tempdir())
+    
+    data <- readxl::read_excel(
+      paste0(tempdir(),"/",file_name),
+      sheet = 2,
+      skip = 3
+    )
+    
+    unlink(paste0(tempdir(),"/",file_name))
+    unlink(temp)
+  } 
+  
+  else if (ext == "xlsx") {
+    
+    name <- "tempfile.xlsx"
+    
+    download.file(file, destfile = name, mode = "wb")
+    
+    data <- readxl::read_excel(name, sheet = 2, skip = 3)  
+    
+    unlink(name)
+  }
+  
+  else if (ext == "xls") {
+    
+    name <- "tempfile.xls"
+    
+    download.file(file, destfile = name, mode = "wb")
+    
+    data <- readxl::read_excel(name, sheet = 1, skip = 2)
+    
+    unlink(name)
+  }
+  
+  else { data <- 0 }
+  
+  return(data)
+}
+```
+
+```{r}
+read_fleet <- function(file) {
+  
+  ext <- tools::file_ext(file)
+  
+  if (ext == "zip") {
+    
+    temp <- tempfile()
+    
+    download.file(file, destfile = temp)
+    
+    file_name <- unzip(temp, list = T)$Name
+    
+    unzip(temp, exdir = tempdir())
+    
+    data <- readxl::read_excel(
+      paste0(tempdir(),"/",file_name),
+      sheet = 2,
+      skip = 3
+    )
+    
+    unlink(paste0(tempdir(),"/",file_name))
+    unlink(temp)
+    
+    return(data)
+  } 
+  
+  else if (ext == "xlsx") {
+    
+    tryCatch(
+      expr = {
+        name <- "tempfile.xlsx"
+    
+        download.file(file, destfile = name, mode = "wb")
+    
+        data <- readxl::read_excel(name, sheet = 2, skip = 3)  
+    
+        unlink(name)
+    
+        return(data)
+      },
+      error = function(e) {
+        name <- "tempfile.xlsx"
+    
+        download.file(file, destfile = name, mode = "wb")
+    
+        data <- readxl::read_excel(name, sheet = 1, skip = 3)  
+    
+        unlink(name)
+    
+        return(data)
+      }
+    )
+    
+  }
+  
+  else if (ext == "xls") {
+    
+    name <- "tempfile.xls"
+    
+    download.file(file, destfile = name, mode = "wb")
+    
+    data <- readxl::read_excel(name, sheet = 1, skip = 2)
+    
+    unlink(name)
+    
+    return(data)
+  }
+  
+  else { 
+    data <- 0
+    return(data)
+  }
+}
+```
+
+```{r}
+fleet_links <- function(url) {
+  page <- read_html(url)
+  
+  links <- page |>  
+   html_elements("a") |> 
+   html_attr("href")
+  
+  link_texts <- page |>  
+    html_elements("a") |> 
+    html_text2()
+  
+  ids <- link_texts |> 
+    tolower() |> 
+    str_detect("por (município|municipio)") |> 
+    which(TRUE)
+  
+  files <- links[ids]
+  
+  return(files)
+}
+```
+
+```{r}
+page_list <- c(
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2013",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2014",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2015",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2016",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2017",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2018",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2019",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2020",
+  "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"
+)
+```
+
+```{r}
+read_fleet_page <- function(page) {
+  links <- rev(fleet_links(page))
+  
+  frota <- lapply(links, read_fleet)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- str_extract(page, "(1|2)\\d{3}")
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet_page(page_list[1]) |> view()
+```
+
+#### Script
+
+```{r}
+read_fleet2011 <- function() {
+  
+  folder <- here("data-raw","frota_mensal","frota_2011","Frota Munic. 2011")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
+
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2011
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+
+  return(frota)
+}
+
+frota2011 <- read_fleet2011()
+```
+
+```{r}
+read_fleet2012 <- function() {
+  
+  folder <- here("data-raw","frota_mensal","frota_2012","Frota Munic. 2012")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
+
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2012
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+
+  return(frota)
+}
+
+frota2012 <- read_fleet2012()
+```
+
+```{r}
+read_fleet2015 <- function() {
+  folder <- here("data-raw","frota_mensal","frota_2015")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2015
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet2015()
+```
+
+```{r}
+read_fleet2016 <- function() {
+  folder <- here("data-raw","frota_mensal","frota_2016")
+  files <- list.files(folder)
+  paths <- paste(sep = "/", folder, files)
+  files_info <- file.info(paths)
+  files_info <- files_info[with(files_info, order(as.POSIXct(mtime))), ]
+  paths <- rownames(files_info)
+  
+  swap <- function(vec, from, to) {
+    tmp <- to[ match(vec, from) ]
+    tmp[is.na(tmp)] <- vec[is.na(tmp)]
+    return(tmp)
+  }
+  
+  paths <- swap(paths, c(paths[5],paths[6]), c(paths[6],paths[5]))
+  
+  
+  readfunc <- function(path) {
+    tryCatch(
+      expr = {
+        frota <- readxl::read_excel(path, sheet = 2, skip = 3)
+        return(frota)
+      },
+      error = function(e) {
+        frota <- readxl::read_excel(path, sheet = 1, skip = 3)
+        return(frota)
+      }
+    )
+  }
+  
+  frota <- lapply(paths, readfunc)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2016
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet2016()
+```
+
+```{r}
+read_fleet2021 <- function() {
+  links <- rev(fleet_links("https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"))
+  
+  readfleet <- function(path) {
+    tryCatch(
+      expr = {
+        ext <- tools::file_ext(path)
+        name <- paste0("tempfile.",ext)
+        download.file(path, destfile = name, mode = "wb")
+        data <- readxl::read_excel(name, sheet = 2, skip = 2)
+        unlink(name)
+        return(data)
+      },
+      error = function(e) {
+        ext <- tools::file_ext(path)
+        name <- paste0("tempfile.",ext)
+        download.file(path, destfile = name, mode = "wb")
+        data <- readxl::read_excel(name, sheet = 1, skip = 2)
+        unlink(name)
+        return(data)
+      }
+    ) 
+  }
+  
+  frota <- lapply(links, readfleet)
+  
+  for(i in 1:length(frota)) {
+    x <- frota[[i]]
+    x <- x[x$UF != "UF", ]
+    x$ANO <- 2021
+    x$MES <- i
+    frota[[i]] <- x 
+  }
+  
+  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
+                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
+                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    mutate,
+    across(!UF, as.numeric)
+  )
+  
+  frota <- reduce(frota, full_join)
+  
+  return(frota)
+}
+
+read_fleet2021() |> view()
+```
+
+```{r}
+load(here("data/frota_mensal.rda"))
+
+frota_mensal |> 
+  pivot_wider(names_from = modal, values_from = frota) 
+```
+
+### Condutores
+
+```{r}
+files <- list.files(here("data-raw","populacao_zip"))
+files <- files[unlist(tools::file_ext(files) == "csv")]
+
+paths <- paste0(here("data-raw","populacao_zip"),
+                "/", files)
+paths
+```
+
+```{r}
+x <- read_csv(paths[1])
+x |> mutate(UF = uf_decod(as.integer(MUNIC_RES/10000)))
+```
+
+```{r}
+df <- lapply(paths, read_csv) |> 
+  reduce(full_join) |>
+  mutate(UF = uf_decod(as.integer(MUNIC_RES/10000)))
+
+df
+```
+
+### PIB
+
+```{r}
+pib <- read_delim(
+  here("data-raw","pib_mensal","pib_bacen_dolar.csv"),
+  delim = ";", locale = locale(encoding = "latin1"),
+  col_names = c("data","pib"), skip = 1
+)
+
+pib <- pib[pib$data != "Fonte", ]
+
+pib <- pib |> 
+  mutate(
+    pib = pib |> 
+      str_replace("\\.","") |> 
+      str_replace(",",".") |> 
+      as.numeric(),
+    data = my(data)
+  )
+
+ggplot(pib, aes(x = data, y = pib)) + geom_point(size = 0.75) + geom_line() 
+```

@@ -1,0 +1,204 @@
+---
+title: "Modelos mensais por meio de análise de série temporal"
+format: html
+editor: visual
+---
+
+## Pacotes
+
+```{r}
+library(tidyverse)
+library(here)
+library(forecast)
+library(yardstick)
+```
+
+## Importação
+
+```{r}
+load(here("data","obitos_transito_mensal.rda"))
+```
+
+```{r}
+head(obitos_transito_mensal)
+```
+
+```{r}
+df <- obitos_transito_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = c(data),
+    mortes = sum(mortes)
+  ) |> 
+  drop_na()
+
+df
+```
+
+```{r}
+ggplot(df, aes(x = data, y = mortes)) + 
+  geom_line() +
+  geom_point(size = 0.75) +
+  scale_y_continuous(limits = c(2000,4500))
+```
+
+## Decomposição
+
+```{r}
+ts <- ts(df$mortes, start = c(1996,1), end = c(2021,12), frequency = 12)
+ts
+```
+
+```{r}
+decomp_ts <- decompose(ts)
+plot(decomp_ts)
+monthplot(x = ts)
+```
+
+## Splitting
+
+```{r}
+ts_train <- head(ts, length(ts) - 12)
+ts_train
+```
+
+```{r}
+plot(ts_train)
+```
+
+## Modelo SARIMA
+
+```{r}
+arima_model <- ts_train |> 
+  auto.arima(
+    stationary = FALSE,
+    seasonal = TRUE
+  )
+
+arima_model
+```
+
+```{r}
+arima_pred <- data.frame(forecast(arima_model, h = 12))
+
+arima_pred <- arima_pred |> 
+  mutate(data = my(rownames(arima_pred)))
+
+rownames(arima_pred) <- NULL
+
+arima_pred
+```
+
+```{r}
+arima_df <- full_join(df, arima_pred)
+
+rmarkdown::paged_table(arima_df)
+```
+
+```{r}
+arima_df |>
+  tail(100) |> 
+  ggplot(aes(data,mortes)) +
+  geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "#6A8EAE", alpha = 0.75) +
+  geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "#9BD1E5", alpha = 0.75) +
+  geom_line() + 
+  geom_point() +
+  geom_line(aes(y = Point.Forecast), color = "#ff6a00") +
+  geom_point(aes(y = Point.Forecast), color = "#ff6a00")
+```
+
+```{r}
+rmse(arima_df, mortes, Point.Forecast, na_rm = T)
+rsq(arima_df, mortes, Point.Forecast, na_rm = T)
+```
+
+```{r}
+arima_model$aic
+```
+
+```{r}
+arima2021 <- sum(arima_df$Point.Forecast, na.rm = T)
+truth2021 <- sum(select(drop_na(arima_df), mortes))
+
+print(paste(arima2021, truth2021, (abs(arima2021 - truth2021)/truth2021) * 100))
+```
+
+```{r}
+adf <- tseries::adf.test(ts_train)
+adf$p.value
+if (adf$p.value < 0.05) {
+  print("estacionária")
+} else {
+  print("não estacionária")
+}
+```
+
+```{r}
+kpss <- tseries::kpss.test(ts_train, null = "Trend")
+kpss$p.value
+if (kpss$p.value < 0.05) {
+  print("não estacionária")
+} else {
+  print("estacionária")
+}
+```
+
+```{r}
+ndiffs(ts_train)
+```
+
+```{r}
+acf(diff(ts_train))
+```
+
+```{r}
+pacf(diff(ts_train))
+```
+
+## Exponential Smoothing (Suavização Exponencial)
+
+Utiliza-se método de Holt Winters pois é a técnica de *Exponential Smoothing* mais adequada a dados com sazonalidade e tendência.
+
+```{r}
+es_model <- HoltWinters(ts_train)
+
+es_model
+```
+
+```{r}
+es_pred <- data.frame(forecast(es_model, h = 12))
+
+es_pred <- es_pred |> 
+  mutate(data = my(rownames(es_pred)))
+
+rownames(es_pred) <- NULL
+
+es_pred
+```
+
+```{r}
+es_df <- full_join(df, es_pred)
+es_df
+```
+
+```{r}
+es_df |> 
+  tail(100) |> 
+  ggplot(aes(data, mortes)) +
+  geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "#6A8EAE", alpha = 0.75) +
+  geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "#9BD1E5", alpha = 0.75) +
+  geom_line() +
+  geom_point() +
+  geom_line(aes(y = Point.Forecast), color = "#ff6a00") +
+  geom_point(aes(y = Point.Forecast), color = "#ff6a00")
+```
+
+```{r}
+rmse(es_df, mortes, Point.Forecast, na_rm = T)
+rsq(es_df, mortes, Point.Forecast, na_rm = T)
+```
+
+```{r}
+es2021 <- sum(es_df$Point.Forecast, na.rm = T)
+print(paste(es2021, truth2021, abs(abs(arima2021 - truth2021)/truth2021) * 100))
+```
