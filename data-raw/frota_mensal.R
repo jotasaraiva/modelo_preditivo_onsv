@@ -98,7 +98,7 @@ read_fleet_page <- function(page) {
   
   frota <- lapply(links, read_fleet)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- str_extract(page, "(1|2)\\d{3}")
@@ -131,7 +131,7 @@ read_fleet2011 <- function() {
   
   frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2011
@@ -164,7 +164,7 @@ read_fleet2012 <- function() {
   
   frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2012
@@ -196,7 +196,7 @@ read_fleet2015 <- function() {
   
   frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2015
@@ -250,7 +250,7 @@ read_fleet2016 <- function() {
   
   frota <- lapply(paths, readfunc)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2016
@@ -298,7 +298,7 @@ read_fleet2021 <- function() {
   
   frota <- lapply(links, readfleet)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2021
@@ -337,16 +337,16 @@ page_list <- page_list <- c(
 fleet_transform <- function(path) {
   ano <- str_extract(path, "(1|2)\\d{3}")
 
-  if(ano == "2011") {
+  if (ano == "2011") {
     frota <- read_fleet2011()
   }
-  else if(ano == "2012") {
+  else if (ano == "2012") {
     frota <- read_fleet2012()
   }
-  else if(ano == "2015") {
+  else if (ano == "2015") {
     frota <- read_fleet2015()
   }
-  else if(ano == "2016") {
+  else if (ano == "2016") {
     frota <- read_fleet2016()
   } 
   else if (ano == "2021") {

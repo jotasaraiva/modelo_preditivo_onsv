@@ -17,12 +17,12 @@ lang: pt
 
 ## Descrição
 
-O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados são reprocessados e novas técnicas são aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram:
+O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resolução temporal anual que impedia a predição precisa de anos posteriores aos usados para seu ajuste. Visando melhorar o desempenho das predições e atualizar o modelo para uma resolução mensal e estadual, os dados coletados foram reprocessados e novas técnicas foram aplicadas para o estudo das variáveis. Pelo fato de algumas das bases de dados consideradas anteriormente não possuírem disponibilidade da unidade de tempo desejada, os atributos considerados para este estudo foram apenas os seguintes:
 
 - Frota (RENAVAM);
-- PIB (Banco Central do Brasil);
+- Produto Interno Bruto - PIB (Banco Central do Brasil);
 - Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);
-- Mortes em trânsito (DataSUS).
+- Mortes em trânsito (DATASUS).
 
 ## Dados
 
@@ -42,6 +42,7 @@ load(here("data","tabela_total_mensal.rda"))
 ```
 
 ### Tabela de dados
+
 ```{r}
 #| echo: false
 
@@ -50,7 +51,7 @@ rmarkdown::paged_table(dados_mensais)
 
 ### Variáveis
 
-Visualizações podem ser criadas para observar o comportamento dos atributos considerados e verificar que estão em conformidade com a realidade:
+Segue a visualização das variáveis:
 
 ::: {.panel-tabset}
 
@@ -65,9 +66,11 @@ dados_mensais |>
   pivot_longer(-data) |> 
   rename(Data = data, Modal = name, Frota = value) |> 
   ggplot(aes(x = Data, y = Frota, color = Modal)) +
-    geom_line(linewidth = 1) +
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
-    scale_discrete_onsv()
+  geom_line(linewidth = 1) +
+  scale_y_continuous(
+    labels = comma_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  scale_discrete_onsv()
 ```
 
 ## PIB
@@ -80,8 +83,11 @@ dados_mensais |>
   select(data, pib) |> 
   rename(Data = data, PIB = pib) |> 
   ggplot(aes(x = Data, y = PIB)) +
-    geom_line(linewidth = 1, color = onsv_palette$blue) +
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+  geom_line(linewidth = 1, color = onsv_palette$blue) +
+  scale_y_continuous(
+    labels = comma_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  labs(y = " PIB em milhões de reais")
 ```
 
 ## Sinistros (PRF)
@@ -92,20 +98,24 @@ dados_mensais |>
 
 dados_mensais |> 
   select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |> 
-  rename(Data = data, 
-         Acidentes = acidentes, 
-         `Acidentes fatais` = acidentes_fatais,
-         `Feridos` = feridos,
-         `Mortes (PRF)` = mortes_prf) |> 
+  rename(
+    Data = data, 
+    Sinistros = acidentes, 
+   `Sinistros fatais` = acidentes_fatais,
+   `Feridos` = feridos,
+   `Mortes (PRF)` = mortes_prf
+  ) |> 
   pivot_longer(-Data) |>
   ggplot(aes(x = Data, y = value, color = name)) +
-    geom_line(linewidth = 1) +
-    ylab(label = "Número de ocorrências") +
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
-    scale_discrete_onsv()
+  geom_line(linewidth = 1) +
+  ylab(label = "Número de ocorrências") +
+  scale_y_continuous(
+    labels = comma_format(big.mark = ".", decimal.mark = ",")
+  ) +
+  scale_discrete_onsv()
 ```
 
-## Mortes (DataSUS)
+## Mortes (DATASUS)
 
 ```{r}
 #| echo: false
@@ -115,8 +125,8 @@ dados_mensais |>
   select(data, mortes) |> 
   rename(Data = data, Mortes = mortes) |> 
   ggplot(aes(x = Data, y = Mortes)) +
-    geom_line(linewidth =  1, color = onsv_palette$blue) +
-    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+  geom_line(linewidth =  1, color = onsv_palette$blue) +
+  scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
 ```
 
 :::
@@ -163,7 +173,12 @@ autoplot(ts, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
 ```{r}
 #| echo: false
 
-autoplot(decomposed$seasonal, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+autoplot(
+  decomposed$seasonal,
+  color = onsv_palette$blue,
+  ylab = "Mortes",
+  xlab = "Data"
+)
 ```
 
 ## Tendência
@@ -171,7 +186,12 @@ autoplot(decomposed$seasonal, color = onsv_palette$blue, ylab = "Mortes", xlab =
 ```{r}
 #| echo: false
 
-autoplot(decomposed$trend, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+autoplot(
+  decomposed$trend,
+  color = onsv_palette$blue,
+  ylab = "Mortes",
+  xlab = "Data"
+)
 ```
 
 ## Residual
@@ -179,7 +199,12 @@ autoplot(decomposed$trend, color = onsv_palette$blue, ylab = "Mortes", xlab = "D
 ```{r}
 #| echo: false
 
-autoplot(decomposed$random, color = onsv_palette$blue, ylab = "Mortes", xlab = "Data")
+autoplot(
+  decomposed$random,
+  color = onsv_palette$blue,
+  ylab = "Mortes",
+  xlab = "Data"
+)
 ```
 
 :::
@@ -216,12 +241,20 @@ arima_df |>
   ggplot(aes(data,mortes)) +
   geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey60", alpha = 0.75) +
   geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey80", alpha = 0.75) +
-  geom_line(aes(color = "Mortes reais"), linewidth = 1) +
-  geom_line(aes(y = Point.Forecast, color = "Mortes previstas"), linewidth = 1) +
-  scale_color_manual(name = "Legenda", 
-                     values = c("Mortes reais" = onsv_palette$blue,
-                                "Mortes previstas" = onsv_palette$yellow)) +
-  xlab("Data") + ylab("Mortes")
+  geom_line(aes(color = "Mortes ocorridas"), linewidth = 1) +
+  geom_line(
+    aes(y = Point.Forecast, color = "Mortes previstas"),
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    name = "Legenda", 
+    values = c(
+      "Mortes ocorridas" = onsv_palette$blue,
+      "Mortes previstas" = onsv_palette$yellow
+    )
+  ) +
+  xlab("Data") +
+  ylab("Mortes")
     
 ```
 
@@ -239,8 +272,10 @@ st_metrics(arima_df, mortes, Point.Forecast, na_rm = T) |>
   mutate(.metric = toupper(.metric)) |> 
   rename(Métrica = .metric, Valor = .estimate) |>
   bind_rows(data.frame("Métrica" = "AIC", "Valor" = arima_model$aic)) |>
-  bind_rows(data.frame("Métrica" = "Erro relativo",
-                       "Valor" = abs(arima2021 - truth2021)/truth2021)) |> 
+  bind_rows(data.frame(
+    "Métrica" = "Erro relativo",
+    "Valor" = abs(arima2021 - truth2021) / truth2021
+  )) |> 
   knitr::kable(table.attr = "quarto-disable-processing=true") |> 
   kableExtra::kable_styling(full_width = F) |> 
   kableExtra::column_spec(1, width = "6cm", bold = T)
@@ -280,12 +315,17 @@ es_df |>
   ggplot(aes(data,mortes)) +
   geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey60", alpha = 0.75) +
   geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey80", alpha = 0.75) +
-  geom_line(aes(color = "Mortes reais"), linewidth = 1) +
-  geom_line(aes(y = Point.Forecast, color = "Mortes previstas"), linewidth = 1) +
-  scale_color_manual(name = "Legenda", 
-                     values = c("Mortes reais" = onsv_palette$blue,
-                                "Mortes previstas" = onsv_palette$yellow)) +
-  xlab("Data") + ylab("Mortes")
+  geom_line(aes(color = "Mortes ocorridas"), linewidth = 1) +
+  geom_line(
+    aes(y = Point.Forecast, color = "Mortes previstas"), linewidth = 1
+  ) +
+  scale_color_manual(
+    name = "Legenda", 
+    values = c("Mortes ocorridas" = onsv_palette$blue,
+    "Mortes previstas" = onsv_palette$yellow)
+  ) +
+  xlab("Data") +
+  ylab("Mortes")
   
 ```
 
@@ -299,8 +339,12 @@ st_metrics(es_df, mortes, Point.Forecast, na_rm = T) |>
   select(-.estimator) |> 
   mutate(.metric = toupper(.metric)) |> 
   rename(Métrica = .metric, Valor = .estimate) |>
-  bind_rows(data.frame("Métrica" = "Erro relativo",
-                       "Valor" = abs(es2021 - truth2021)/truth2021)) |> 
+  bind_rows(
+    data.frame(
+      "Métrica" = "Erro relativo",
+      "Valor" = abs(es2021 - truth2021) / truth2021
+    )
+  ) |> 
   knitr::kable(table.attr = "quarto-disable-processing=true") |> 
   kableExtra::kable_styling(full_width = F) |> 
   kableExtra::column_spec(1, width = "6cm", bold = T)
@@ -317,11 +361,11 @@ A regressão linear múltipla ajustada neste estudo é equivalente ao seu modelo
 #| warning: false
 
 ggcorrplot::ggcorrplot(
-  corr = cor(select(dados_mensais,-data)),
+  corr = cor(select(dados_mensais, -data)),
   type = "lower",
   method = "square",
   lab = TRUE,
-  colors = c(onsv_palette$blue,"white",onsv_palette$red)
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
 )
 ```
 
@@ -398,12 +442,23 @@ lm_valid <-
 #| warning: false
 
 ggplot(lm_valid, aes(x = data, y = mortes)) +
-  geom_ribbon(aes(ymin = .pred_lower, ymax = .pred_upper), fill = "grey70") +
-  geom_line(aes(color = "Mortes"), linewidth = 1) +
-  geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
-  scale_color_manual(values = c("Mortes" = onsv_palette$blue,
-                                "Mortes previstas" = onsv_palette$yellow)) + 
-  xlab("Data") + ylab("Mortes")
+  geom_ribbon(
+    aes(ymin = .pred_lower, ymax = .pred_upper),
+    fill = "grey70",
+    alpha = 0.7
+  ) +
+  geom_line(aes(color = "Mortes observadas"), linewidth = 1, alpha = 0.7) +
+  geom_line(
+    aes(y = .pred, color = "Mortes previstas"),
+    linewidth = 1,
+    alpha = 0.7
+  ) +
+  scale_color_manual(values = c(
+    "Mortes observadas" = onsv_palette$blue,
+    "Mortes previstas" = onsv_palette$yellow)
+  ) + 
+  xlab("Data") +
+  ylab("Mortes")
 ```
 
 #### Random Forest
@@ -466,10 +521,13 @@ rf_valid <-
 #| warning: false
 
 ggplot(rf_valid, aes(x = data, y = mortes)) +
-  geom_line(aes(color = "Mortes"), linewidth = 1) +
+  geom_line(aes(color = "Mortes observadas"), linewidth = 1) +
   geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
-  scale_color_manual(values = c("Mortes" = onsv_palette$blue,
-                                "Mortes previstas" = onsv_palette$yellow)) + 
-  xlab("Data") + ylab("Mortes")
+  scale_color_manual(values = c(
+    "Mortes observadas" = onsv_palette$blue,
+    "Mortes previstas" = onsv_palette$yellow
+  )) + 
+  xlab("Data") +
+  ylab("Mortes")
 ```
 
