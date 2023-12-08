@@ -9,12 +9,15 @@ library(tidyverse)
 library(roadtrafficdeaths)
 library(here)
 library(rvest)
+library(forecast)
 ```
 
 ## Decodificador de município para UF
 
 ```{r}
-table <- readODS::read_ods(here("data-raw","ibge-cod-munic","ibge_cod_municipios.ods"))
+table <- readODS::read_ods(
+  here("data-raw","ibge-cod-munic","ibge_cod_municipios.ods")
+)
 ```
 
 ```{r}
@@ -45,18 +48,22 @@ uf_decod(43)
 ### DataSUS
 
 ```{r}
-rtdeaths |> head()
+rtdeaths |> 
+  head()
 ```
 
 ```{r}
 mortes <- rtdeaths |> 
+  as_tibble() |> 
   mutate(mes_ocorrencia = month(data_ocorrencia)) |> 
   count(mes_ocorrencia, ano_ocorrencia, nome_uf_ocor) |> 
   arrange(ano_ocorrencia) |> 
-  mutate(data = paste0(as.character(mes_ocorrencia),
-                       "-",
-                       as.character(ano_ocorrencia)),
-         data = my(data))
+  mutate(
+    data = paste0(
+      as.character(mes_ocorrencia), "-", as.character(ano_ocorrencia)
+    ),
+    data = my(data)
+  )
 
 mortes
 ```
@@ -68,8 +75,15 @@ ggplot(mortes, aes(x = ano_ocorrencia, y = n)) +
 ```
 
 ```{r}
-library(forecast)
-tseries <- ts(data = mortes$n, start = c(1996,1), end = c(2021,12), frequency = 12)
+
+tseries <- ts(
+  data = mortes$n,
+  start = c(1996,1),
+  end = c(2021,12),
+  frequency = 12
+)
+
+
 plot(tseries)
 
 fit <- stl(tseries, s.window = "periodic")
@@ -78,7 +92,8 @@ monthplot(tseries)
 ```
 
 ```{r}
-tseries_dec <- tseries |> decompose()
+tseries_dec <- tseries |>
+  decompose()
 
 autoplot(tseries_dec$seasonal, )
 autoplot(tseries_dec$trend, )
@@ -97,35 +112,51 @@ prf_filepaths
 ```
 
 ```{r}
-prf_temp <- lapply(prf_filepaths, 
-                read_delim, 
-                delim = ";", 
-                locale = locale(decimal_mark = ",",
-                                encoding = "Latin1",
-                                date_format = "%d/%m/%Y"))
+prf_temp <- lapply(
+  prf_filepaths, 
+  read_delim, 
+  delim = ";", 
+  locale = locale(
+    decimal_mark = ",",
+    encoding = "Latin1",
+    date_format = "%d/%m/%Y"
+  )
+)
 
-prf_temp[[10]] <-  prf_temp[[10]] |> mutate(data_inversa = dmy(data_inversa))
+prf_temp[[10]] <-  prf_temp[[10]] |>
+  mutate(data_inversa = dmy(data_inversa))
 
 prf_temp
 ```
 
 ```{r}
-prf <- prf_temp |> lapply(select, data_inversa, uf, causa_acidente, tipo_acidente, classificacao_acidente, pessoas, mortos, feridos)
-
-prf <- reduce(prf, full_join)
+prf <- prf_temp |>
+  lapply(
+    select,
+    data_inversa,
+    uf,
+    causa_acidente,
+    tipo_acidente,
+    classificacao_acidente,
+    pessoas,
+    mortos,
+    feridos
+  ) |> 
+  reduce(bind_rows)
 ```
 
 ```{r}
-prf_data <- prf |> mutate(
-  ano = year(data_inversa),
-  mes = month(data_inversa),
-  classificacao_acidente = case_when(
-    classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos > 0 ~ "Com Vítimas Fatais",
-    classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
-    classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
-    TRUE ~ classificacao_acidente
+prf_data <- prf |>
+  mutate(
+    ano = year(data_inversa),
+    mes = month(data_inversa),
+    classificacao_acidente = case_when(
+      classificacao_acidente %in% c("(null)", "Ignorado", NA) & mortos > 0 ~ "Com Vítimas Fatais",
+      classificacao_acidente %in% c("(null)", "Ignorado", NA) & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
+      classificacao_acidente %in% c("(null)", "Ignorado", NA) & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
+      TRUE ~ classificacao_acidente
+    )
   )
-)
 ```
 
 ```{r}
@@ -137,15 +168,15 @@ sinistros_prf <- prf_data |>
     feridos = sum(feridos),
     mortes = sum(mortos)
   ) |> 
-  arrange(ano,mes) |> 
-  mutate(data = my(paste0(mes,"-",ano)))
+  arrange(ano, mes) |> 
+  mutate(data = my(paste0(mes, "-" ,ano)))
 
 sinistros_prf
 ```
 
 ```{r}
 sinistros_prf |> 
-  select(-c(mes,ano)) |> 
+  select(-c(mes, ano)) |> 
   pivot_longer(-data) |> 
   ggplot(aes(x = data, y = value, color = name)) +
   geom_point() +
@@ -168,7 +199,7 @@ page_list <- c(
   "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"
 )
 
-page <- read_html(page_list[10])
+page <- read_html(page_list[9])
 
 file_list <- page |>  
   html_elements("a") |> 
@@ -259,12 +290,12 @@ read_fleet <- function(file) {
     unzip(temp, exdir = tempdir())
     
     data <- readxl::read_excel(
-      paste0(tempdir(),"/",file_name),
+      paste0(tempdir(), "/", file_name),
       sheet = 2,
       skip = 3
     )
     
-    unlink(paste0(tempdir(),"/",file_name))
+    unlink(paste0(tempdir(), "/", file_name))
     unlink(temp)
     
     return(data)
@@ -362,7 +393,7 @@ read_fleet_page <- function(page) {
   
   frota <- lapply(links, read_fleet)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- str_extract(page, "(1|2)\\d{3}")
@@ -370,9 +401,24 @@ read_fleet_page <- function(page) {
     frota[[i]] <- x 
   }
   
-  frota <- lapply(frota, select, c(UF,TOTAL,AUTOMOVEL,CAMINHONETE,
-                                   CAMIONETA,UTILITARIO,MOTOCICLETA,
-                                   CICLOMOTOR,MOTONETA,MES,ANO))
+  frota <- lapply(
+    frota,
+    select,
+    c(
+      UF,
+      TOTAL,
+      AUTOMOVEL,
+      CAMINHONETE,
+      CAMIONETA,
+      UTILITARIO,
+      MOTOCICLETA,
+      CICLOMOTOR,
+      MOTONETA,
+      MES,
+      ANO
+    )
+  )
+  
   frota <- lapply(
     frota,
     mutate,
@@ -392,7 +438,7 @@ read_fleet_page(page_list[1]) |> view()
 ```{r}
 read_fleet2011 <- function() {
   
-  folder <- here("data-raw","frota_mensal","frota_2011","Frota Munic. 2011")
+  folder <- here("data-raw", "frota_mensal", "frota_2011", "Frota Munic. 2011")
   files <- list.files(folder)
   paths <- paste(sep = "/", folder, files)
   files_info <- file.info(paths)
@@ -401,7 +447,7 @@ read_fleet2011 <- function() {
   
   frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
 
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2011
@@ -438,7 +484,7 @@ read_fleet2012 <- function() {
   
   frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
 
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2012
@@ -474,7 +520,7 @@ read_fleet2015 <- function() {
   
   frota <- lapply(paths, readxl::read_excel, sheet = 2, skip = 2)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2015
@@ -532,7 +578,7 @@ read_fleet2016 <- function() {
   
   frota <- lapply(paths, readfunc)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2016
@@ -559,7 +605,11 @@ read_fleet2016()
 
 ```{r}
 read_fleet2021 <- function() {
-  links <- rev(fleet_links("https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"))
+  links <- rev(
+    fleet_links(
+      "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2021"
+    )
+  )
   
   readfleet <- function(path) {
     tryCatch(
@@ -584,7 +634,7 @@ read_fleet2021 <- function() {
   
   frota <- lapply(links, readfleet)
   
-  for(i in 1:length(frota)) {
+  for (i in 1:length(frota)) {
     x <- frota[[i]]
     x <- x[x$UF != "UF", ]
     x$ANO <- 2021
