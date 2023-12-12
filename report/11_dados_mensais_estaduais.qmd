@@ -17,7 +17,9 @@ library(here)
 load(here("data","tabela_total_mes_uf.rda"))
 ```
 
-## Pré-processamento
+## Modelo Regional
+
+### Pré-processamento
 
 ```{r}
 dados_mensais_uf |> 
@@ -85,7 +87,7 @@ df_nest$data[[4]] |>
                   type = "scatter")
 ```
 
-## Modelagem
+### Modelo Regional
 
 ```{r}
 set.seed(123)
@@ -101,7 +103,10 @@ rec <- df |>
 lm <- 
   linear_reg() |> 
   set_engine("glm")
+```
 
+
+```{r}
 df_splits <- 
   df_nest |> 
   mutate(
@@ -127,12 +132,12 @@ fit_models <- function(df) {
   return(df)
 }
 
-predict_models <- function(df) {
+predict_models <- function(df,testing_col) {
   for(i in seq_along(df$model)) {
     df$pred[[i]] <- bind_cols(
       df$testing[[i]],
-      predict(df$fit[[i]],df$testing[[i]]),
-      predict(df$fit[[i]],df$testing[[i]],type = "conf_int")
+      predict(df$fit[[i]],df[[testing_col]][[i]]),
+      predict(df$fit[[i]],df[[testing_col]][[i]],type = "conf_int")
     )
   }
   return(df)
@@ -142,7 +147,7 @@ predict_models <- function(df) {
 ```{r}
 preds <- df_splits |> 
   fit_models() |> 
-  predict_models() |> 
+  predict_models("testing") |> 
   mutate(metric = map(pred,metrix,truth = mortes,estimate = .pred))
 
 preds$pred[[6]]
@@ -226,3 +231,82 @@ df |>
     geom_bar(stat = "identity")
 ```
 
+```{r}
+preds
+```
+
+
+## Modelo Estadual
+
+```{r}
+rm(list = ls())
+load(here("data","tabela_total_mes_uf.rda"))
+```
+
+```{r}
+df_estadual <- dados_mensais_uf |>
+  nest(.by = uf) |>
+  bind_rows(list(
+    uf = "Brasil",
+    data = list(select(dados_mensais_uf,-uf))
+  ))
+
+df_estadual
+```
+
+```{r}
+set.seed(123)
+
+metrix <- metric_set(rmse,mae,rsq)
+
+rec <- dados_mensais_uf |> 
+  select(-uf) |> 
+  recipe(formula = mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+lm <- 
+  linear_reg() |> 
+  set_engine("glm")
+```
+
+```{r}
+fit_models <- function(df) {
+  for(i in seq_along(df$model)) {
+    df$fit[[i]] <- fit(df$model[[i]], df$training[[i]])
+  }
+  return(df)
+}
+
+predict_models <- function(df,testing_col) {
+  for(i in seq_along(df$model)) {
+    df$pred[[i]] <- bind_cols(
+      df$testing[[i]],
+      predict(df$fit[[i]],df[[testing_col]][[i]]),
+      predict(df$fit[[i]],df[[testing_col]][[i]],type = "conf_int")
+    )
+  }
+  return(df)
+}
+```
+
+```{r}
+modelos_estaduais <- 
+  df_estadual |> 
+  mutate(
+    splits = map(data, initial_split, prop = 0.8),
+    training = map(splits, training),
+    testing = map(splits, testing),
+    model = list(workflow()),
+    model = 
+      model |> 
+      map(add_recipe, rec) |> 
+      map(add_model, lm)
+  ) |> 
+  fit_models() |> 
+  predict_models("testing")
+  
+  
+
+modelos_estaduais
+```
