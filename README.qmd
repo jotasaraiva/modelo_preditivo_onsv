@@ -21,7 +21,7 @@ source("R/main.R")
 
 ## Objetivo
 
-Este projeto é um modelo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com uma resolução temporal anual, confeccionado a fim de gerar um estudo científico para o Observatório Nacional de Segurança Viária (ONSV).
+Este projeto é um estudo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com o intuito de confeccionar um modelo de melhor ajuste para expressar a quantidade futura de mortes no trânsito, a fim de gerar um artigo científico para o Observatório Nacional de Segurança Viária (ONSV).
 
 ## Método
 
@@ -60,19 +60,4 @@ res2$specs |>
   rename(variavel = term, pvalor = p.value, valor = estimate) |> 
   select(-std.error, -statistic) |> 
   kable()
-```
-
-```{r include=FALSE}
-fig <- plot_ly(data = res2$pred, x = ~ano) |>
-  add_trace(y = ~mortes.pred,
-            name = "Mortes Previstas",
-            mode = "markers") |>
-  add_trace(y = ~mortes,
-            name = "Mortes Observadas",
-            mode = "markers") |>
-  add_ribbons(ymin = ~.pred_lower,
-              ymax = ~.pred_upper,
-              name = "Intervalo de Confiança",
-              line = list(color = 'rgba(7, 164, 181, 0.05)'),
-              fillcolor = 'rgba(7, 164, 181, 0.2)')
 ```
