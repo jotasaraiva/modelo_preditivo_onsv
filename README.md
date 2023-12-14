@@ -1,11 +1,14 @@
 # Modelo Preditivo de Mortes Viárias Anuais
 
+
 - [Objetivo](#objetivo)
 - [Método](#método)
 - [Estrutura dos Arquivos](#estrutura-dos-arquivos)
 - [Principais resultados](#principais-resultados)
 
-<img src="figures/onsv.png" data-fig-align="center" width="308" />
+<p align="center">
+  <img src="figures/onsv.png"/>
+</p>
 
 ## Objetivo
 

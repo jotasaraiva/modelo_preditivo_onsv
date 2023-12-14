@@ -13,7 +13,11 @@ library(plotly)
 source("R/main.R")
 ```
 
-![](figures/onsv.png){fig-align="center" width="308"}
+```{=html}
+<p align="center">
+  <img src="figures/onsv.png"/>
+</p>
+```
 
 ## Objetivo
 
