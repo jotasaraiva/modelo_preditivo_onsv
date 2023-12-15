@@ -12,9 +12,10 @@
 
 ## Objetivo
 
-Este projeto é um modelo baseado em dados viários para previsão de
-mortes relacionadas à segurança viária e veicular no Brasil com uma
-resolução temporal anual, confeccionado a fim de gerar um estudo
+Este projeto é um estudo baseado em dados viários para previsão de
+mortes relacionadas à segurança viária e veicular no Brasil com o
+intuito de confeccionar um modelo de melhor ajuste para expressar a
+quantidade futura de mortes no trânsito, a fim de gerar um artigo
 científico para o Observatório Nacional de Segurança Viária (ONSV).
 
 ## Método
