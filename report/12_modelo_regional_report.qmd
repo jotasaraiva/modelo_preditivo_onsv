@@ -1,0 +1,387 @@
+---
+title: "Modelo preditivo regional de mortes no trânsito brasileiro"
+format: 
+  dashboard:
+    nav-buttons: 
+      - icon: github
+        href: https://github.com/ONSV/modelo_preditivo_onsv
+    orientation: columns
+    theme:
+      - cosmo
+      - style.scss
+---
+
+```{r}
+#| include: false
+
+library(tidyverse)
+library(tidymodels)
+library(onsvplot)
+library(here)
+library(plotly)
+```
+
+```{r}
+#| include: false
+
+load(here("data","tabela_total_mes_uf.rda"))
+```
+
+```{r}
+#| include: false
+
+dados <- dados_mensais_uf |> 
+  mutate(regiao = case_match(
+    uf,
+    c("SP","MG","RJ","ES") ~ "sudeste",
+    c("MT","GO","MS","DF") ~ "centro-oeste",
+    c("AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE") ~ "nordeste",
+    c("AC", "AM", "AP", "PA", "RO", "RR", "TO") ~ "norte",
+    c("SC","PR","RS") ~ "sul"
+  )) |> 
+  select(-uf) |> 
+  group_by(data,regiao) |> 
+  summarise(across(everything(),sum),
+            .groups = 'drop')
+
+nest <- dados |> 
+  nest(.by = regiao) |> 
+  bind_rows(
+    list(
+      regiao = "brasil",
+      data = list(
+        dados |> 
+          select(-regiao) |> 
+          group_by(data) |> 
+          summarise(across(everything(),sum),
+                    .groups = 'drop')
+      )
+    )
+  )
+```
+
+```{r}
+#| include: false
+
+set.seed(123)
+
+metrix <- metric_set(rmse,mae,rsq)
+
+rec <- nest$data[[6]] |> 
+  recipe(formula = mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+lm <- 
+  linear_reg() |> 
+  set_engine("glm")
+```
+
+```{r}
+#| include: false
+
+# função para ajustar os modelos
+fit_models <- function(df) {
+  for(i in seq_along(df$model)) {
+    df$fit[[i]] <- fit(df$model[[i]], df$training[[i]])
+  }
+  return(df)
+}
+
+# função para prever com os modelos
+predict_models <- function(df,testing_col) {
+  for(i in seq_along(df$model)) {
+    df$pred[[i]] <- bind_cols(
+      df[[testing_col]][[i]],
+      predict(df$fit[[i]],df[[testing_col]][[i]]),
+      predict(df$fit[[i]],df[[testing_col]][[i]],type = "conf_int")
+    )
+  }
+  return(df)
+}
+
+# função para agrupar por ano
+group_years <- function(df) {
+  res <- df |> 
+    mutate(anos = year(data)) |> 
+    select(-data) |> 
+  group_by(anos) |> 
+  summarise(across(everything(),sum),
+            .groups = 'drop')
+  
+  return(res)
+}
+
+# função para formatar tabela de métricas
+format_table <- function(df) {
+  res <- df |> 
+    select(-.estimator) |> 
+    mutate(.metric = toupper(.metric),
+          .estimate = format(.estimate, decimal.mark = ",", 
+                             big.mark = ".", digits = 2)) |> 
+    rename(Métrica = .metric, Valor = .estimate) |> 
+    knitr::kable()
+  
+  return(res)
+}
+
+# função para fazer plot mensal
+make_plotly_month <- function(df) {
+  res <- df |> 
+    rename(Ano = data, Mortes = mortes) |> 
+  plot_ly(x = ~Ano, y = ~.pred_upper, 
+          type = 'scatter', mode = 'lines',
+          name = "Lim. Superior", line = list(color = 'transparent'),
+          showlegend = F) |> 
+  add_trace(x = ~Ano, y = ~.pred_lower, 
+          type = 'scatter', mode = 'lines',
+          name = "Lim. Inferior", line = list(color = 'transparent'),
+          showlegend = F, fill = 'tonexty', fillcolor = "lightgrey") |> 
+  add_trace(x = ~Ano, y = ~Mortes,
+            type = 'scatter', mode = 'lines',
+            name = 'Mortes reais', 
+            line = list(color = onsv_palette$blue),
+            showlegend = TRUE) |> 
+  add_trace(x = ~Ano, y = ~.pred,
+            type = 'scatter', mode = 'lines',
+            name = 'Mortes previstas', 
+            line = list(color = onsv_palette$yellow),
+            showlegend = TRUE) |> 
+  layout(yaxis = list(title = "Mortes"))
+  
+  return(res)
+}
+
+#função para fazer plot anual
+make_plotly_year <- function(df) {
+  res <- df |> 
+    rename(Ano = anos, Mortes = mortes) |> 
+  plot_ly(x = ~Ano, y = ~.pred_upper, 
+          type = 'scatter', mode = 'lines',
+          name = "Lim. Superior", line = list(color = 'transparent'),
+          showlegend = F) |> 
+  add_trace(x = ~Ano, y = ~.pred_lower, 
+          type = 'scatter', mode = 'lines',
+          name = "Lim. Inferior", line = list(color = 'transparent'),
+          showlegend = F, fill = 'tonexty', fillcolor = "lightgrey") |> 
+  add_trace(x = ~Ano, y = ~Mortes,
+            type = 'scatter', mode = 'lines+markers',
+            name = 'Mortes reais', 
+            line = list(color = onsv_palette$blue),
+            marker = list(color = onsv_palette$blue),
+            showlegend = TRUE) |> 
+  add_trace(x = ~Ano, y = ~.pred,
+            type = 'scatter', mode = 'lines+markers',
+            name = 'Mortes previstas', 
+            line = list(color = onsv_palette$yellow),
+            marker = list(color = onsv_palette$yellow),
+            showlegend = TRUE) |> 
+  layout(yaxis = list(title = "Mortes"))
+  
+  return(res)
+}
+```
+
+```{r}
+#| include: false
+
+modelos <-
+  nest |> 
+  mutate(
+    splits = map(data, initial_split, prop = 0.8),
+    training = map(splits, training),
+    testing = map(splits, testing),
+    model = list(workflow()),
+    model = 
+      model |> 
+      map(add_recipe, rec) |> 
+      map(add_model, lm)
+  ) |> 
+  fit_models() |> 
+  predict_models(testing_col = "testing") |> 
+  mutate(metric = map(pred, metrix, truth = mortes, estimate = .pred)) |> 
+  rename(pred_test = pred) |> 
+  predict_models(testing_col = "data") |> 
+  rename(pred_mensal = pred) |> 
+  mutate(pred_anual = map(pred_mensal, group_years))
+```
+
+# Centro-Oeste
+
+## Column {.tabset}
+
+```{r}
+#| title: Mensal
+make_plotly_month(modelos$pred_mensal[[1]])
+```
+
+```{r}
+#| title: Anual
+make_plotly_year(modelos$pred_anual[[1]])
+```
+
+## Column {width=40%}
+
+```{r}
+#| title: Métricas
+format_table(modelos$metric[[1]])
+
+modelos$pred_test[[1]] |> 
+  ggplot(aes(mortes,.pred)) +
+    geom_point(size = 2, stroke = 1.5,
+               shape = 21, color = onsv_palette$blue) +
+    geom_abline(size = 1, color = onsv_palette$blue, 
+                alpha = 0.5, linetype = 'dashed') +
+    xlab("Mortes reais") + ylab("Mortes previstas") +
+    coord_obs_pred()
+```
+
+# Nordeste
+
+## Column {.tabset}
+
+```{r}
+#| title: Mensal
+make_plotly_month(modelos$pred_mensal[[2]])
+```
+
+```{r}
+#| title: Anual
+make_plotly_year(modelos$pred_anual[[2]])
+```
+
+## Column {width=40%}
+
+```{r}
+#| title: Métricas
+format_table(modelos$metric[[2]])
+
+modelos$pred_test[[2]] |> 
+  ggplot(aes(mortes,.pred)) +
+    geom_point(size = 2, stroke = 1.5,
+               shape = 21, color = onsv_palette$blue) +
+    geom_abline(size = 1, color = onsv_palette$blue, 
+                alpha = 0.5, linetype = 'dashed') +
+    xlab("Mortes reais") + ylab("Mortes previstas") +
+    coord_obs_pred()
+```
+
+# Norte
+
+## Column {.tabset}
+
+```{r}
+#| title: Mensal
+make_plotly_month(modelos$pred_mensal[[3]])
+```
+
+```{r}
+#| title: Anual
+make_plotly_year(modelos$pred_anual[[3]])
+```
+
+## Column {width=40%}
+
+```{r}
+#| title: Métricas
+format_table(modelos$metric[[3]])
+
+modelos$pred_test[[3]] |> 
+  ggplot(aes(mortes,.pred)) +
+    geom_point(size = 2, stroke = 1.5,
+               shape = 21, color = onsv_palette$blue) +
+    geom_abline(size = 1, color = onsv_palette$blue, 
+                alpha = 0.5, linetype = 'dashed') +
+    xlab("Mortes reais") + ylab("Mortes previstas") +
+    coord_obs_pred()
+```
+
+# Sudeste
+
+## Column {.tabset}
+
+```{r}
+#| title: Mensal
+make_plotly_month(modelos$pred_mensal[[4]])
+```
+
+```{r}
+#| title: Anual
+make_plotly_year(modelos$pred_anual[[4]])
+```
+
+## Column {width=40%}
+
+```{r}
+#| title: Métricas
+format_table(modelos$metric[[4]])
+
+modelos$pred_test[[4]] |> 
+  ggplot(aes(mortes,.pred)) +
+    geom_point(size = 2, stroke = 1.5,
+               shape = 21, color = onsv_palette$blue) +
+    geom_abline(size = 1, color = onsv_palette$blue, 
+                alpha = 0.5, linetype = 'dashed') +
+    xlab("Mortes reais") + ylab("Mortes previstas") +
+    coord_obs_pred()
+```
+
+# Sul
+
+## Column {.tabset}
+
+```{r}
+#| title: Mensal
+make_plotly_month(modelos$pred_mensal[[5]])
+```
+
+```{r}
+#| title: Anual
+make_plotly_year(modelos$pred_anual[[5]])
+```
+
+## Column {width=40%}
+
+```{r}
+#| title: Métricas
+format_table(modelos$metric[[5]])
+
+modelos$pred_test[[5]] |> 
+  ggplot(aes(mortes,.pred)) +
+    geom_point(size = 2, stroke = 1.5,
+               shape = 21, color = onsv_palette$blue) +
+    geom_abline(size = 1, color = onsv_palette$blue, 
+                alpha = 0.5, linetype = 'dashed') +
+    xlab("Mortes reais") + ylab("Mortes previstas") +
+    coord_obs_pred()
+```
+
+# Brasil
+
+## Column {.tabset}
+
+```{r}
+#| title: Mensal
+make_plotly_month(modelos$pred_mensal[[6]])
+```
+
+```{r}
+#| title: Anual
+make_plotly_year(modelos$pred_anual[[6]])
+```
+
+## Column {width=40%}
+
+```{r}
+#| title: Métricas
+format_table(modelos$metric[[6]])
+
+modelos$pred_test[[6]] |> 
+  ggplot(aes(mortes,.pred)) +
+    geom_point(size = 2, stroke = 1.5,
+               shape = 21, color = onsv_palette$blue) +
+    geom_abline(size = 1, color = onsv_palette$blue, 
+                alpha = 0.5, linetype = 'dashed') +
+    xlab("Mortes reais") + ylab("Mortes previstas") +
+    coord_obs_pred()
+```
