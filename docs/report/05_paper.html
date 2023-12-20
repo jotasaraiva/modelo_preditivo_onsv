@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -66,8 +66,7 @@ div.csl-indent {
     "search-more-matches-text": "mais correspondências neste documento",
     "search-clear-button-title": "Limpar",
     "search-detached-cancel-button-title": "Cancelar",
-    "search-submit-button-title": "Enviar",
-    "search-label": "Procurar"
+    "search-submit-button-title": "Enviar"
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
@@ -138,7 +137,7 @@ div.csl-indent {
       <div>
       <div class="quarto-title-meta-heading">Data de Publicação</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">28 de setembro de 2023</p>
+        <p class="date">19 de dezembro de 2023</p>
       </div>
     </div>
     
@@ -205,11 +204,11 @@ div.csl-indent {
 </ul>
 <p>Em razão da ausência de dados prévios à 2011 de certas fontes, o intervalo de estudo foi reduzido para 2011 a 2021.</p>
 <p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, assim, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na <a href="#fig-corr">Figura&nbsp;1</a></p>
-<div class="cell" data-layout-align="center" data-fig.dpi="300">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-corr" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="05_paper_files/figure-html/fig-corr-1.png" class="img-fluid figure-img" width="768"></p>
+<p><img src="05_paper_files/figure-html/fig-corr-1.png" class="img-fluid figure-img" width="2400"></p>
 <figcaption class="figure-caption">Figura&nbsp;1: Correlograma dos atributos</figcaption>
 </figure>
 </div>
@@ -381,12 +380,12 @@ div.csl-indent {
 <ul>
 <li>Frota (RENAVAM);</li>
 <li>Produto Interno Bruto - PIB (Banco Central do Brasil);</li>
-<li>Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);</li>
-<li>Mortes em trânsito (DataSUS).</li>
+<li>Quantidade de sinistros, sinistros fatais e feridos em sinistros ocorridos em rodovias federais (PRF);</li>
+<li>Mortes em sinistros de trânsito (DATASUS).</li>
 </ul>
 <p>A fim de melhor compreender o comportamento destas variáveis em uma resolução temporal maior, as seguintes visualização demonstram a variação de cada atributo considerado conforme o tempo do período disponível para estudo:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Frota (RENAVAM)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">PIB (BACEN)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Sinistros (PRF)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Mortes (DataSUS)</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Frota (RENAVAM)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">PIB (BACEN)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Sinistros (PRF)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Mortes (DATASUS)</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell" data-layout-align="center">
@@ -440,7 +439,7 @@ div.csl-indent {
 </div>
 <section id="análise-de-série-temporal" class="level4" data-number="3.1.1">
 <h4 data-number="3.1.1" class="anchored" data-anchor-id="análise-de-série-temporal"><span class="header-section-number">3.1.1</span> Análise de Série Temporal</h4>
-<p>A análise de séries temporais é efetuada a partir da regressão de um modelo de melhor ajuste sob uma sequência de observações de um evento em um determinado intervalo de tempo de unidades uniformes, sendo estas séries representadas em função do tempo como sua única variável preditora. Entre as vantagens de modelos de série temporal estão o fato de não necessitarem de outras variáveis e de serem capazes de prever grandes períodos a frente, apesar de serem mais dificilmente ajustados em comparação a modelos determinísticos convencionais.</p>
+<p>A análise de séries temporais foi efetuada a partir da regressão de um modelo de melhor ajuste sob uma sequência de observações de um evento em um determinado intervalo de tempo de unidades uniformes, sendo estas séries representadas em função do tempo como sua única variável preditora. Entre as vantagens de modelos de série temporal, uma delas é o fato de não necessitarem de outras variáveis e de serem capazes de prever grandes períodos a frente, apesar de serem mais dificilmente ajustadas em comparação a modelos determinísticos convencionais.</p>
 <section id="sarima" class="level5" data-number="3.1.1.1">
 <h5 data-number="3.1.1.1" class="anchored" data-anchor-id="sarima"><span class="header-section-number">3.1.1.1</span> SARIMA</h5>
 <p>O primeiro modelo avaliado é o <em>Seasonal Autoregressive Integrated Moving Average</em> (SARIMA), uma forma de ARIMA que leva em consideração a sazonalidade da série temporal. Observando a decomposição da série, têm-se as seguintes componentes temporais:</p>
@@ -493,7 +492,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p>Tradicionalmente, um algoritmo da fámilia ARIMA possui três principais parâmetros: <em>p</em>,<em>d</em>,<em>q</em>, denotando, respectivamente, a ordem do modelo auto-regressivo, o grau de diferenciação necessária e a ordem do modelo de média móvel. Em um modelo de ARIMA sazonal, estes parâmetros podem ser expandidos em uma função ARIMA(<em>p</em>,<em>d</em>,<em>q</em>)(<em>P</em>,<em>D</em>,<em>Q</em>)<em>m</em>, onde a segunda parte se refere aos parâmetros da componente sazonal do modelo. Portanto, diversos modelos são testados e avaliados com variação sobre os hiperparâmetros a fim de encontrar a melhor combinação de valores, sendo este processo automatizado por meio da função <code>auto.arima()</code> do (pacote) <code>forecast</code>. A <a href="#fig-arima">Figura&nbsp;13</a> e a <a href="#fig-erarima">Figura&nbsp;14</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
+<p>Tradicionalmente, um algoritmo da fámilia ARIMA possui três principais parâmetros: <em>p</em>,<em>d</em>,<em>q</em>, denotando, respectivamente, a ordem do modelo auto-regressivo, o grau de diferenciação necessária e a ordem do modelo de média móvel. Em um modelo de ARIMA sazonal, estes parâmetros podem ser expandidos em uma função ARIMA(<em>p</em>,<em>d</em>,<em>q</em>)(<em>P</em>,<em>D</em>,<em>Q</em>)<em>m</em>, onde a segunda parte se refere aos parâmetros da componente sazonal do modelo. Portanto, diversos modelos foram testados e avaliados com variação sobre os hiperparâmetros a fim de encontrar a melhor combinação de valores, sendo este processo automatizado por meio da função <code>auto.arima()</code> do pacote <code>forecast</code>. A <a href="#fig-arima">Figura&nbsp;13</a> e a <a href="#tbl-erarima">Tabela&nbsp;1</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-arima" class="quarto-figure quarto-figure-center anchored">
@@ -505,58 +504,37 @@ div.csl-indent {
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div id="fig-erarima" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
+<div class="cell-output-display">
+<div id="tbl-erarima" class="anchored">
 
-<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Métrica
-</th>
-<th style="text-align:right;">
-Valor
-</th>
-</tr>
-</thead>
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"><caption>Tabela&nbsp;1:  <p>Métricas de erro para modelo SARIMA</p> </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RMSE
-</td>
-<td style="text-align:right;">
-288.45
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RSQ
-</td>
-<td style="text-align:right;">
-0.54
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-AIC
-</td>
-<td style="text-align:right;">
-3739.88
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-Erro relativo
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-</tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 288.45 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.54 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> AIC </td>
+   <td style="text-align:right;"> 3739.88 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> Erro relativo </td>
+   <td style="text-align:right;"> 0.08 </td>
+  </tr>
 </tbody>
-
 </table>
-<figcaption class="figure-caption">Figura&nbsp;14: Métricas de erro para modelo SARIMA</figcaption>
-</figure>
+
+</div>
 </div>
 </div>
 </section>
@@ -568,62 +546,45 @@ Erro relativo
 <li>Suavização Exponencial Dupla (Holt Linear)</li>
 <li>Suavização Exponencial Tripla (Método Holt-Winters)</li>
 </ul>
-<p>Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A <a href="#fig-es">Figura&nbsp;15</a> e a <a href="#fig-eres">Figura&nbsp;16</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
+<p>Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A <a href="#fig-es">Figura&nbsp;14</a> e a <a href="#tbl-eres">Tabela&nbsp;2</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div id="fig-es" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-es-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;15: Modelo de suavização exponencial</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;14: Modelo de suavização exponencial</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div id="fig-eres" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
+<div class="cell-output-display">
+<div id="tbl-eres" class="anchored">
 
-<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Métrica
-</th>
-<th style="text-align:right;">
-Valor
-</th>
-</tr>
-</thead>
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"><caption>Tabela&nbsp;2:  <p>Métricas de erro para modelo de suavização exponencial</p> </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RMSE
-</td>
-<td style="text-align:right;">
-271.65
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RSQ
-</td>
-<td style="text-align:right;">
-0.65
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-Erro relativo
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-</tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 271.65 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.65 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> Erro relativo </td>
+   <td style="text-align:right;"> 0.08 </td>
+  </tr>
 </tbody>
-
 </table>
-<figcaption class="figure-caption">Figura&nbsp;16: Métricas de erro para modelo de suavização exponencial</figcaption>
-</figure>
+
+</div>
 </div>
 </div>
 <p>Baseando-se no modelo de Holt-Winters, pode-se emitir uma previsão até 2030 a fim de analisar o cenário futuro das mortes em trânsito, evidenciando o decaimento da capacidade preditiva deste tipo de modelo ao longo do tempo.</p>
@@ -632,7 +593,7 @@ Erro relativo
 <div id="fig-pred30" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-pred30-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;17: Previsão até 2030 utilizando Exponential Smoothing</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;15: Previsão até 2030 utilizando Exponential Smoothing</figcaption>
 </figure>
 </div>
 </div>
@@ -649,57 +610,40 @@ Erro relativo
 <div id="fig-corr2" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-corr2-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;18: Correlograma de atributos mensais</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;16: Correlograma de atributos mensais</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Conforme o procedimento de modelagem, a regressão linear é ajustada e representada na <a href="#fig-erlinreg">Figura&nbsp;19</a> e <a href="#fig-linreg">Figura&nbsp;20</a>:</p>
+<p>Conforme o procedimento de modelagem, a regressão linear é ajustada e representada na <a href="#tbl-erlinreg">Tabela&nbsp;3</a> e <a href="#fig-linreg">Figura&nbsp;17</a>:</p>
 <div class="cell" data-layout-align="center">
-<div id="fig-erlinreg" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
+<div class="cell-output-display">
+<div id="tbl-erlinreg" class="anchored">
 
-<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Métrica
-</th>
-<th style="text-align:right;">
-Valor
-</th>
-</tr>
-</thead>
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"><caption>Tabela&nbsp;3:  <p>Métricas de erro para regressão linear mensal</p> </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RMSE
-</td>
-<td style="text-align:right;">
-131.46
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-MAE
-</td>
-<td style="text-align:right;">
-105.34
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RSQ
-</td>
-<td style="text-align:right;">
-0.94
-</td>
-</tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 131.46 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 105.34 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.94 </td>
+  </tr>
 </tbody>
-
 </table>
-<figcaption class="figure-caption">Figura&nbsp;19: Métricas de erro para regressão linear mensal</figcaption>
-</figure>
+
+</div>
 </div>
 </div>
 <p>Em geral, suas métricas apresentaram maior precisão e desempenho em comparação ao modelo anual apesar de se basear em uma quantidade menor de variáveis, obtendo uma maior capacidade preditiva:</p>
@@ -708,7 +652,7 @@ RSQ
 <div id="fig-linreg" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-linreg-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;20: Modelo de regressão linear mensal</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;17: Modelo de regressão linear mensal</figcaption>
 </figure>
 </div>
 </div>
@@ -716,52 +660,35 @@ RSQ
 </section>
 <section id="random-forest" class="level5" data-number="3.1.2.2">
 <h5 data-number="3.1.2.2" class="anchored" data-anchor-id="random-forest"><span class="header-section-number">3.1.2.2</span> Random Forest</h5>
-<p>O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear, sendo ajustado e representado na <a href="#fig-errf">Figura&nbsp;21</a> e <a href="#fig-rf">Figura&nbsp;22</a>. Embora suas métricas apontem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021.</p>
+<p>O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear, sendo ajustado e representado na <a href="#tbl-errf">Tabela&nbsp;4</a> e <a href="#fig-rf">Figura&nbsp;18</a>. Embora suas métricas apontem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021.</p>
 <div class="cell" data-layout-align="center">
-<div id="fig-errf" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
+<div class="cell-output-display">
+<div id="tbl-errf" class="anchored">
 
-<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Métrica
-</th>
-<th style="text-align:right;">
-Valor
-</th>
-</tr>
-</thead>
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"><caption>Tabela&nbsp;4:  <p>Métricas de erro para modelo Random Forest</p> </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Métrica </th>
+   <th style="text-align:right;"> Valor </th>
+  </tr>
+ </thead>
 <tbody>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RMSE
-</td>
-<td style="text-align:right;">
-158.28
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-MAE
-</td>
-<td style="text-align:right;">
-125.81
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 6cm; font-weight: bold;">
-RSQ
-</td>
-<td style="text-align:right;">
-0.91
-</td>
-</tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RMSE </td>
+   <td style="text-align:right;"> 158.28 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> MAE </td>
+   <td style="text-align:right;"> 125.81 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 6cm; font-weight: bold;"> RSQ </td>
+   <td style="text-align:right;"> 0.91 </td>
+  </tr>
 </tbody>
-
 </table>
-<figcaption class="figure-caption">Figura&nbsp;21: Métricas de erro para modelo Random Forest</figcaption>
-</figure>
+
+</div>
 </div>
 </div>
 <p>A sobressaliência do modelo linear em relação ao Random Forest é possivelmente devido:</p>
@@ -775,7 +702,7 @@ RSQ
 <div id="fig-rf" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="05_paper_files/figure-html/fig-rf-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figura&nbsp;22: Modelo Random Forest</figcaption>
+<figcaption class="figure-caption">Figura&nbsp;18: Modelo Random Forest</figcaption>
 </figure>
 </div>
 </div>
@@ -787,8 +714,8 @@ RSQ
 <h3 data-number="3.2" class="anchored" data-anchor-id="resultados-e-discussão-1"><span class="header-section-number">3.2</span> Resultados e Discussão</h3>
 <p>A variedade de modelos testados foram avaliados individualmente, mas diversas métricas de erros utilizados são não normalizados, necessitando, portanto de uma análise comparativa do desempenho de cada técnica em relação às demais. A tabela a seguir apresenta as métricas para cada algoritmo utilizado até o momento, o que auxiliará na escolha de um modelo definitivo:</p>
 <div class="cell" data-layout-align="center">
-<div id="fig-ertotal" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
+<div class="cell-output-display">
+<div id="tbl-ertotal" class="anchored">
 
 <div id="wzfngjefpx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#wzfngjefpx table {
@@ -1230,7 +1157,7 @@ RSQ
   text-indent: 25px;
 }
 </style>
-<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false"><caption>Tabela&nbsp;5:  <p>Tabela de métricas para todos os modelos</p> </caption>
   <thead>
     <tr class="gt_heading">
       <td colspan="4" class="gt_heading gt_title gt_font_normal" style="color: #00496D;">Métricas de Erros</td>
@@ -1277,11 +1204,10 @@ RSQ
   
 </table>
 </div>
-<figcaption class="figure-caption">Figura&nbsp;23: Tabela de métricas para todos os modelos</figcaption>
-</figure>
 </div>
 </div>
-<p>Conforme a <a href="#fig-ertotal">Figura&nbsp;23</a> e os gráficos da <a href="#fig-rf">Figura&nbsp;22</a> e <a href="#fig-linreg">Figura&nbsp;20</a>, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.</p>
+</div>
+<p>Conforme a <a href="#tbl-ertotal">Tabela&nbsp;5</a> e os gráficos da <a href="#fig-rf">Figura&nbsp;18</a> e <a href="#fig-linreg">Figura&nbsp;17</a>, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.</p>
 </section>
 </section>
 <section id="conclusão" class="level2" data-number="4">
