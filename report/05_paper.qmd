@@ -971,11 +971,10 @@ ggplot(lm_valid, aes(x = data, y = mortes)) +
     fill = "grey70",
     alpha = 0.7
   ) +
-  geom_line(aes(color = "Mortes observadas"), linewidth = 1, alpha = 0.7) +
+  geom_line(aes(color = "Mortes observadas"), linewidth = 1) +
   geom_line(
     aes(y = .pred, color = "Mortes previstas"),
-    linewidth = 1,
-    alpha = 0.7
+    linewidth = 1
   ) +
   scale_color_manual(values = c(
     "Mortes observadas" = onsv_palette$blue,
@@ -1119,6 +1118,87 @@ bind_rows(tbl_metrics1,tbl_metrics2,tbl_metrics3,tbl_metrics4,tbl_metrics5) |>
 ```
 
 Conforme a @fig-ertotal e os gráficos da @fig-rf e @fig-linreg, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.
+
+O modelo linear mensal pode ser utilizado para gerar resultados preliminares para o ano de 2022, conforme denota a @fig-pred2022, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.
+
+```{r}
+#| echo: false
+#| label: fig-pred2022
+#| fig.width: 7
+#| fig.height: 5
+#| fig.cap: Previsões para 2022 com modelo linear
+
+load(here("data","frota_mensal.rda"))
+load(here("data","obitos_transito_mensal.rda"))
+load(here("data","pib_mensal.rda"))
+load(here("data","sinistros_prf_mensal.rda"))
+
+frota_2022 <- frota_mensal |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL, CAMINHONETE, CAMIONETA, UTILITARIO,
+    motocicleta = MOTOCICLETA, CICLOMOTOR, MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    total = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+mortes_2022 <- obitos_transito_mensal |> 
+  select(-uf) |> 
+  drop_na() |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = data,
+    mortes = sum(mortes)
+  )
+
+pib_2022 <- pib_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  select(data, pib)
+
+prf_2022 <- sinistros_prf_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = data,
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes)
+  )
+
+dados_mensais_2022 <- reduce(
+  list(frota_2022, mortes_2022, pib_2022, prf_2022),
+  full_join,
+  by = "data"
+) |> 
+  rename(veiculos = total) |> 
+  filter(year(data) %in% seq(2011,2022,1))
+
+pred_mensal_2022 <- bind_cols(
+  dados_mensais_2022,
+  predict(lm_wflow, dados_mensais_2022),
+  predict(lm_wflow, dados_mensais_2022, type = "conf_int")
+) 
+
+pred_mensal_2022 |> 
+  ggplot(aes(data, mortes)) +
+    geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), fill = "gray70", alpha = 0.7) +
+    geom_line(aes(color = "Mortes observadas"), linewidth = 1) +
+    geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
+    scale_color_manual(values = c(
+      "Mortes previstas" = onsv_palette$yellow,
+      "Mortes observadas" = onsv_palette$blue
+    )) +
+    scale_y_continuous(labels = comma_format(decimal.mark = ",",big.mark = ".")) +
+    xlab("Anos") +
+    ylab("Mortes")
+```
+
 
 ## Conclusão
 
