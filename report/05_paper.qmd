@@ -1199,6 +1199,71 @@ pred_mensal_2022 |>
     ylab("Mortes")
 ```
 
+```{r}
+#| echo: false
+
+# total arima 2022
+total_arima_2022 <- data.frame(forecast(arima_model, h = 24))
+total_arima_2022 <- total_arima_2022 |> 
+  mutate(data = my(rownames(total_arima_2022)))
+rownames(total_arima_2022) <- NULL
+total_arima_2022 <- total_arima_2022 |> 
+  filter(year(data) == 2022) |> 
+  select(Point.Forecast, Lo.95, Hi.95) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = Point.Forecast, lower = Lo.95, higher = Hi.95)
+
+total_arima_2022
+
+# total exponential smoothing 2022
+total_es_2022 <- data.frame(forecast(es_model, h = 24))
+total_es_2022 <- total_es_2022 |> 
+  mutate(data = my(rownames(total_es_2022)))
+rownames(total_es_2022) <- NULL
+total_es_2022 <- total_es_2022 |> 
+  filter(year(data) == 2022) |> 
+  select(Point.Forecast, Lo.95, Hi.95) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = Point.Forecast, lower = Lo.95, higher = Hi.95)
+
+total_es_2022
+
+# total anual 2022
+total_lm_anual_2022 <- df_pred |> 
+  filter(ano == 2022) |> 
+  select(.pred, .pred_lower, .pred_upper) |> 
+  rename(pred = .pred, lower = .pred_lower, higher = .pred_upper)
+
+total_lm_anual_2022
+
+# total linear mensal 2022
+total_lm_mensal_2022 <- pred_mensal_2022 |> 
+  filter(year(data) == 2022) |> 
+  select(.pred, .pred_lower, .pred_upper) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = .pred, lower = .pred_lower, higher = .pred_upper)
+
+total_lm_mensal_2022
+
+# total rf mensal 2022
+total_rf_mensal_2022 <- bind_cols(
+  dados_mensais_2022,
+  predict(rf_wflow, dados_mensais_2022)
+) |> 
+  filter(year(data) == 2022) |> 
+  select(.pred) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = .pred) |> 
+  mutate(lower = NA, upper = NA)
+
+total_rf_mensal_2022
+
+
+```
 
 ## Conclusão
 
