@@ -1212,9 +1212,7 @@ total_arima_2022 <- total_arima_2022 |>
   select(Point.Forecast, Lo.95, Hi.95) |> 
   mutate_all(sum) |> 
   first() |> 
-  rename(pred = Point.Forecast, lower = Lo.95, higher = Hi.95)
-
-total_arima_2022
+  rename(pred = Point.Forecast, lower = Lo.95, upper = Hi.95)
 
 # total exponential smoothing 2022
 total_es_2022 <- data.frame(forecast(es_model, h = 24))
@@ -1226,17 +1224,13 @@ total_es_2022 <- total_es_2022 |>
   select(Point.Forecast, Lo.95, Hi.95) |> 
   mutate_all(sum) |> 
   first() |> 
-  rename(pred = Point.Forecast, lower = Lo.95, higher = Hi.95)
-
-total_es_2022
+  rename(pred = Point.Forecast, lower = Lo.95, upper = Hi.95)
 
 # total anual 2022
 total_lm_anual_2022 <- df_pred |> 
   filter(ano == 2022) |> 
   select(.pred, .pred_lower, .pred_upper) |> 
-  rename(pred = .pred, lower = .pred_lower, higher = .pred_upper)
-
-total_lm_anual_2022
+  rename(pred = .pred, lower = .pred_lower, upper = .pred_upper)
 
 # total linear mensal 2022
 total_lm_mensal_2022 <- pred_mensal_2022 |> 
@@ -1244,9 +1238,7 @@ total_lm_mensal_2022 <- pred_mensal_2022 |>
   select(.pred, .pred_lower, .pred_upper) |> 
   mutate_all(sum) |> 
   first() |> 
-  rename(pred = .pred, lower = .pred_lower, higher = .pred_upper)
-
-total_lm_mensal_2022
+  rename(pred = .pred, lower = .pred_lower, upper = .pred_upper)
 
 # total rf mensal 2022
 total_rf_mensal_2022 <- bind_cols(
@@ -1260,9 +1252,37 @@ total_rf_mensal_2022 <- bind_cols(
   rename(pred = .pred) |> 
   mutate(lower = NA, upper = NA)
 
-total_rf_mensal_2022
-
-
+# tabela de predições 2022
+bind_rows(
+  total_arima_2022, 
+  total_es_2022, 
+  total_lm_anual_2022,
+  total_lm_mensal_2022, 
+  total_rf_mensal_2022
+) |> 
+  mutate(Modelo = c("SARIMA", "Exponential Smoothing", 
+                    "Linear Anual", "Linear Mensal",
+                    "Random Forest Mensal")) |> 
+  relocate(Modelo) |> 
+  rename(Previsão = pred, `Limite Máx.` = upper, `Limite Mín.` = lower) |> 
+  gt() |> 
+  tab_header("Previsões para 2022",
+             subtitle = "Valores estimados para número de mortes por cada modelo") |> 
+  fmt_number(columns = c(Previsão,`Limite Mín.`,`Limite Máx.`),
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_options(column_labels.background.color = onsv_palette$blue,
+              column_labels.font.weight = "bold") |> 
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  tab_style(style = cell_text(align = "center"),
+            locations = cells_column_labels()) |> 
+  sub_missing(missing_text = "-") |> 
+  tab_footnote(
+    footnote = "Algoritmo não produz intervalo de confiança",
+    locations = cells_body(columns = Modelo,
+                           rows = Modelo == "Random Forest Mensal")
+  )
 ```
 
 ## Conclusão
