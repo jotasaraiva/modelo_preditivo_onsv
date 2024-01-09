@@ -1,6 +1,6 @@
 ---
 title: "Modelo Preditivo de Mortes no Trânsito Brasileiro"
-date: 2023-09-28
+date: 2023-12-19
 
 smooth-scroll: true
 
@@ -503,8 +503,8 @@ O modelo preditivo de mortes no trânsito anteriormente criado possuia uma resol
 
 -   Frota (RENAVAM);
 -   Produto Interno Bruto - PIB (Banco Central do Brasil);
--   Quantidade de sinistros, sinistros fatais e feridos no trânsito de rodovias federais (PRF);
--   Mortes em trânsito (DataSUS).
+-   Quantidade de sinistros, sinistros fatais e feridos em sinistros ocorridos em rodovias federais (PRF);
+-   Mortes em sinistros de trânsito (DATASUS).
 
 A fim de melhor compreender o comportamento destas variáveis em uma resolução temporal maior, as seguintes visualização demonstram a variação de cada atributo considerado conforme o tempo do período disponível para estudo:
 
@@ -520,7 +520,11 @@ A fim de melhor compreender o comportamento destas variáveis em uma resolução
 
 dados_mensais |> 
   select(data, veiculos, automovel, motocicleta) |>
-  rename(Veículos = veiculos, Automóvel = automovel, Motocicleta = motocicleta) |> 
+  rename(
+    Veículos = veiculos,
+    Automóvel = automovel,
+    Motocicleta = motocicleta
+  ) |> 
   pivot_longer(-data) |> 
   rename(Anos = data, Modal = name, Frota = value) |> 
   ggplot(aes(x = Anos, y = Frota, color = Modal)) +
@@ -579,7 +583,7 @@ dados_mensais |>
   scale_discrete_onsv()
 ```
 
-#### Mortes (DataSUS)
+#### Mortes (DATASUS)
 
 ```{r}
 #| echo: false
@@ -599,7 +603,7 @@ dados_mensais |>
 
 #### Análise de Série Temporal
 
-A análise de séries temporais é efetuada a partir da regressão de um modelo de melhor ajuste sob uma sequência de observações de um evento em um determinado intervalo de tempo de unidades uniformes, sendo estas séries representadas em função do tempo como sua única variável preditora. Entre as vantagens de modelos de série temporal estão o fato de não necessitarem de outras variáveis e de serem capazes de prever grandes períodos a frente, apesar de serem mais dificilmente ajustados em comparação a modelos determinísticos convencionais.
+A análise de séries temporais foi efetuada a partir da regressão de um modelo de melhor ajuste sob uma sequência de observações de um evento em um determinado intervalo de tempo de unidades uniformes, sendo estas séries representadas em função do tempo como sua única variável preditora. Entre as vantagens de modelos de série temporal, uma delas é o fato de não necessitarem de outras variáveis e de serem capazes de prever grandes períodos a frente, apesar de serem mais dificilmente ajustadas em comparação a modelos determinísticos convencionais.
 
 ##### SARIMA
 
@@ -673,7 +677,7 @@ autoplot(
 ```
 :::
 
-Tradicionalmente, um algoritmo da fámilia ARIMA possui três principais parâmetros: *p*,*d*,*q*, denotando, respectivamente, a ordem do modelo auto-regressivo, o grau de diferenciação necessária e a ordem do modelo de média móvel. Em um modelo de ARIMA sazonal, estes parâmetros podem ser expandidos em uma função ARIMA(*p*,*d*,*q*)(*P*,*D*,*Q*)*m*, onde a segunda parte se refere aos parâmetros da componente sazonal do modelo. Portanto, diversos modelos são testados e avaliados com variação sobre os hiperparâmetros a fim de encontrar a melhor combinação de valores, sendo este processo automatizado por meio da função `auto.arima()` do (pacote) `forecast`. A @fig-arima e a @fig-erarima demonstram a visualização do desempenho do modelo e suas métricas de erro:
+Tradicionalmente, um algoritmo da fámilia ARIMA possui três principais parâmetros: *p*,*d*,*q*, denotando, respectivamente, a ordem do modelo auto-regressivo, o grau de diferenciação necessária e a ordem do modelo de média móvel. Em um modelo de ARIMA sazonal, estes parâmetros podem ser expandidos em uma função ARIMA(*p*,*d*,*q*)(*P*,*D*,*Q*)*m*, onde a segunda parte se refere aos parâmetros da componente sazonal do modelo. Portanto, diversos modelos foram testados e avaliados com variação sobre os hiperparâmetros a fim de encontrar a melhor combinação de valores, sendo este processo automatizado por meio da função `auto.arima()` do pacote `forecast`. A @fig-arima e a @tbl-erarima demonstram a visualização do desempenho do modelo e suas métricas de erro:
 
 ```{r}
 #| include: false
@@ -728,10 +732,8 @@ arima_df |>
 
 ```{r}
 #| echo: false
-#| label: fig-erarima
-#| fig.width: 7
-#| fig.height: 5
-#| fig.cap: Métricas de erro para modelo SARIMA
+#| label: tbl-erarima
+#| tbl-cap: Métricas de erro para modelo SARIMA
 
 st_metrics <- metric_set(rmse, rsq)
 
@@ -760,7 +762,7 @@ O modelo de Suavização Exponencial constitui uma família de métodos de anál
 - Suavização Exponencial Dupla (Holt Linear)
 - Suavização Exponencial Tripla (Método Holt-Winters)
 
-Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A @fig-es e a @fig-eres demonstram a visualização do desempenho do modelo e suas métricas de erro:
+Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A @fig-es e a @tbl-eres demonstram a visualização do desempenho do modelo e suas métricas de erro:
 
 ```{r}
 #| include: false
@@ -806,10 +808,10 @@ es_df |>
 
 ```{r}
 #| echo: false
-#| label: fig-eres
+#| label: tbl-eres
 #| fig.width: 7
 #| fig.height: 5
-#| fig.cap: Métricas de erro para modelo de suavização exponencial
+#| tbl-cap: Métricas de erro para modelo de suavização exponencial
 
 es2021 <- sum(es_df$Point.Forecast, na.rm = T)
 
@@ -834,7 +836,7 @@ Baseando-se no modelo de Holt-Winters, pode-se emitir uma previsão até 2030 a 
 #| echo: false
 #| label: fig-pred30
 #| fig.width: 7
-#| fig.height: 2
+#| fig.height: 4
 #| fig.cap: Previsão até 2030 utilizando Exponential Smoothing
 
 es_pred30 <- data.frame(forecast(es_model, h = 120))
@@ -886,7 +888,7 @@ ggcorrplot::ggcorrplot(
 )
 ```
 
-Conforme o procedimento de modelagem, a regressão linear é ajustada e representada na @fig-erlinreg e @fig-linreg:
+Conforme o procedimento de modelagem, a regressão linear é ajustada e representada na @tbl-erlinreg e @fig-linreg:
 
 ```{r}
 #| include: false
@@ -926,10 +928,10 @@ lm_pred <-
 
 ```{r}
 #| echo: false
-#| label: fig-erlinreg
+#| label: tbl-erlinreg
 #| fig.width: 7
 #| fig.height: 5
-#| fig.cap: Métricas de erro para regressão linear mensal
+#| tbl-cap: Métricas de erro para regressão linear mensal
 
 ml_metrics <- metric_set(rmse, mae, rsq)
 
@@ -987,7 +989,7 @@ ggplot(lm_valid, aes(x = data, y = mortes)) +
 
 ##### Random Forest
 
-O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear, sendo ajustado e representado na @fig-errf e @fig-rf. Embora suas métricas apontem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021.
+O modelo de regressão por Random Forest foi criado com um número fixo de 5000 árvores de decisão e treinado com a mesma repartição treino-teste utilizada na regressão linear, sendo ajustado e representado na @tbl-errf e @fig-rf. Embora suas métricas apontem desempenhos inferiores em relação ao método linear, o modelo Random Forest teve precisões maiores no ano de 2021.
 
 ```{r}
 #| include: false
@@ -1014,10 +1016,10 @@ rf_pred <-
 
 ```{r}
 #| echo: false
-#| label: fig-errf
+#| label: tbl-errf
 #| fig.width: 7
 #| fig.height: 5
-#| fig.cap: Métricas de erro para modelo Random Forest
+#| tbl-cap: Métricas de erro para modelo Random Forest
 
 ml_metrics(rf_pred, truth = mortes, estimate = .pred) |> 
   select(-.estimator) |> 
@@ -1089,10 +1091,10 @@ tbl_metrics5 <- format_metrics(st_metrics(es_df,mortes,Point.Forecast),"Exponent
 
 ```{r}
 #| echo: false
-#| label: fig-ertotal
+#| label: tbl-ertotal
 #| fig.width: 7
 #| fig.height: 5
-#| fig.cap: Tabela de métricas para todos os modelos
+#| tbl-cap: Tabela de métricas para todos os modelos
 
 bind_rows(tbl_metrics1,tbl_metrics2,tbl_metrics3,tbl_metrics4,tbl_metrics5) |> 
   pivot_wider(names_from = Métrica, values_from = Valor) |>  
@@ -1117,7 +1119,7 @@ bind_rows(tbl_metrics1,tbl_metrics2,tbl_metrics3,tbl_metrics4,tbl_metrics5) |>
   
 ```
 
-Conforme a @fig-ertotal e os gráficos da @fig-rf e @fig-linreg, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.
+Conforme a @tbl-ertotal e os gráficos da @fig-rf e @fig-linreg, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.
 
 O modelo linear mensal pode ser utilizado para exemplificar os resultados preliminares para o ano de 2022, conforme denota a @fig-lmpred2022, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.
 
