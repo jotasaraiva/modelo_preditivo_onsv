@@ -758,9 +758,9 @@ st_metrics(arima_df, mortes, Point.Forecast, na_rm = T) |>
 
 O modelo de Suavização Exponencial constitui uma família de métodos de análise e previsão de séries temporais mais básicos que os algoritmos de média movel. O método tem como princípio que as predições feitas pelo modelo são simplesmente as médias ponderadas das observações anteriores, tendo seus pesos reduzidos exponencialmente com a passagem do tempo. Os principais tipos de modelos desta categoria são:
 
-- Suavização Exponencial Simples
-- Suavização Exponencial Dupla (Holt Linear)
-- Suavização Exponencial Tripla (Método Holt-Winters)
+-   Suavização Exponencial Simples
+-   Suavização Exponencial Dupla (Holt Linear)
+-   Suavização Exponencial Tripla (Método Holt-Winters)
 
 Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A @fig-es e a @tbl-eres demonstram a visualização do desempenho do modelo e suas métricas de erro:
 
@@ -1032,9 +1032,9 @@ ml_metrics(rf_pred, truth = mortes, estimate = .pred) |>
 
 A sobressaliência do modelo linear em relação ao Random Forest é possivelmente devido:
 
-- Às altas correlações lineares e covariâncias entre as variáveis;
-- Ao número de árvores (hiperparâmetro não otimizado) e ou;
-- Ao sobreajuste.
+-   Às altas correlações lineares e covariâncias entre as variáveis;
+-   Ao número de árvores (hiperparâmetro não otimizado) e ou;
+-   Ao sobreajuste.
 
 ```{r}
 #| include: false
