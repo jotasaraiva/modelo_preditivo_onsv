@@ -973,11 +973,10 @@ ggplot(lm_valid, aes(x = data, y = mortes)) +
     fill = "grey70",
     alpha = 0.7
   ) +
-  geom_line(aes(color = "Mortes observadas"), linewidth = 1, alpha = 0.7) +
+  geom_line(aes(color = "Mortes observadas"), linewidth = 1) +
   geom_line(
     aes(y = .pred, color = "Mortes previstas"),
-    linewidth = 1,
-    alpha = 0.7
+    linewidth = 1
   ) +
   scale_color_manual(values = c(
     "Mortes observadas" = onsv_palette$blue,
@@ -1067,7 +1066,7 @@ ggplot(rf_valid, aes(x = data, y = mortes)) +
 
 ### Resultados e Discussão
 
-A variedade de modelos testados foram avaliados individualmente, mas diversas métricas de erros utilizados são não normalizados, necessitando, portanto de uma análise comparativa do desempenho de cada técnica em relação às demais. A tabela a seguir apresenta as métricas para cada algoritmo utilizado até o momento, o que auxiliará na escolha de um modelo definitivo:
+Após a avaliação individual de cada modelo, nota-se que diversas métricas de erros utilizadas são não normalizadas, necessitando, portanto, de uma análise comparativa do desempenho de cada técnica em relação às demais. A tabela a seguir apresenta as métricas para cada algoritmo utilizado até então, o que auxiliará na escolha de um modelo definitivo:
 
 ```{r}
 #| include: false
@@ -1121,6 +1120,179 @@ bind_rows(tbl_metrics1,tbl_metrics2,tbl_metrics3,tbl_metrics4,tbl_metrics5) |>
 ```
 
 Conforme a @tbl-ertotal e os gráficos da @fig-rf e @fig-linreg, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.
+
+O modelo linear mensal pode ser utilizado para exemplificar os resultados preliminares para o ano de 2022, conforme denota a @fig-lmpred2022, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.
+
+```{r}
+#| echo: false
+#| label: fig-lmpred2022
+#| fig.width: 7
+#| fig.height: 5
+#| fig.cap: Previsões para 2022 com modelo linear
+
+load(here("data","frota_mensal.rda"))
+load(here("data","obitos_transito_mensal.rda"))
+load(here("data","pib_mensal.rda"))
+load(here("data","sinistros_prf_mensal.rda"))
+
+frota_2022 <- frota_mensal |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL, CAMINHONETE, CAMIONETA, UTILITARIO,
+    motocicleta = MOTOCICLETA, CICLOMOTOR, MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    total = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+mortes_2022 <- obitos_transito_mensal |> 
+  select(-uf) |> 
+  drop_na() |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = data,
+    mortes = sum(mortes)
+  )
+
+pib_2022 <- pib_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  select(data, pib)
+
+prf_2022 <- sinistros_prf_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(
+    .by = data,
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes)
+  )
+
+dados_mensais_2022 <- reduce(
+  list(frota_2022, mortes_2022, pib_2022, prf_2022),
+  full_join,
+  by = "data"
+) |> 
+  rename(veiculos = total) |> 
+  filter(year(data) %in% seq(2011,2022,1))
+
+pred_mensal_2022 <- bind_cols(
+  dados_mensais_2022,
+  predict(lm_wflow, dados_mensais_2022),
+  predict(lm_wflow, dados_mensais_2022, type = "conf_int")
+) 
+
+pred_mensal_2022 |> 
+  ggplot(aes(data, mortes)) +
+    geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), fill = "gray70", alpha = 0.7) +
+    geom_line(aes(color = "Mortes observadas"), linewidth = 1) +
+    geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
+    scale_color_manual(values = c(
+      "Mortes previstas" = onsv_palette$yellow,
+      "Mortes observadas" = onsv_palette$blue
+    )) +
+    scale_y_continuous(labels = comma_format(decimal.mark = ",",big.mark = ".")) +
+    xlab("Anos") +
+    ylab("Mortes")
+```
+
+Neste sentido, a @fig-totpred2022 representa os valores totais estimados para o ano de 2022 de cada modelo contemplado até o momento, junto com intervalos de confiança previstos por cada algoritmo. Vale destacar que o modelo Random Forest, que anteriormente teria tido métricas ligeiramente inferiores ao modelo linear mensal, obteve um valor mais próximo ao linear anual. Isto aponta que este modelo pode ser o mais adequado para estipulações temporais de curto prazo.
+
+```{r}
+#| echo: false
+#| label: fig-totpred2022
+#| fig-width: 7
+#| fig-height: 5
+#| fig-cap: Tabela de previsões para 2022
+
+# total arima 2022
+total_arima_2022 <- data.frame(forecast(arima_model, h = 24))
+total_arima_2022 <- total_arima_2022 |> 
+  mutate(data = my(rownames(total_arima_2022)))
+rownames(total_arima_2022) <- NULL
+total_arima_2022 <- total_arima_2022 |> 
+  filter(year(data) == 2022) |> 
+  select(Point.Forecast, Lo.95, Hi.95) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = Point.Forecast, lower = Lo.95, upper = Hi.95)
+
+# total exponential smoothing 2022
+total_es_2022 <- data.frame(forecast(es_model, h = 24))
+total_es_2022 <- total_es_2022 |> 
+  mutate(data = my(rownames(total_es_2022)))
+rownames(total_es_2022) <- NULL
+total_es_2022 <- total_es_2022 |> 
+  filter(year(data) == 2022) |> 
+  select(Point.Forecast, Lo.95, Hi.95) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = Point.Forecast, lower = Lo.95, upper = Hi.95)
+
+# total anual 2022
+total_lm_anual_2022 <- df_pred |> 
+  filter(ano == 2022) |> 
+  select(.pred, .pred_lower, .pred_upper) |> 
+  rename(pred = .pred, lower = .pred_lower, upper = .pred_upper)
+
+# total linear mensal 2022
+total_lm_mensal_2022 <- pred_mensal_2022 |> 
+  filter(year(data) == 2022) |> 
+  select(.pred, .pred_lower, .pred_upper) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = .pred, lower = .pred_lower, upper = .pred_upper)
+
+# total rf mensal 2022
+total_rf_mensal_2022 <- bind_cols(
+  dados_mensais_2022,
+  predict(rf_wflow, dados_mensais_2022)
+) |> 
+  filter(year(data) == 2022) |> 
+  select(.pred) |> 
+  mutate_all(sum) |> 
+  first() |> 
+  rename(pred = .pred) |> 
+  mutate(lower = NA, upper = NA)
+
+# tabela de predições 2022
+bind_rows(
+  total_arima_2022, 
+  total_es_2022, 
+  total_lm_anual_2022,
+  total_lm_mensal_2022, 
+  total_rf_mensal_2022
+) |> 
+  mutate(Modelo = c("SARIMA", "Exponential Smoothing", 
+                    "Linear Anual", "Linear Mensal",
+                    "Random Forest Mensal")) |> 
+  relocate(Modelo) |> 
+  rename(Previsão = pred, `Limite Máx.` = upper, `Limite Mín.` = lower) |> 
+  gt() |> 
+  tab_header("Previsões para 2022",
+             subtitle = "Valores estimados para número de mortes por cada modelo") |> 
+  fmt_number(columns = c(Previsão,`Limite Mín.`,`Limite Máx.`),
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_options(column_labels.background.color = onsv_palette$blue,
+              column_labels.font.weight = "bold") |> 
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  tab_style(style = cell_text(align = "center"),
+            locations = cells_column_labels()) |> 
+  sub_missing(missing_text = "-") |> 
+  tab_footnote(
+    footnote = "Algoritmo não produz intervalo de confiança",
+    locations = cells_body(columns = Modelo,
+                           rows = Modelo == "Random Forest Mensal"),
+    placement = "left"
+  )
+```
 
 ## Conclusão
 
