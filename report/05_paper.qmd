@@ -14,7 +14,6 @@ title-block-banner: true
 
 format: 
   html:
-    theme: style.scss
     editor: visual
     dpi: 300
     number-sections: true

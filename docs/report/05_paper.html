@@ -236,7 +236,7 @@ window.Quarto = {
 <p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, assim, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na <a href="#fig-corr" class="quarto-xref">Figura&nbsp;1</a></p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-corr" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="2400">
+<div id="fig-corr" class="quarto-figure quarto-figure-center anchored" width="2400" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-corr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-corr-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="2400">
@@ -252,7 +252,7 @@ Figura&nbsp;1: Correlograma dos atributos
 <p>Desta forma, a próxima etapa inclui a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente correlacionada com a quantidade de sinistros fatais, que por sua vez é correlacionada com a quantidade de sinistros totais. As três variáveis, em adição à quantidade de feridos, estão apresentadas na série temporal da <a href="#fig-prf" class="quarto-xref">Figura&nbsp;2</a> à seguir.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-prf" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-prf" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-prf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-prf-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -267,7 +267,7 @@ Figura&nbsp;2: Sinistros e óbitos ocorridos em rodovias federais
 <p>Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na <a href="#fig-cond" class="quarto-xref">Figura&nbsp;3</a>, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Durante a elaboração do modelo, a variável <code>condutores</code> apresentou um melhor desempenho que a variável <code>população</code>, comparando seus <span class="math inline">\(p\)</span>-valores</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-cond" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-cond" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-cond-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-cond-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -328,7 +328,7 @@ Figura&nbsp;3: Número de novos condutores por ano
 <p>A redução da disponibilidade de dados tornou inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na <a href="#fig-reg" class="quarto-xref">Figura&nbsp;4</a>.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-reg" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-reg" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-reg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-reg-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -343,7 +343,7 @@ Figura&nbsp;4: Quantidade de mortes em sinistros de trânsito
 <p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na <a href="#fig-pred" class="quarto-xref">Figura&nbsp;5</a>. O valor previsto para 2022, com base no modelo efetuado, resultou em 33.725 mortes, com um intervalo de confiança entre 31.286 e 36.164 mortes.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-pred" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-pred" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-pred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-pred-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -387,7 +387,7 @@ Figura&nbsp;5: Previsões com intervalo de confiança até 2022
 <p>Com o valor previsto para 2022, foi possível realizar cálculo das taxas de mortos por 100 mil habitantes e por 10 mil veículos, com o propósito de observar suas tendências. A <a href="#fig-hab" class="quarto-xref">Figura&nbsp;6</a> explicita a crescente taxa de mortes por 100 mil habitantes, apresentando uma estimativa de 16,61 em 2022.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-hab" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-hab" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-hab-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-hab-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -402,7 +402,7 @@ Figura&nbsp;6: Mortes por 100.000 habitantes
 <p>A taxa de mortes por 10 mil veículos resultou em uma previsão de 2,93 em 2022, como mostrada na <a href="#fig-veic" class="quarto-xref">Figura&nbsp;7</a>. O valor representa uma queda em comparação aos anos anteriores, o que pode ser uma consequência do aumento da frota de veículos em relação às mortes no trânsito.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-veic" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-veic" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-veic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-veic-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -417,7 +417,7 @@ Figura&nbsp;7: Mortes por 10.000 veículos
 <p>A <a href="#fig-qq" class="quarto-xref">Figura&nbsp;8</a> a seguir apresenta uma comparação entre os dados de mortes previstos e reais.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-qq" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-qq" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-qq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-qq-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -450,7 +450,7 @@ Figura&nbsp;8: Comparação mortes previstas x reais
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab1" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab1" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab1-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -466,7 +466,7 @@ Figura&nbsp;9: Dados mensais de frota (RENAVAM)
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab2" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab2" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -482,7 +482,7 @@ Figura&nbsp;10: Dados mensais de PIB (BACEN)
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab3" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab3" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -498,7 +498,7 @@ Figura&nbsp;11: Dados mensais de sinistros em rodovias federais
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab4" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab4" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab4-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -571,7 +571,7 @@ Figura&nbsp;12: Dados mensais de mortes em trânsito
 <p>Tradicionalmente, um algoritmo da fámilia ARIMA possui três principais parâmetros: <em>p</em>,<em>d</em>,<em>q</em>, denotando, respectivamente, a ordem do modelo auto-regressivo, o grau de diferenciação necessária e a ordem do modelo de média móvel. Em um modelo de ARIMA sazonal, estes parâmetros podem ser expandidos em uma função ARIMA(<em>p</em>,<em>d</em>,<em>q</em>)(<em>P</em>,<em>D</em>,<em>Q</em>)<em>m</em>, onde a segunda parte se refere aos parâmetros da componente sazonal do modelo. Portanto, diversos modelos foram testados e avaliados com variação sobre os hiperparâmetros a fim de encontrar a melhor combinação de valores, sendo este processo automatizado por meio da função <code>auto.arima()</code> do pacote <code>forecast</code>. A <a href="#fig-arima" class="quarto-xref">Figura&nbsp;13</a> e a <a href="#tbl-erarima" class="quarto-xref">Tabela&nbsp;1</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-arima" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-arima" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-arima-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-arima-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -635,7 +635,7 @@ Tabela&nbsp;1: Métricas de erro para modelo SARIMA
 <p>Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A <a href="#fig-es" class="quarto-xref">Figura&nbsp;14</a> e a <a href="#tbl-eres" class="quarto-xref">Tabela&nbsp;2</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-es" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-es" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-es-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-es-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -686,7 +686,7 @@ Tabela&nbsp;2: Métricas de erro para modelo de suavização exponencial
 <p>Baseando-se no modelo de Holt-Winters, pode-se emitir uma previsão até 2030 a fim de analisar o cenário futuro das mortes em trânsito, evidenciando o decaimento da capacidade preditiva deste tipo de modelo ao longo do tempo.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-pred30" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-pred30" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-pred30-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-pred30-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -707,7 +707,7 @@ Figura&nbsp;15: Previsão até 2030 utilizando Exponential Smoothing
 <p>A regressão linear múltipla ajustada neste estudo é equivalente ao seu modelo anual predecessor, mas com um número reduzido de variáveis consideradas para treinamento. O correlograma pode ser utilizado novamente para confirmar as correlações lineares entre os atributos:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-corr2" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-corr2" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-corr2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-corr2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -759,7 +759,7 @@ Tabela&nbsp;3: Métricas de erro para regressão linear mensal
 <p>Em geral, suas métricas apresentaram maior precisão e desempenho em comparação ao modelo anual apesar de se basear em uma quantidade menor de variáveis, obtendo uma maior capacidade preditiva:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-linreg" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-linreg" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-linreg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-linreg-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -819,7 +819,7 @@ Tabela&nbsp;4: Métricas de erro para modelo Random Forest
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-rf" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-rf" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-rf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-rf-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -1351,7 +1351,7 @@ Tabela&nbsp;5: Tabela de métricas para todos os modelos
 <p>O modelo linear mensal pode ser utilizado para exemplificar os resultados preliminares para o ano de 2022, conforme denota a <a href="#fig-lmpred2022" class="quarto-xref">Figura&nbsp;19</a>, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-lmpred2022" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-lmpred2022" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-lmpred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-lmpred2022-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
