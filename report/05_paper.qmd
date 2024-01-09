@@ -1064,7 +1064,7 @@ ggplot(rf_valid, aes(x = data, y = mortes)) +
 
 ### Resultados e Discussão
 
-A variedade de modelos testados foram avaliados individualmente, mas diversas métricas de erros utilizados são não normalizados, necessitando, portanto de uma análise comparativa do desempenho de cada técnica em relação às demais. A tabela a seguir apresenta as métricas para cada algoritmo utilizado até o momento, o que auxiliará na escolha de um modelo definitivo:
+Após a avaliação individual de cada modelo, nota-se que diversas métricas de erros utilizadas são não normalizadas, necessitando, portanto, de uma análise comparativa do desempenho de cada técnica em relação às demais. A tabela a seguir apresenta as métricas para cada algoritmo utilizado até então, o que auxiliará na escolha de um modelo definitivo:
 
 ```{r}
 #| include: false
