@@ -236,7 +236,7 @@ window.Quarto = {
 <p>Assim sendo, a análise exploratória dos dados (AED) foi produzida para efetivar a validade dos dados e a significância delas para a construção do modelo. É observável que diversas variáveis possuem alto grau de colinearidade entre si, indicando que a modelagem utilizando todos os atributos poderia ser afetada por uma multicolinearidade, assim, podendo resultar em um modelo com baixa performance. A correlação de Spearman foi utilizada e seus resultados estão apresentados à seguir na <a href="#fig-corr" class="quarto-xref">Figura&nbsp;1</a></p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-corr" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="2400">
+<div id="fig-corr" class="quarto-figure quarto-figure-center anchored" width="2400" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-corr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-corr-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="2400">
@@ -252,7 +252,7 @@ Figura&nbsp;1: Correlograma dos atributos
 <p>Desta forma, a próxima etapa inclui a engenharia dos atributos para a otimização do modelo. O estudo inferencial mostra como diversas variáveis consideradas possuem alta colinearidade, congruente com as relações reais que uma categoria de dado têm com a ocorrência de outro. Por exemplo, a quantidade de mortes em sinistros de trânsito é diretamente correlacionada com a quantidade de sinistros fatais, que por sua vez é correlacionada com a quantidade de sinistros totais. As três variáveis, em adição à quantidade de feridos, estão apresentadas na série temporal da <a href="#fig-prf" class="quarto-xref">Figura&nbsp;2</a> à seguir.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-prf" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-prf" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-prf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-prf-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -267,7 +267,7 @@ Figura&nbsp;2: Sinistros e óbitos ocorridos em rodovias federais
 <p>Outra variável que deve ser analisada individualmente é o número de condutores, que possui uma alta correlação com a população e um comportamento similar em questão da sua contribuição ao modelo. Para verificar se o número de condutores possui um acréscimo homogêneo ao longo do período estudado, calcula-se a quantidade de novos condutores por ano, como visto na <a href="#fig-cond" class="quarto-xref">Figura&nbsp;3</a>, denotando como o ano de 2020 sofreu uma brusca queda de novos indivíduos, possivelmente devido aos impactos da pandemia. Durante a elaboração do modelo, a variável <code>condutores</code> apresentou um melhor desempenho que a variável <code>população</code>, comparando seus <span class="math inline">\(p\)</span>-valores</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-cond" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-cond" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-cond-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-cond-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -328,7 +328,7 @@ Figura&nbsp;3: Número de novos condutores por ano
 <p>A redução da disponibilidade de dados tornou inviável a aplicação de técnicas de avaliação de modelo como a separação de conjuntos para treino e teste ou a validação cruzada (<em>Cross validation</em>). Por outro lado, a capacidade do algoritmo regressivo pode ser mensurada pelo comparação entre os dados de mortes iniciais com o produto encontrado pelo modelo, conforme apresentado na <a href="#fig-reg" class="quarto-xref">Figura&nbsp;4</a>.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-reg" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-reg" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-reg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-reg-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -343,7 +343,7 @@ Figura&nbsp;4: Quantidade de mortes em sinistros de trânsito
 <p>O modelo foi utilizado para prever a ocorrência de mortes relacionadas à sinistros de trânsito em 2022, recebendo como <em>input</em> os respectivos dados das bases anteriormente consultadas. A predição aponta a tendência anual das mortes, com limites de erro considerados em um intervalo de confiança, conforme apresentado na <a href="#fig-pred" class="quarto-xref">Figura&nbsp;5</a>. O valor previsto para 2022, com base no modelo efetuado, resultou em 33.725 mortes, com um intervalo de confiança entre 31.286 e 36.164 mortes.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-pred" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-pred" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-pred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-pred-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -387,7 +387,7 @@ Figura&nbsp;5: Previsões com intervalo de confiança até 2022
 <p>Com o valor previsto para 2022, foi possível realizar cálculo das taxas de mortos por 100 mil habitantes e por 10 mil veículos, com o propósito de observar suas tendências. A <a href="#fig-hab" class="quarto-xref">Figura&nbsp;6</a> explicita a crescente taxa de mortes por 100 mil habitantes, apresentando uma estimativa de 16,61 em 2022.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-hab" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-hab" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-hab-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-hab-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -402,7 +402,7 @@ Figura&nbsp;6: Mortes por 100.000 habitantes
 <p>A taxa de mortes por 10 mil veículos resultou em uma previsão de 2,93 em 2022, como mostrada na <a href="#fig-veic" class="quarto-xref">Figura&nbsp;7</a>. O valor representa uma queda em comparação aos anos anteriores, o que pode ser uma consequência do aumento da frota de veículos em relação às mortes no trânsito.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-veic" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-veic" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-veic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-veic-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -417,7 +417,7 @@ Figura&nbsp;7: Mortes por 10.000 veículos
 <p>A <a href="#fig-qq" class="quarto-xref">Figura&nbsp;8</a> a seguir apresenta uma comparação entre os dados de mortes previstos e reais.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-qq" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-qq" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-qq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-qq-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -450,7 +450,7 @@ Figura&nbsp;8: Comparação mortes previstas x reais
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab1" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab1" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab1-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -466,7 +466,7 @@ Figura&nbsp;9: Dados mensais de frota (RENAVAM)
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab2" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab2" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -482,7 +482,7 @@ Figura&nbsp;10: Dados mensais de PIB (BACEN)
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab3" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab3" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -498,7 +498,7 @@ Figura&nbsp;11: Dados mensais de sinistros em rodovias federais
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-tab4" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-tab4" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tab4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-tab4-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -571,7 +571,7 @@ Figura&nbsp;12: Dados mensais de mortes em trânsito
 <p>Tradicionalmente, um algoritmo da fámilia ARIMA possui três principais parâmetros: <em>p</em>,<em>d</em>,<em>q</em>, denotando, respectivamente, a ordem do modelo auto-regressivo, o grau de diferenciação necessária e a ordem do modelo de média móvel. Em um modelo de ARIMA sazonal, estes parâmetros podem ser expandidos em uma função ARIMA(<em>p</em>,<em>d</em>,<em>q</em>)(<em>P</em>,<em>D</em>,<em>Q</em>)<em>m</em>, onde a segunda parte se refere aos parâmetros da componente sazonal do modelo. Portanto, diversos modelos são testados e avaliados com variação sobre os hiperparâmetros a fim de encontrar a melhor combinação de valores, sendo este processo automatizado por meio da função <code>auto.arima()</code> do (pacote) <code>forecast</code>. A <a href="#fig-arima" class="quarto-xref">Figura&nbsp;13</a> e a <a href="#fig-erarima" class="quarto-xref">Figura&nbsp;14</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-arima" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-arima" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-arima-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-arima-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -652,7 +652,7 @@ Figura&nbsp;14: Métricas de erro para modelo SARIMA
 <p>Foi utilizado o método de Holt-Winters devido ao fato de ser considerado o mais ideal para tratamento de dados sazonais e não estacionários. A <a href="#fig-es" class="quarto-xref">Figura&nbsp;15</a> e a <a href="#fig-eres" class="quarto-xref">Figura&nbsp;16</a> demonstram a visualização do desempenho do modelo e suas métricas de erro:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-es" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-es" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-es-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-es-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -716,7 +716,7 @@ Figura&nbsp;16: Métricas de erro para modelo de suavização exponencial
 <p>Baseando-se no modelo de Holt-Winters, pode-se emitir uma previsão até 2030 a fim de analisar o cenário futuro das mortes em trânsito, evidenciando o decaimento da capacidade preditiva deste tipo de modelo ao longo do tempo.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-pred30" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-pred30" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-pred30-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-pred30-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -737,7 +737,7 @@ Figura&nbsp;17: Previsão até 2030 utilizando Exponential Smoothing
 <p>A regressão linear múltipla ajustada neste estudo é equivalente ao seu modelo anual predecessor, mas com um número reduzido de variáveis consideradas para treinamento. O correlograma pode ser utilizado novamente para confirmar as correlações lineares entre os atributos:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-corr2" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-corr2" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-corr2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-corr2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -802,7 +802,7 @@ Figura&nbsp;19: Métricas de erro para regressão linear mensal
 <p>Em geral, suas métricas apresentaram maior precisão e desempenho em comparação ao modelo anual apesar de se basear em uma quantidade menor de variáveis, obtendo uma maior capacidade preditiva:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-linreg" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-linreg" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-linreg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-linreg-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -875,7 +875,7 @@ Figura&nbsp;21: Métricas de erro para modelo Random Forest
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-rf" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-rf" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-rf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="05_paper_files/figure-html/fig-rf-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
@@ -1402,19 +1402,527 @@ Figura&nbsp;23: Tabela de métricas para todos os modelos
 </div>
 </div>
 <p>Conforme a <a href="#fig-ertotal" class="quarto-xref">Figura&nbsp;23</a> e os gráficos da <a href="#fig-rf" class="quarto-xref">Figura&nbsp;22</a> e <a href="#fig-linreg" class="quarto-xref">Figura&nbsp;20</a>, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.</p>
-<p>O modelo linear mensal pode ser utilizado para gerar resultados preliminares para o ano de 2022, conforme denota a <a href="#fig-pred2022" class="quarto-xref">Figura&nbsp;24</a>, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.</p>
+<p>O modelo linear mensal pode ser utilizado para exemplificar os resultados preliminares para o ano de 2022, conforme denota a <a href="#fig-lmpred2022" class="quarto-xref">Figura&nbsp;24</a>, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-pred2022" class="quarto-figure quarto-figure-center anchored" data-fig-align="center" width="672">
+<div id="fig-lmpred2022" class="quarto-figure quarto-figure-center anchored" width="672" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-pred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="05_paper_files/figure-html/fig-pred2022-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
+<div aria-describedby="fig-lmpred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05_paper_files/figure-html/fig-lmpred2022-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lmpred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figura&nbsp;24: Previsões para 2022 com modelo linear
 </figcaption>
 </figure>
 </div>
+</div>
+</div>
+<p>Neste sentido, a <a href="#fig-totpred2022" class="quarto-xref">Figura&nbsp;25</a> representa os valores totais estimados para o ano de 2022 de cada modelo contemplado até o momento, junto com intervalos de confiança previstos por cada algoritmo. Vale destacar que o modelo Random Forest, que anteriormente teria tido métricas ligeiramente inferiores ao modelo linear mensal, obteve um valor mais próximo ao linear anual. Isto aponta que este modelo pode ser o mais adequado para estipulações temporais de curto prazo.</p>
+<div class="cell" data-layout-align="center">
+<div id="fig-totpred2022" class="cell-output-display quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-totpred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="dlnsygvzig" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#dlnsygvzig table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#dlnsygvzig thead, #dlnsygvzig tbody, #dlnsygvzig tfoot, #dlnsygvzig tr, #dlnsygvzig td, #dlnsygvzig th {
+  border-style: none;
+}
+
+#dlnsygvzig p {
+  margin: 0;
+  padding: 0;
+}
+
+#dlnsygvzig .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#dlnsygvzig .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dlnsygvzig .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dlnsygvzig .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #00496D;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dlnsygvzig .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #00496D;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dlnsygvzig .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dlnsygvzig .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dlnsygvzig .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dlnsygvzig .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#dlnsygvzig .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#dlnsygvzig .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dlnsygvzig .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dlnsygvzig .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dlnsygvzig .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dlnsygvzig .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dlnsygvzig .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#dlnsygvzig .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#dlnsygvzig .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#dlnsygvzig .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dlnsygvzig .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#dlnsygvzig .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dlnsygvzig .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dlnsygvzig .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dlnsygvzig .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dlnsygvzig .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dlnsygvzig .gt_left {
+  text-align: left;
+}
+
+#dlnsygvzig .gt_center {
+  text-align: center;
+}
+
+#dlnsygvzig .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dlnsygvzig .gt_font_normal {
+  font-weight: normal;
+}
+
+#dlnsygvzig .gt_font_bold {
+  font-weight: bold;
+}
+
+#dlnsygvzig .gt_font_italic {
+  font-style: italic;
+}
+
+#dlnsygvzig .gt_super {
+  font-size: 65%;
+}
+
+#dlnsygvzig .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#dlnsygvzig .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#dlnsygvzig .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#dlnsygvzig .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#dlnsygvzig .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#dlnsygvzig .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#dlnsygvzig .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal" style="color: #00496D">Previsões para 2022</th>
+</tr>
+<tr class="odd gt_heading">
+<th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="color: #00496D">Valores estimados para número de mortes por cada modelo</th>
+</tr>
+<tr class="header gt_col_headings">
+<th id="Modelo" class="gt_col_heading gt_columns_bottom_border gt_left" style="text-align: center;" data-quarto-table-cell-role="th" scope="col">Modelo</th>
+<th id="Previsão" class="gt_col_heading gt_columns_bottom_border gt_right" style="text-align: center;" data-quarto-table-cell-role="th" scope="col">Previsão</th>
+<th id="Limite Mín." class="gt_col_heading gt_columns_bottom_border gt_right" style="text-align: center;" data-quarto-table-cell-role="th" scope="col">Limite Mín.</th>
+<th id="Limite Máx." class="gt_col_heading gt_columns_bottom_border gt_right" style="text-align: center;" data-quarto-table-cell-role="th" scope="col">Limite Máx.</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Modelo">SARIMA</td>
+<td class="gt_row gt_right" headers="Previsão">38.113,01</td>
+<td class="gt_row gt_right" headers="Limite Mín.">27.679,54</td>
+<td class="gt_row gt_right" headers="Limite Máx.">48.546,47</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Modelo">Exponential Smoothing</td>
+<td class="gt_row gt_right" headers="Previsão">36.962,61</td>
+<td class="gt_row gt_right" headers="Limite Mín.">29.406,16</td>
+<td class="gt_row gt_right" headers="Limite Máx.">44.519,07</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Modelo">Linear Anual</td>
+<td class="gt_row gt_right" headers="Previsão">33.724,66</td>
+<td class="gt_row gt_right" headers="Limite Mín.">31.285,43</td>
+<td class="gt_row gt_right" headers="Limite Máx.">36.163,89</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Modelo">Linear Mensal</td>
+<td class="gt_row gt_right" headers="Previsão">35.378,88</td>
+<td class="gt_row gt_right" headers="Limite Mín.">33.048,62</td>
+<td class="gt_row gt_right" headers="Limite Máx.">37.709,15</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Modelo"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>&nbsp;Random Forest Mensal</td>
+<td class="gt_row gt_right" headers="Previsão">33.393,91</td>
+<td class="gt_row gt_right" headers="Limite Mín.">-</td>
+<td class="gt_row gt_right" headers="Limite Máx.">-</td>
+</tr>
+</tbody><tfoot class="gt_footnotes">
+<tr class="even">
+<td colspan="4" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Algoritmo não produz intervalo de confiança</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-totpred2022-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;25: Tabela de previsões para 2022
+</figcaption>
+</figure>
 </div>
 </div>
 </section>

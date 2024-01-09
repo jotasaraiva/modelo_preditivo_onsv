@@ -1119,11 +1119,11 @@ bind_rows(tbl_metrics1,tbl_metrics2,tbl_metrics3,tbl_metrics4,tbl_metrics5) |>
 
 Conforme a @fig-ertotal e os gráficos da @fig-rf e @fig-linreg, os modelos de Regressão Linear e Random Forest mensais possuem os melhores valores de perfomance entre os métodos contemplados pelo presente estudo, com o modelo linear apresentando resultados ligeiramente superiores aos do Random Forest em geral, embora o último tenho se sobressaído ao prever as mortes de 2021 com maior exatidão, possivelmente ao acaso.
 
-O modelo linear mensal pode ser utilizado para gerar resultados preliminares para o ano de 2022, conforme denota a @fig-pred2022, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.
+O modelo linear mensal pode ser utilizado para exemplificar os resultados preliminares para o ano de 2022, conforme denota a @fig-lmpred2022, assim como foi feito com o modelo linear anual. As predições produzidas totalizam 35.379 mortes neste ano, com um aumento previsto de 1.566 (4,4%) em relação a 2011. Comparado ao modelo linear anual, o modelo mensal aparenta ser menos preciso na previsão de anos inteiros, sendo possivelmente mais adequado apenas para o monitoramento mensal.
 
 ```{r}
 #| echo: false
-#| label: fig-pred2022
+#| label: fig-lmpred2022
 #| fig.width: 7
 #| fig.height: 5
 #| fig.cap: Previsões para 2022 com modelo linear
@@ -1199,8 +1199,14 @@ pred_mensal_2022 |>
     ylab("Mortes")
 ```
 
+Neste sentido, a @fig-totpred2022 representa os valores totais estimados para o ano de 2022 de cada modelo contemplado até o momento, junto com intervalos de confiança previstos por cada algoritmo. Vale destacar que o modelo Random Forest, que anteriormente teria tido métricas ligeiramente inferiores ao modelo linear mensal, obteve um valor mais próximo ao linear anual. Isto aponta que este modelo pode ser o mais adequado para estipulações temporais de curto prazo.
+
 ```{r}
 #| echo: false
+#| label: fig-totpred2022
+#| fig-width: 7
+#| fig-height: 5
+#| fig-cap: Tabela de previsões para 2022
 
 # total arima 2022
 total_arima_2022 <- data.frame(forecast(arima_model, h = 24))
@@ -1281,7 +1287,8 @@ bind_rows(
   tab_footnote(
     footnote = "Algoritmo não produz intervalo de confiança",
     locations = cells_body(columns = Modelo,
-                           rows = Modelo == "Random Forest Mensal")
+                           rows = Modelo == "Random Forest Mensal"),
+    placement = "left"
   )
 ```
 
