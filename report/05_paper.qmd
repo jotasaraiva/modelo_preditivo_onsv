@@ -1274,9 +1274,8 @@ bind_rows(
   rename(Previsão = pred, `Limite Máx.` = upper, `Limite Mín.` = lower) |> 
   gt() |> 
   tab_header("Previsões para 2022") |> 
-  fmt_number(columns = c(Previsão,`Limite Mín.`,`Limite Máx.`),
-             sep_mark = ".",
-             dec_mark = ",") |>
+  fmt_integer(columns = c(Previsão,`Limite Mín.`,`Limite Máx.`),
+             sep_mark = ".") |>
   tab_options(column_labels.background.color = onsv_palette$blue,
               column_labels.font.weight = "bold") |> 
   tab_style(style = cell_text(color = onsv_palette$blue),
