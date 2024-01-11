@@ -14,7 +14,7 @@ title-block-banner: true
 
 format: 
   html:
-    editor: visual
+    editor: source
     dpi: 300
     number-sections: true
 
@@ -1103,8 +1103,7 @@ bind_rows(tbl_metrics1,tbl_metrics2,tbl_metrics3,tbl_metrics4,tbl_metrics5) |>
   )) |>
   group_by(`Tipo de modelo`) |> 
   gt() |> 
-  tab_header("Métricas de Erros",
-             subtitle = "Avaliação de desempenho para os modelos preditivos") |> 
+  tab_header("Métricas de Erros") |> 
   fmt_number(columns = c(RMSE,MAE,RSQ),
              sep_mark = ".",
              dec_mark = ",") |> 
@@ -1188,7 +1187,8 @@ pred_mensal_2022 <- bind_cols(
 
 pred_mensal_2022 |> 
   ggplot(aes(data, mortes)) +
-    geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), fill = "gray70", alpha = 0.7) +
+    geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), 
+                fill = "gray70", alpha = 0.7) +
     geom_line(aes(color = "Mortes observadas"), linewidth = 1) +
     geom_line(aes(y = .pred, color = "Mortes previstas"), linewidth = 1) +
     scale_color_manual(values = c(
@@ -1200,14 +1200,14 @@ pred_mensal_2022 |>
     ylab("Mortes")
 ```
 
-Neste sentido, a @fig-totpred2022 representa os valores totais estimados para o ano de 2022 de cada modelo contemplado até o momento, junto com intervalos de confiança previstos por cada algoritmo. Vale destacar que o modelo Random Forest, que anteriormente teria tido métricas ligeiramente inferiores ao modelo linear mensal, obteve um valor mais próximo ao linear anual. Isto aponta que este modelo pode ser o mais adequado para estipulações temporais de curto prazo.
+Neste sentido, a @tbl-totpred2022 representa os valores totais estimados para o ano de 2022 de cada modelo contemplado até o momento, junto com intervalos de confiança previstos por cada algoritmo. Vale destacar que o modelo Random Forest, que anteriormente teria tido métricas ligeiramente inferiores ao modelo linear mensal, obteve um valor mais próximo ao linear anual. Isto aponta que este modelo pode ser o mais adequado para estipulações temporais de curto prazo.
 
 ```{r}
 #| echo: false
-#| label: fig-totpred2022
+#| label: tbl-totpred2022
 #| fig-width: 7
 #| fig-height: 5
-#| fig-cap: Tabela de previsões para 2022
+#| tbl-cap: Tabela de previsões para 2022
 
 # total arima 2022
 total_arima_2022 <- data.frame(forecast(arima_model, h = 24))
@@ -1273,8 +1273,7 @@ bind_rows(
   relocate(Modelo) |> 
   rename(Previsão = pred, `Limite Máx.` = upper, `Limite Mín.` = lower) |> 
   gt() |> 
-  tab_header("Previsões para 2022",
-             subtitle = "Valores estimados para número de mortes por cada modelo") |> 
+  tab_header("Previsões para 2022") |> 
   fmt_number(columns = c(Previsão,`Limite Mín.`,`Limite Máx.`),
              sep_mark = ".",
              dec_mark = ",") |>
