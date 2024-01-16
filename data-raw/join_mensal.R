@@ -1,16 +1,21 @@
 library(here)
 library(tidyverse)
-library(tidymodels)
+library(fleetbr)
+library(roadtrafficdeaths)
 
-load(here("data","obitos_transito_mensal.rda"))
-load(here("data","frota_mensal.rda"))
 load(here("data","pib_mensal.rda"))
 load(here("data","sinistros_prf_mensal.rda"))
 
-df_frota <- frota_mensal |> 
+df_mortes <- rtdeaths |> 
+  mutate(data = ym(paste0(year(data_ocorrencia),'-',month(data_ocorrencia)))) |> 
+  summarise(.by = data, mortes = n()) |> 
+  drop_na() |> 
+  arrange(data)
+
+df_frota <- fleetbr |> 
   pivot_wider(names_from = modal, values_from = frota) |> 
   mutate(
-    data = ym(paste0(ano,"-",mes)),
+    data = ym(paste0(ano,'-',mes)),
     automovel = AUTOMOVEL, CAMINHONETE, CAMIONETA, UTILITARIO,
     motocicleta = MOTOCICLETA, CICLOMOTOR, MOTONETA
   ) |> 
@@ -20,15 +25,6 @@ df_frota <- frota_mensal |>
     total = sum(total),
     automovel = sum(automovel),
     motocicleta = sum(motocicleta)
-  )
-
-df_mortes <- obitos_transito_mensal |> 
-  select(-uf) |> 
-  drop_na() |> 
-  mutate(data = ym(paste0(ano,"-",mes))) |> 
-  summarise(
-    .by = data,
-    mortes = sum(mortes)
   )
 
 df_pib <- pib_mensal |> 
