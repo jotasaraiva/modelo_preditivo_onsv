@@ -13,6 +13,12 @@ enderecos_data <- c(
 
 for (k in enderecos_data) { load(k) }
 
+frota_veiculos <- frota_veiculos |> 
+  rename(
+    veiculos_total = total,
+    ano = anos
+  )
+
 df_list <- list(
   frota_veiculos,
   obitos_transito,
