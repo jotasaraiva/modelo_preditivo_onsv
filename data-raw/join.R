@@ -1,14 +1,8 @@
-library(tidyverse)
-library(here)
-
-enderecos_data <- c(
-  here("data","frota_veiculos.rda"),
-  here("data","obitos_transito.rda"),
-  here("data","pib.rda"),
-  here("data","populacao.rda"),
-  here("data","quilometragem.rda"),
-  here("data","sinistros_prf.rda"),
-  here("data","tabela_condutores.rda")
+enderecos_data <- paste(
+  here(
+    "data",
+    list.files(here("data"))
+  )
 )
 
 for (k in enderecos_data) { load(k) }
