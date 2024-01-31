@@ -494,6 +494,58 @@ df_pred |>
 
 O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a apresentar um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que, apesar da intensidade das correlações dos preditores selecionados para o estudo, a resolução temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é limitada.
 
+Retornando ao resultado obtido anteriormente de 33.725 óbitos previstos para 2022, é possível comparar o valor previsto ao valor consolidado real disponibilizado pelo DataSUS em 2024. Foram encontrados 33.894 óbitos, exibindo uma diferença de 169 vítimas esperadas por este modelo.
+
+### Previsões para 2023
+
+```{r}
+# limpa ambiente
+rm(list = ls(envir = .GlobalEnv))
+
+# carrega dados para análises posteriores
+load(here("data","tabela_total.rda"))
+load(here("data","tabela_total_mensal.rda"))
+
+# dados atualizados
+library(fleetbr)
+library(roadtrafficdeaths)
+library(arrow)
+prf_sinistros <- read_parquet("https://github.com/ONSV/prfdata/releases/download/v0.1.0/prf_sinistros.parquet")
+load(here("data","tabela_condutores.rda"))
+```
+
+```{r}
+dados_modelo_2023 <- list(
+  drop_na(count(rename(rtdeaths, ano = ano_ocorrencia), ano, name = "mortes")),
+  summarise(filter(fleetbr, modal == "TOTAL", mes == 7), 
+            .by = ano, frota = sum(frota)),
+  count(filter(prf_sinistros, classificacao_acidente == "Com Vítimas Fatais"), 
+        ano, name = "acid_fatais"),
+  count(prf_sinistros, ano, name = "acid"),
+  tabela_condutores
+) |> 
+  reduce(full_join, by = "ano") |> 
+  arrange(ano)
+```
+
+```{r}
+rec_anual_2023 <-
+  recipe(x = drop_na(dados_modelo_2023), mortes ~ .) |> 
+  remove_role(ano, old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+modelo_anual_2023 <-
+  linear_reg() |> 
+  set_engine("lm")
+  
+wflow_anual_2023 <-
+  workflow() |> 
+  add_model(modelo_anual_2023) |> 
+  add_recipe(rec_anual_2023) |> 
+  fit(drop_na(dados_modelo_2023))
+```
+
+
 ## Modelo Preditivo Mensal
 
 ### Metodologia
