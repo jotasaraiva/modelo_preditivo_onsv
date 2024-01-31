@@ -11,13 +11,7 @@ enderecos_data <- c(
   here("data","tabela_condutores.rda")
 )
 
-for (k in enderecos_data) {load(k)}
-
-frota_veiculos <- frota_veiculos |> 
-  rename(
-    veiculos_total = total,
-    ano = anos
-  )
+for (k in enderecos_data) { load(k) }
 
 df_list <- list(
   frota_veiculos,
