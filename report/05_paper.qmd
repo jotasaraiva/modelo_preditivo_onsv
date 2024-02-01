@@ -520,8 +520,8 @@ dados_modelo_2023 <- list(
   summarise(filter(fleetbr, modal == "TOTAL", mes == 7), 
             .by = ano, frota = sum(frota)),
   count(filter(prf_sinistros, classificacao_acidente == "Com Vítimas Fatais"), 
-        ano, name = "acid_fatais"),
-  count(prf_sinistros, ano, name = "acid"),
+        ano, name = "acids_fatais"),
+  count(prf_sinistros, ano, name = "acids"),
   tabela_condutores
 ) |> 
   reduce(full_join, by = "ano") |> 
@@ -543,6 +543,33 @@ wflow_anual_2023 <-
   add_model(modelo_anual_2023) |> 
   add_recipe(rec_anual_2023) |> 
   fit(drop_na(dados_modelo_2023))
+
+pred_anual_2023 <- bind_cols(
+  dados_modelo_2023,
+  predict(wflow_anual_2023, dados_modelo_2023),
+  predict(wflow_anual_2023, dados_modelo_2023, type = "conf_int")
+)
+
+pred_anual_2023 |> 
+  select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
+  pivot_longer(
+    cols = c(.pred, mortes),
+    names_to = "Tipo",
+    values_to = "Mortes"
+  ) |> 
+  mutate(
+    Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")
+  ) |> 
+  ggplot(aes(ano, Mortes, color = Tipo)) +
+    geom_ribbon(
+      aes(ymax = .pred_upper, ymin = .pred_lower),
+      fill = "grey90",
+      color = "grey70"
+    ) +
+    geom_line() +
+    geom_point() +
+    scale_x_continuous(limits = c(2011,2023)) +
+    scale_discrete_onsv()
 ```
 
 
