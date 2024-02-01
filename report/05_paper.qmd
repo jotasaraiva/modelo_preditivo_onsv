@@ -498,7 +498,13 @@ Retornando ao resultado obtido anteriormente de 33.725 óbitos previstos para 20
 
 ### Previsões para 2023
 
+A divulgação dos dados consolidados de óbitos em trânsito para 2022 e a atualização das bases de dados do Senatran viabilizam a repaginação do modelo linear anual, passível de uma reestruturação para acomodar os novos dados, com o objetivo de prever o ano de 2023.
+
+Para o treinamento deste modelo, a mesma metodologia é utilizada com a adição dos dados mais atuais. A previsão emitida é apresentada na @fig-pred2023:
+
 ```{r}
+#| include: false
+
 # limpa ambiente
 rm(list = ls(envir = .GlobalEnv))
 
@@ -515,6 +521,8 @@ load(here("data","tabela_condutores.rda"))
 ```
 
 ```{r}
+#| include: false
+
 dados_modelo_2023 <- list(
   drop_na(count(rename(rtdeaths, ano = ano_ocorrencia), ano, name = "mortes")),
   summarise(filter(fleetbr, modal == "TOTAL", mes == 7), 
@@ -529,6 +537,8 @@ dados_modelo_2023 <- list(
 ```
 
 ```{r}
+#| include=FALSE
+
 rec_anual_2023 <-
   recipe(x = drop_na(dados_modelo_2023), mortes ~ .) |> 
   remove_role(ano, old_role = "predictor") |> 
@@ -549,6 +559,14 @@ pred_anual_2023 <- bind_cols(
   predict(wflow_anual_2023, dados_modelo_2023),
   predict(wflow_anual_2023, dados_modelo_2023, type = "conf_int")
 )
+```
+
+```{r}
+#| echo: false
+#| label: fig-pred2023
+#| fig.cap: Previsão de mortes anuais para 2023
+#| fig.width: 7
+#| fig.height: 5
 
 pred_anual_2023 |> 
   select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
@@ -563,15 +581,19 @@ pred_anual_2023 |>
   ggplot(aes(ano, Mortes, color = Tipo)) +
     geom_ribbon(
       aes(ymax = .pred_upper, ymin = .pred_lower),
-      fill = "grey90",
-      color = "grey70"
+      fill = "grey",
+      color = "grey",
+      alpha = 0.25
     ) +
-    geom_line() +
-    geom_point() +
-    scale_x_continuous(limits = c(2011,2023)) +
-    scale_discrete_onsv()
+    geom_line(linewidth = 1, alpha = 0.25) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+    scale_x_continuous(limits = c(2011,2023), breaks = seq(2011,2023,1)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    scale_discrete_onsv() + 
+    labs(x = NULL, y = NULL)
 ```
 
+É notável uma brusca diminuição em vítimas previstas em comparação à previsão de 2022, assim como uma dilatação no intervalo de confiança para dados exteriores ao conjunto de ajuste. Este fato implica que o alto desempenho do mesmo modelo em 2022 possa ter sido simplesmente ao acaso, podendo ocasionar em uma valor impreciso para o caso de 2023.
 
 ## Modelo Preditivo Mensal
 
