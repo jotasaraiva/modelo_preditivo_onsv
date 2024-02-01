@@ -1,3 +1,6 @@
+library(roadtrafficdeaths)
+library(tidyverse)
+
 obitos_transito_mensal <- rtdeaths |> 
   mutate(mes_ocorrencia = month(data_ocorrencia)) |>
   count(mes_ocorrencia, ano_ocorrencia, nome_uf_ocor) |> 
@@ -7,6 +10,7 @@ obitos_transito_mensal <- rtdeaths |>
     mes = mes_ocorrencia,
     ano = ano_ocorrencia,
     uf = nome_uf_ocor
-  )
+  ) |> 
+  filter(ano < 2022 | is.na(ano))
 
 save(obitos_transito_mensal, file = "data/obitos_transito_mensal.rda")
