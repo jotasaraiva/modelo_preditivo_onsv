@@ -505,15 +505,22 @@ Para o treinamento deste modelo, a mesma metodologia é utilizada com a adição
 ```{r}
 #| include: false
 
+library(fleetbr)
+library(roadtrafficdeaths)
+library(arrow)
+library(here)
+
 # carrega dados para análises posteriores
 load(here("data","tabela_total.rda"))
 load(here("data","tabela_total_mensal.rda"))
 
 # dados atualizados
-library(fleetbr)
-library(roadtrafficdeaths)
-library(arrow)
-prf_sinistros <- read_parquet("https://github.com/ONSV/prfdata/releases/download/v0.1.0/prf_sinistros.parquet")
+
+temp <- tempfile()
+download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip", temp)
+unzip(temp, exdir = tempdir())
+unlink(temp)
+prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
 load(here("data","tabela_condutores.rda"))
 ```
 
@@ -524,9 +531,13 @@ dados_modelo_2023 <- list(
   drop_na(count(rename(rtdeaths, ano = ano_ocorrencia), ano, name = "mortes")),
   summarise(filter(fleetbr, modal == "TOTAL", mes == 7), 
             .by = ano, frota = sum(frota)),
-  count(filter(prf_sinistros, classificacao_acidente == "Com Vítimas Fatais"), 
-        ano, name = "acids_fatais"),
-  count(prf_sinistros, ano, name = "acids"),
+  prf_sinistros |> 
+    filter(classificacao_acidente == "Com Vítimas Fatais") |> 
+    count(ano, name = "acids_fatais") |> 
+    collect(),
+  prf_sinistros |> 
+    count(ano, name = "acids") |> 
+    collect(),
   tabela_condutores
 ) |> 
   reduce(full_join, by = "ano") |> 
