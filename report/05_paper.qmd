@@ -505,9 +505,6 @@ Para o treinamento deste modelo, a mesma metodologia é utilizada com a adição
 ```{r}
 #| include: false
 
-# limpa ambiente
-rm(list = ls(envir = .GlobalEnv))
-
 # carrega dados para análises posteriores
 load(here("data","tabela_total.rda"))
 load(here("data","tabela_total_mensal.rda"))
