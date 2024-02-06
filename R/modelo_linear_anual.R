@@ -1,7 +1,7 @@
-
 library(dplyr)
-
-load("data/tabela_total.rda")
+library(tidyr)
+library(parsnip)
+library(workflows)
 
 linear_anual_recipe <- function(data) {
   rec <- data |> 
@@ -30,18 +30,3 @@ linear_anual_wflow <- function(recipe, data) {
   
   return(linear_wflow)  
 }
-
-df_preprocess <- df_total |> 
-  select(
-    ano,
-    mortes,
-    veiculos_total,
-    qnt_acidentes_fatais,
-    condutores,
-    qnt_acidentes,
-    populacao
-  ) |> 
-  drop_na()
-
-modelo <- linear_anual_wflow(recipe = linear_anual_recipe(df_preprocess), data = df_preprocess)
-
