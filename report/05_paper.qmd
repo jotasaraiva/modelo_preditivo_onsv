@@ -509,6 +509,7 @@ library(fleetbr)
 library(roadtrafficdeaths)
 library(arrow)
 library(here)
+load(here("data","tabela_condutores.rda"))
 
 # carrega dados para análises posteriores
 load(here("data","tabela_total.rda"))
@@ -521,7 +522,6 @@ download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sini
 unzip(temp, exdir = tempdir())
 unlink(temp)
 prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
-load(here("data","tabela_condutores.rda"))
 ```
 
 ```{r}
@@ -601,7 +601,7 @@ pred_anual_2023 |>
     labs(x = NULL, y = NULL)
 ```
 
-É notável uma brusca diminuição em vítimas previstas em comparação à previsão de 2022, assim como uma dilatação no intervalo de confiança para dados exteriores ao conjunto de ajuste. Este fato implica que o alto desempenho do mesmo modelo em 2022 possa ter sido simplesmente ao acaso, podendo ocasionar em uma valor impreciso para o caso de 2023.
+É notável um aumento relativamente alto de vítimas previstas em comparação à previsão de 2022, assim como uma dilatação no intervalo de confiança para dados exteriores ao conjunto de ajuste. Este fato implica que o alto desempenho do mesmo modelo em 2022 possa ter sido parcial ao acaso, podendo este ocasionar em um valor menos preciso para o caso de 2023.
 
 ## Modelo Preditivo Mensal
 
@@ -1398,6 +1398,116 @@ bind_rows(
                            rows = Modelo == "Random Forest Mensal"),
     placement = "left"
   )
+```
+
+### Previsões para 2023
+
+```{r}
+#| include: false
+
+load(here("data/pib_mensal.rda"))
+
+df_frota_2023 <- fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    veiculos = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+df_mortes_2023 <- rtdeaths |> 
+  mutate(mes = month(data_ocorrencia),
+         ano = year(data_ocorrencia),
+         data = ym(paste0(ano, "-", mes))) |> 
+  count(data, name = "mortes") |> 
+  drop_na()
+
+df_pib_2023 <- pib_mensal |> 
+  mutate(data = ym(paste0(ano, "-", mes))) |> 
+  group_by(data) |> 
+  summarise(pib)
+
+df_prf_2023 <- prf_sinistros |> 
+  collect() |> 
+  mutate(
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais", 1, 0, missing = 0
+    ),
+    mes = month(data_inversa),
+    data = ym(paste0(ano, "-", mes))
+  ) |> 
+  summarise(
+    .by = data,
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortos)
+  ) |> 
+  arrange(data)
+  
+dados_mensais_2023 <- 
+  list(df_frota_2023, df_mortes_2023, df_pib_2023, df_prf_2023) |> 
+  reduce(full_join, by = "data") |> 
+  arrange(data)
+```
+
+```{r}
+set.seed(123)
+
+split_2023 <- initial_split(drop_na(dados_mensais_2023), prop = 0.8)
+
+train_2023 <- training(split_2023)
+test_2023 <- testing(split_2023)
+
+rec_mensal_2023 <-
+  recipe(train, mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+lm_mensal_2023 <-
+  linear_reg() |> 
+  set_engine("lm")
+
+lm_wflow_mensal_2023 <-
+  workflow() |> 
+  add_model(lm_mensal_2023) |> 
+  add_recipe(rec_mensal_2023) |> 
+  fit(train_2023)
+
+pred_mensal_2023 <-
+  bind_cols(
+    dados_mensais_2023,
+    predict(lm_wflow_mensal_2023, dados_mensais_2023),
+    predict(lm_wflow_mensal_2023, dados_mensais_2023, type = "conf_int")
+  )
+```
+
+```{r}
+ggplot(pred_mensal_2023, aes(data, mortes)) +
+    geom_ribbon(
+      aes(ymin = .pred_lower, ymax = .pred_upper),
+      fill = "grey70",
+      alpha = 0.7
+    ) +
+    geom_line(aes(y = .pred, color  = "Óbitos previstos"), size = 1) +
+    geom_line(aes(color  = "Óbitos reais"), size = 1) +
+    scale_x_date(limits = as.Date(c("2011-01-01", "2023-12-01")),
+                 date_breaks = "2 years",
+                 labels = label_date(format = "%Y")) +
+    scale_color_manual(values = c(
+      "Óbitos reais" = onsv_palette$blue,
+      "Óbitos previstos" = onsv_palette$yellow)
+    ) + 
+    scale_y_continuous(labels = comma_format(decimal.mark = ",",big.mark = ".")) +
+    xlab("Anos") +
+    ylab("Mortes")
 ```
 
 ## Conclusão
