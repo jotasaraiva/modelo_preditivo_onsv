@@ -1,60 +1,32 @@
-datatran_extract <- function(df) {
-  
-  acidentes <- df |> 
-    select(
-      data_inversa,
-      mortos,
-      feridos,
-      classificacao_acidente
-    ) |> 
-    mutate(
-      
-      ano = case_when(
-        is.character(data_inversa) ~ year(dmy(data_inversa)),
-        !is.character(data_inversa) ~ year(data_inversa)
-      ),
-      
-      classificacao_acidente = case_when(
-        classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos > 0 ~ "Com Vítimas Fatais",
-        classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
-        classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
-        TRUE ~ classificacao_acidente
-      )
-    )
-  
-  mortes <- acidentes |> 
-    group_by(ano) |> 
-    summarise(
-      qnt_acidentes = n(),
-      qnt_acidentes_fatais = sum(classificacao_acidente == "Com Vítimas Fatais"),
-      qnt_feridos = sum(feridos),
-      qnt_mortos = sum(mortos)
-    )
-  
-  return(mortes)
-  
-}
+library(arrow)
+library(tidyverse)
 
-arrange_datatran <- function() {
-  k <- seq(2007, 2021, 1)
-  enderecos_datatran <- paste(
-    "data-raw/datatran/datatran",
-    k,
-    ".csv",
-    sep = ""
-  )
-  #criação de loop para a importação de todos os anos
-  for (i in enderecos_datatran) {
-    df_temp <- read_csv2(i, locale = locale(encoding = "latin1")) |>
-      datatran_extract()
-    if (exists("datatran_anos")) {
-      datatran_anos <- bind_rows(datatran_anos, df_temp)
-    } else {
-      datatran_anos <- df_temp
-    }
-  }
-  return(datatran_anos)
-}
+url <- "https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip"
 
-sinistros_prf <- arrange_datatran()
+temp_file <- tempfile()
+temp_dir <- tempdir()
+
+download.file(url, temp_file, quiet = T)
+unzip(temp_file, exdir = temp_dir)
+
+sinistros_prf <- open_dataset(file.path(temp_dir, "prf_sinistros")) |> 
+  mutate(
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais",
+      1, 0, missing = 0
+    )
+  ) |> 
+  summarise(
+    .by = ano,
+    qnt_acidentes = n(),
+    qnt_acidentes_fatais = sum(acidentes_fatais),
+    qnt_feridos = sum(feridos),
+    qnt_mortos = sum(mortos)
+  ) |> 
+  arrange(ano) |> 
+  filter(ano <= 2021) |> 
+  collect()
+
+unlink(temp_file)
+
 save(sinistros_prf, file = "data/sinistros_prf.rda")
