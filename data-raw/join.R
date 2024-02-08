@@ -1,17 +1,10 @@
-enderecos_data <- paste(
-  here(
-    "data",
-    list.files(here("data"))
-  )
-)
-
-for (k in enderecos_data) {load(k)}
-
-frota_veiculos <- frota_veiculos |> 
-  rename(
-    veiculos_total = total,
-    ano = anos
-  )
+load("data/frota_veiculos.rda")
+load("data/obitos_transito.rda")
+load("data/pib.rda")
+load("data/populacao.rda")
+load("data/sinistros_prf.rda")
+load("data/tabela_condutores.rda")
+load("data/quilometragem.rda")
 
 df_list <- list(
   frota_veiculos,
