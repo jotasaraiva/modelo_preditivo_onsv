@@ -498,9 +498,7 @@ Retornando ao resultado obtido anteriormente de 33.725 óbitos previstos para 20
 
 ### Previsões para 2023
 
-A divulgação dos dados consolidados de óbitos em trânsito para 2022 e a atualização das bases de dados do Senatran viabilizam a repaginação do modelo linear anual, passível de uma reestruturação para acomodar os novos dados, com o objetivo de prever o ano de 2023.
-
-Para o treinamento deste modelo, a mesma metodologia é utilizada com a adição dos dados mais atuais. A previsão emitida é apresentada na @fig-pred2023:
+A divulgação dos dados consolidados de óbitos em trânsito para 2022 pelo DataSUS e a atualização das bases de dados do Senatran viabilizam a repaginação do modelo linear anual, passível de uma reestruturação para acomodar os novos dados com o objetivo de prever o total de vítimas no ano de 2023. Para o treinamento deste modelo, a mesma metodologia de treinamento é utilizada nas novas observações, sendo a previsão emitida na @fig-pred2023:
 
 ```{r}
 #| include: false
@@ -598,10 +596,16 @@ pred_anual_2023 |>
     scale_x_continuous(limits = c(2011,2023), breaks = seq(2011,2023,1)) +
     scale_y_continuous(labels = comma_format(big.mark = ".")) +
     scale_discrete_onsv() + 
-    labs(x = NULL, y = NULL)
+    labs(x = NULL, y = NULL) +
+    annotate("label",
+             x = 2022,
+             y = 40000,
+             label = paste0("Total de 2023:\n", 
+                            round(last(pred_anual_2023$.pred)),
+                            " vítimas"))
 ```
 
-É notável um aumento relativamente alto de vítimas previstas em comparação à previsão de 2022, assim como uma dilatação no intervalo de confiança para dados exteriores ao conjunto de ajuste. Este fato implica que o alto desempenho do mesmo modelo em 2022 possa ter sido parcial ao acaso, podendo este ocasionar em um valor menos preciso para o caso de 2023.
+É notável um aumento expressivo de vítimas previstas em comparação à previsão de 2022, assim como uma dilatação no intervalo de confiança para dados exteriores ao conjunto de ajuste. Este fato implica que o alto desempenho do mesmo modelo em 2022 possa ter sido parcial ao acaso, podendo este ocasionar em um valor menos preciso para o caso de 2023.
 
 ## Modelo Preditivo Mensal
 
@@ -1402,6 +1406,8 @@ bind_rows(
 
 ### Previsões para 2023
 
+Em conformidade com a renovação dos dados das bases consultadas para o ano de 2023, é viável a atualização do modelo mensal para a emissão de uma nova previsão. Sendo assim, a escolha do modelo de regressão linear mensal para esta situação é decorrente da capacidade deste algoritmo em fornecer intervalos de confiança. As predições mensais de 2023 estão destacadas na @fig-predmes2023, assim como o total de vítimas de trânsito neste período:
+
 ```{r}
 #| include: false
 
@@ -1459,6 +1465,8 @@ dados_mensais_2023 <-
 ```
 
 ```{r}
+#| include: false
+
 set.seed(123)
 
 split_2023 <- initial_split(drop_na(dados_mensais_2023), prop = 0.8)
@@ -1490,6 +1498,18 @@ pred_mensal_2023 <-
 ```
 
 ```{r}
+#| echo: false
+#| label: fig-predmes2023
+#| fig.cap: Previsão de mortes mensais para 2023
+#| fig.width: 7
+#| fig.height: 5
+
+pred_soma_2023 <- pred_mensal_2023 |> 
+  filter(year(data) == 2023) |> 
+  select(.pred) |> 
+  sum() |> 
+  round()
+
 ggplot(pred_mensal_2023, aes(data, mortes)) +
     geom_ribbon(
       aes(ymin = .pred_lower, ymax = .pred_upper),
@@ -1507,7 +1527,33 @@ ggplot(pred_mensal_2023, aes(data, mortes)) +
     ) + 
     scale_y_continuous(labels = comma_format(decimal.mark = ",",big.mark = ".")) +
     xlab("Anos") +
-    ylab("Mortes")
+    ylab("Mortes") +
+    geom_label(x = as.Date("2022-01-01"), y = 3500, 
+             label = paste0("Total de 2023:\n", pred_soma_2023, " vítimas"))
+```
+
+Como de praxe, os valores para as métricas de avaliação do modelo ajustado são evidenciados na @tbl-erlinreg2023, demonstrando a capacidade de aprendizado e predição do mesmo.
+
+```{r}
+#| echo: false
+#| label: tbl-erlinreg2023
+#| fig.width: 7
+#| fig.height: 5
+#| tbl-cap: Métricas de erro para regressão linear mensal de 2023
+
+df_metricas_2023 <-
+  bind_cols(
+    test_2023,
+    predict(lm_wflow_mensal_2023, test_2023)
+  )
+
+ml_metrics(df_metricas_2023, truth = mortes, estimate = .pred) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric)) |> 
+  rename(Métrica = .metric, Valor = .estimate) |>
+  knitr::kable(table.attr = "quarto-disable-processing=true") |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::column_spec(1, width = "6cm", bold = T)
 ```
 
 ## Conclusão
