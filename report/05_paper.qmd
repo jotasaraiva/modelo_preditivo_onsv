@@ -1537,8 +1537,6 @@ Como de praxe, os valores para as métricas de avaliação do modelo ajustado s�
 ```{r}
 #| echo: false
 #| label: tbl-erlinreg2023
-#| fig.width: 7
-#| fig.height: 5
 #| tbl-cap: Métricas de erro para regressão linear mensal de 2023
 
 df_metricas_2023 <-
