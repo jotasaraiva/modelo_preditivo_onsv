@@ -7,6 +7,7 @@
 - [Previsões](#previsões)
   - [Previsão de 2022](#previsão-de-2022)
   - [Previsão de 2023](#previsão-de-2023)
+  - [Tabela de previsões](#tabela-de-previsões)
 
 ## Descrição
 
@@ -20,7 +21,7 @@ de uma regressão linear multivariada com as variáveis:
   (PRF);
 - Óbitos em trânsito (variável dependente - DataSUS).
 
-Pacotes utilizados
+Pacotes utilizados:
 
 ``` r
 library(tidyverse)
@@ -81,3 +82,18 @@ com as funções de métricas `rmse()`, `mae()` e `rsq()`:
 ![](13_modelo_trimestral_files/figure-commonmark/unnamed-chunk-12-1.png)
 
 ![](13_modelo_trimestral_files/figure-commonmark/unnamed-chunk-13-1.png)
+
+### Tabela de previsões
+
+| Previsão         | Valor            |  Ano |
+|:-----------------|:-----------------|-----:|
+| Óbitos reais     | 33894            | 2022 |
+| Óbitos previstos | 34277.8790955293 | 2022 |
+| Mín.             | 32916.4107831219 | 2022 |
+| Máx.             | 35639.3474079368 | 2022 |
+| Óbitos reais     | \-               | 2023 |
+| Óbitos previstos | 36241.2403957546 | 2023 |
+| Mín.             | 33550.8644473077 | 2023 |
+| Máx.             | 38931.6163442015 | 2023 |
+
+![](13_modelo_trimestral_files/figure-commonmark/unnamed-chunk-15-1.png)

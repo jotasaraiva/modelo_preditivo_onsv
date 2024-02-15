@@ -254,6 +254,8 @@ pred_trimestre |>
   labs(x = "Ano", y = "Óbitos")
 ```
 
+### Previsão de 2023
+
 ```{r}
 #| include: false
 #| warning: false
@@ -283,8 +285,6 @@ pred_trimestre_2023 <- bind_cols(
   predict(lm_wflow_fit, df_trimestre_2023, type = "conf_int")
 )
 ```
-
-### Previsão de 2023
 
 ```{r}
 #| warning: false
@@ -336,5 +336,59 @@ pred_trimestre_2023 |>
   scale_x_continuous(breaks = seq(2011, 2023, 1)) +
   scale_y_continuous(labels = comma_format(big.mark = ".")) +
   labs(x = "Ano", y = "Óbitos")
+```
+
+### Tabela de previsões
+
+```{r}
+#| warning: false
+#| echo: false
+
+previsto2022 <- pred_trimestre |> 
+  tail(4) |> 
+  select(mortes, .pred, .pred_lower, .pred_upper) |> 
+  rename(`Óbitos reais` = mortes,
+         `Óbitos previstos` = .pred,
+         `Máx.` = .pred_upper, 
+         `Mín.` = .pred_lower) |> 
+  colSums()
+
+previsto2023 <- pred_trimestre_2023 |> 
+  tail(4) |> 
+  select(mortes, .pred, .pred_lower, .pred_upper) |> 
+  rename(`Óbitos reais` = mortes,
+         `Óbitos previstos` = .pred,
+         `Máx.` = .pred_upper, 
+         `Mín.` = .pred_lower) |> 
+  colSums()
+
+previsto2022 <- previsto2022 |> 
+  data.frame() |> 
+  rownames_to_column() |> 
+  rename(`Previsão` = rowname, Valor = previsto2022) |> 
+  mutate(Ano = 2022)
+
+previsto2023 <- previsto2023 |> 
+  data.frame() |> 
+  rownames_to_column() |>
+  rename(`Previsão` = rowname, Valor = previsto2023) |> 
+  mutate(Ano = 2023)
+
+bind_rows(previsto2022, previsto2023) |>
+  mutate(Valor = as.character(Valor)) |> 
+  replace_na(list(Valor = "-")) |>
+  kable()
+```
+
+```{r}
+#| warning: false
+#| echo: false
+
+bind_rows(previsto2022, previsto2023) |> 
+  mutate(Ano = as.character(Ano)) |> 
+  ggplot(aes(`Previsão`, Valor, fill = Ano)) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.5) +
+    scale_discrete_onsv() +
+    scale_y_continuous(labels = comma_format(big.mark = "."))
 ```
 
