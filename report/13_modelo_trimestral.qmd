@@ -1,0 +1,340 @@
+---
+title: "Modelo Preditivo Trimestral de Mortes no Trânsito"
+format: gfm
+toc: true
+---
+
+## Descrição
+
+Modelo de âmbito nacional para a previsão de número de mortos em trânsito em resolução temporal trimestral. Este modelo é criado a partir de uma regressão linear multivariada com as variáveis:
+
+- Frota (veículos totais, motocicletas e automóveis - RENAVAM);
+- PIB (em dólar - Bacen);
+- Acidentes totais, acidentes fatais e feridos em rodovias federais (PRF);
+- Óbitos em trânsito (variável dependente - DataSUS).
+
+Pacotes utilizados:
+
+```{r}
+#| output: false
+
+library(tidyverse)
+library(tidymodels)
+library(here)
+library(fleetbr)
+library(arrow)
+library(roadtrafficdeaths)
+library(onsvplot)
+library(knitr)
+```
+
+## Dados
+
+```{r}
+#| include: false
+load(here("data/pib_mensal.rda"))
+temp <- tempfile()
+download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip", temp)
+unzip(temp, exdir = tempdir())
+unlink(temp)
+prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
+
+options(scipen = 999)
+theme_set(theme_onsv())
+```
+
+```{r}
+#| include: false
+
+df_frota_2023 <- fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    veiculos = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+df_mortes_2023 <- rtdeaths |> 
+  mutate(mes = month(data_ocorrencia),
+         ano = year(data_ocorrencia),
+         data = ym(paste0(ano, "-", mes))) |> 
+  count(data, name = "mortes") |> 
+  drop_na()
+
+df_pib_2023 <- pib_mensal |> 
+  mutate(data = ym(paste0(ano, "-", mes))) |> 
+  group_by(data) |> 
+  summarise(pib)
+
+df_prf_2023 <- prf_sinistros |> 
+  collect() |> 
+  mutate(
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais", 1, 0, missing = 0
+    ),
+    mes = month(data_inversa),
+    data = ym(paste0(ano, "-", mes))
+  ) |> 
+  summarise(
+    .by = data,
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortos)
+  ) |> 
+  arrange(data)
+  
+dados_mensais_2023 <- 
+  list(df_frota_2023, df_mortes_2023, df_pib_2023, df_prf_2023) |> 
+  reduce(full_join, by = "data") |> 
+  arrange(data)
+```
+
+Os dados foram pré-processados e agrupados em trimestres utilizando a função `lubridate::quarter()` para a criação do *dataset* do modelo, como indica a tabela:
+
+```{r}
+#| echo: false
+#| warning: false
+
+df_trimestre <- dados_mensais_2023 |> 
+  drop_na() |> 
+  mutate(
+    trimestre = quarter(data),
+    data = as_factor(paste0(year(data), " T", quarter(data)))
+  ) |> 
+  group_by(data, trimestre) |> 
+  summarise(
+    veiculos = last(veiculos),
+    automovel = last(automovel),
+    motocicleta = last(motocicleta),
+    mortes = sum(mortes),
+    pib = sum(pib),
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes_prf)
+  ) |> 
+  ungroup()
+
+kable(head(df_trimestre, 8))
+```
+
+Como demonstram os gráficos de série temporal e autocorrelação, óbitos em trânsito possuem uma sazonalidade trimestral: 
+
+```{r}
+#| warning: false
+#| echo: false 
+
+df_trimestre |> 
+  ggplot(aes(data, mortes)) +
+    geom_line(group = 1, color = onsv_palette$blue) +
+    geom_point(group = 1, color = onsv_palette$blue) +
+    theme(axis.text.x = element_text(vjust = 0.5, angle = 90)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    labs(x = "Trimestres", y = "Óbitos")
+```
+
+```{r}
+#| echo: false
+
+autocor <-acf(df_trimestre$mortes, plot = F)
+plot(autocor, main = "Autocorrelação")
+```
+
+## Modelagem
+
+O modelo foi treinado com 75% dos dados, tendo seu desempenho avaliado com as funções de métricas `rmse()`, `mae()` e `rsq()`: 
+
+```{r}
+#| include: false
+
+set.seed(123)
+
+splits <- initial_split(drop_na(df_trimestre), prop = 3/4)
+train <- training(splits)
+test <- testing(splits)
+
+metrix <- metric_set(rmse, mae, rsq)
+
+rec <- 
+  recipe(df_trimestre, mortes ~ .) |> 
+  remove_role(c(mortes_prf, trimestre, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+model <-
+  linear_reg() |>
+  set_engine("lm")
+
+lm_wflow <-
+  workflow() |> 
+  add_model(model) |> 
+  add_recipe(rec)
+
+lm_wflow_fit <-
+  lm_wflow |> 
+  fit(train)
+```
+
+```{r}
+#| echo: false
+
+bind_cols(test, predict(lm_wflow_fit, test)) |> 
+  metrix(truth = mortes, estimate = .pred) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric), 
+         .estimate = round(.estimate, digits = 2)) |> 
+  rename(`Métrica` = .metric, Valor = .estimate) |> 
+  kable()
+```
+
+## Previsões
+
+### Previsão de 2022
+
+```{r}
+#| warning: false
+#| echo: false
+
+pred_trimestre <- bind_cols(
+  df_trimestre,
+  predict(lm_wflow_fit, df_trimestre),
+  predict(lm_wflow_fit, df_trimestre, type = "conf_int")
+) 
+
+pred_trimestre |> 
+  ggplot(aes(data)) +
+  geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), 
+              group = 1, alpha = 0.1) +
+  geom_line(aes(y = mortes, color = "Óbitos reais"), group = 1) +
+  geom_line(aes(y = .pred, color = "Óbitos previstos"), group = 1) +
+  geom_point(aes(y = mortes, color = "Óbitos reais"), group = 1) +
+  geom_point(aes(y = .pred, color = "Óbitos previstos"), group = 1) +
+  scale_color_manual(values = c(
+      "Óbitos reais" = onsv_palette$yellow,
+      "Óbitos previstos" = onsv_palette$blue
+    )) +
+  theme(axis.text.x = element_text(vjust = 0.5, angle = 90)) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) +
+  labs(x = "Trimestres", y = "Óbitos")
+```
+
+```{r}
+#| warning: false
+#| echo: false
+
+pred_trimestre |> 
+  mutate(ano = as.integer(str_sub(data, 0, 4))) |> 
+  summarise(
+    .by = ano,
+    mortes = sum(mortes),
+    .pred = sum(.pred),
+    .pred_lower = sum(.pred_lower),
+    .pred_upper = sum(.pred_upper)
+  ) |> 
+  ggplot(aes(ano)) +
+  geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), 
+              group = 1, alpha = 0.1) +
+  geom_line(aes(y = mortes, color = "Óbitos reais")) +
+  geom_line(aes(y = .pred, color = "Óbitos previstos")) +
+  geom_point(aes(y = mortes, color = "Óbitos reais")) +
+  geom_point(aes(y = .pred, color = "Óbitos previstos")) +
+  scale_color_manual(values = c(
+      "Óbitos reais" = onsv_palette$yellow,
+      "Óbitos previstos" = onsv_palette$blue
+    )) +
+  scale_x_continuous(breaks = seq(2011, 2022, 1)) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) +
+  labs(x = "Ano", y = "Óbitos")
+```
+
+```{r}
+#| include: false
+#| warning: false
+
+df_trimestre_2023 <- dados_mensais_2023 |>
+  mutate(
+    trimestre = quarter(data),
+    data = as_factor(paste0(year(data), " T", quarter(data)))
+  ) |> 
+  group_by(data, trimestre) |> 
+  summarise(
+    veiculos = last(veiculos),
+    automovel = last(automovel),
+    motocicleta = last(motocicleta),
+    mortes = sum(mortes),
+    pib = sum(pib),
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes_prf)
+  ) |> 
+  ungroup()
+
+pred_trimestre_2023 <- bind_cols(
+  df_trimestre_2023,
+  predict(lm_wflow_fit, df_trimestre_2023),
+  predict(lm_wflow_fit, df_trimestre_2023, type = "conf_int")
+)
+```
+
+### Previsão de 2023
+
+```{r}
+#| warning: false
+#| echo: false
+
+pred_trimestre_2023 |> 
+  drop_na(.pred) |> 
+  ggplot(aes(data)) +
+  geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), 
+              group = 1, alpha = 0.1) +
+  geom_line(aes(y = mortes, color = "Óbitos reais"), group = 1) +
+  geom_line(aes(y = .pred, color = "Óbitos previstos"), group = 1) +
+  geom_point(aes(y = mortes, color = "Óbitos reais"), group = 1) +
+  geom_point(aes(y = .pred, color = "Óbitos previstos"), group = 1) +
+  scale_color_manual(values = c(
+      "Óbitos reais" = onsv_palette$yellow,
+      "Óbitos previstos" = onsv_palette$blue
+    )) +
+  theme(axis.text.x = element_text(vjust = 0.5, angle = 90)) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) +
+  labs(x = "Trimestres", y = "Óbitos")
+```
+
+```{r}
+#| warning: false
+#| echo: false
+
+pred_trimestre_2023 |> 
+  drop_na(.pred) |> 
+  mutate(ano = as.integer(str_sub(data, 0, 4))) |> 
+  summarise(
+    .by = ano,
+    mortes = sum(mortes),
+    .pred = sum(.pred),
+    .pred_lower = sum(.pred_lower),
+    .pred_upper = sum(.pred_upper)
+  ) |> 
+  ggplot(aes(ano)) +
+  geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower), 
+              group = 1, alpha = 0.1) +
+  geom_line(aes(y = mortes, color = "Óbitos reais")) +
+  geom_line(aes(y = .pred, color = "Óbitos previstos")) +
+  geom_point(aes(y = mortes, color = "Óbitos reais")) +
+  geom_point(aes(y = .pred, color = "Óbitos previstos")) +
+  scale_color_manual(values = c(
+      "Óbitos reais" = onsv_palette$yellow,
+      "Óbitos previstos" = onsv_palette$blue
+    )) +
+  scale_x_continuous(breaks = seq(2011, 2023, 1)) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) +
+  labs(x = "Ano", y = "Óbitos")
+```
+
