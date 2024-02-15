@@ -85,15 +85,15 @@ com as funções de métricas `rmse()`, `mae()` e `rsq()`:
 
 ### Tabela de previsões
 
-| Previsão         | Valor            |  Ano |
-|:-----------------|:-----------------|-----:|
-| Óbitos reais     | 33894            | 2022 |
-| Óbitos previstos | 34277.8790955293 | 2022 |
-| Mín.             | 32916.4107831219 | 2022 |
-| Máx.             | 35639.3474079368 | 2022 |
-| Óbitos reais     | \-               | 2023 |
-| Óbitos previstos | 36241.2403957546 | 2023 |
-| Mín.             | 33550.8644473077 | 2023 |
-| Máx.             | 38931.6163442015 | 2023 |
+| Previsão         | Valor |  Ano |
+|:-----------------|:------|-----:|
+| Óbitos reais     | 33894 | 2022 |
+| Óbitos previstos | 34278 | 2022 |
+| Mín.             | 32916 | 2022 |
+| Máx.             | 35639 | 2022 |
+| Óbitos reais     | \-    | 2023 |
+| Óbitos previstos | 36241 | 2023 |
+| Mín.             | 33551 | 2023 |
+| Máx.             | 38932 | 2023 |
 
 ![](13_modelo_trimestral_files/figure-commonmark/unnamed-chunk-15-1.png)

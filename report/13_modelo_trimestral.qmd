@@ -375,7 +375,7 @@ previsto2023 <- previsto2023 |>
   mutate(Ano = 2023)
 
 bind_rows(previsto2022, previsto2023) |>
-  mutate(Valor = as.character(Valor)) |> 
+  mutate(Valor = as.character(round(Valor, digits = 0))) |> 
   replace_na(list(Valor = "-")) |>
   kable()
 ```
