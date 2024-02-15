@@ -1,7 +1,7 @@
 ---
 title: "Modelo mensal de análise de regressão"
 format: html
-editor: visual
+editor: source
 ---
 
 ## Importação
@@ -11,10 +11,106 @@ library(tidyverse)
 library(tidymodels)
 library(onsvplot)
 library(here)
+library(roadtrafficdeaths)
+library(fleetbr)
+library(arrow)
 ```
 
 ```{r}
-load(here("data","tabela_total_mes_uf.rda"))
+# função para transformar nome de uf para sigla
+brazil_states_acronym <- function(df) {
+  brazil_states_df <- data.frame(
+    State = c(
+      "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal",
+      "Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul",
+      "Minas Gerais", "Pará", "Paraíba", "Paraná", "Pernambuco", "Piauí",
+      "Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia", "Roraima",
+      "Santa Catarina", "São Paulo", "Sergipe", "Tocantins"
+    ),
+    Acronym = c(
+      "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+      "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+    )
+  )
+  
+  for(i in 1:length(df$uf)) {
+    for(j in 1:length(brazil_states_df$State)) {
+      if(df$uf[i] == brazil_states_df$State[j] & !is.na(df$uf[i])) {
+        df$uf[i] <- brazil_states_df$Acronym[j]
+      }
+    }
+  }
+  
+  return(df)
+}
+```
+
+```{r}
+# frota
+df_frota <- fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(data = ym(paste0(ano, "-", mes)),
+         automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+         motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA,
+         total = TOTAL) |> 
+  summarise(
+    .by = c(data, uf),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta),
+    veiculos = sum(total)
+  )
+
+# prf
+url <- "https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip"
+
+temp_file <- tempfile()
+temp_dir <- tempdir()
+
+download.file(url, temp_file, quiet = T)
+unzip(temp_file, exdir = temp_dir)
+
+df_prf <- open_dataset(file.path(temp_dir,"prf_sinistros")) |> 
+  mutate(
+    mes = month(data_inversa),
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais",
+      1, 0, missing = 0
+    )
+  ) |> 
+  summarise(
+    .by = c(mes, ano, uf),
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortos)
+  ) |> 
+  arrange(mes, ano) |>
+  mutate(data = ym(paste0(ano, "-", mes))) |> 
+  select(-c(mes, ano)) |> 
+  collect()
+
+unlink(temp_file)
+
+# mortes
+df_mortes <- rtdeaths |> 
+  mutate(mes_ocorrencia = month(data_ocorrencia)) |>
+  count(mes_ocorrencia, ano_ocorrencia, nome_uf_ocor) |> 
+  arrange(ano_ocorrencia) |> 
+  rename(
+    mortes = n,
+    mes = mes_ocorrencia,
+    ano = ano_ocorrencia,
+    uf = nome_uf_ocor
+  ) |> 
+  brazil_states_acronym() |> 
+  mutate(data = ym(paste0(ano, "-", mes))) |> 
+  select(c(uf, mortes, data))
+
+dados_mensais_uf <- reduce(
+  list(df_frota, df_prf, df_mortes),
+  inner_join,
+  by = c("data", "uf")
+)
 ```
 
 ## Modelo Regional
@@ -105,7 +201,6 @@ lm <-
   set_engine("glm")
 ```
 
-
 ```{r}
 df_splits <- 
   df_nest |> 
@@ -135,7 +230,7 @@ fit_models <- function(df) {
 predict_models <- function(df,testing_col) {
   for(i in seq_along(df$model)) {
     df$pred[[i]] <- bind_cols(
-      df$testing[[i]],
+      df[[testing_col]][[i]],
       predict(df$fit[[i]],df[[testing_col]][[i]]),
       predict(df$fit[[i]],df[[testing_col]][[i]],type = "conf_int")
     )
@@ -235,12 +330,10 @@ df |>
 preds
 ```
 
-
 ## Modelo Estadual
 
 ```{r}
-rm(list = ls())
-load(here("data","tabela_total_mes_uf.rda"))
+rm(list = (ls()[ls() != "dados_mensais_uf"]))
 ```
 
 ```{r}
@@ -281,7 +374,7 @@ fit_models <- function(df) {
 predict_models <- function(df,testing_col) {
   for(i in seq_along(df$model)) {
     df$pred[[i]] <- bind_cols(
-      df$testing[[i]],
+      df[[testing_col]][[i]],
       predict(df$fit[[i]],df[[testing_col]][[i]]),
       predict(df$fit[[i]],df[[testing_col]][[i]],type = "conf_int")
     )
@@ -306,7 +399,21 @@ modelos_estaduais <-
   fit_models() |> 
   predict_models("testing")
   
-  
-
 modelos_estaduais
 ```
+
+```{r}
+ts_estaduais <- modelos_estaduais |> 
+  predict_models("data")
+
+ts_estaduais$pred |>
+  last() |> 
+  summarise(
+    .by = data,
+    mortes = sum(mortes),
+    .pred = sum(.pred),
+    .pred_lower = sum(.pred_lower),
+    .pred_upper = sum(.pred_upper)
+  )
+```
+
