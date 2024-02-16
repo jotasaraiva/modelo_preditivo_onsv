@@ -11,8 +11,8 @@ df_frota <- frota_mensal |>
   pivot_wider(names_from = modal, values_from = frota) |> 
   mutate(
     data = ym(paste0(ano,"-",mes)),
-    automovel = AUTOMOVEL, CAMINHONETE, CAMIONETA, UTILITARIO,
-    motocicleta = MOTOCICLETA, CICLOMOTOR, MOTONETA
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
   ) |> 
   rename(total = TOTAL) |> 
   summarise(

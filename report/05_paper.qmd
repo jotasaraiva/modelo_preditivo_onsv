@@ -494,6 +494,119 @@ df_pred |>
 
 O valor obtido da previsão implica em uma leve queda de 7,4% no número de mortes em relação ao ano anterior (2021), que registrou 33.813 casos. Conforme a análise dos dados, 2021 foi o segundo ano consecutivo a apresentar um aumento em fatalidades no trânsito. O intervalo de confiança mostra como este pode ser o caso de 2022 novamente, não obstante da diminuição prevista para as mortes. Ademais, é notável que, apesar da intensidade das correlações dos preditores selecionados para o estudo, a resolução temporal anual permanece como um gargalo para a análise dos sinistros de trânsito, já que a disponibilidade de dados é limitada.
 
+Retornando ao resultado obtido anteriormente de 33.725 óbitos previstos para 2022, é possível comparar o valor previsto ao valor consolidado real disponibilizado pelo DataSUS em 2024. Foram encontrados 33.894 óbitos, exibindo uma diferença de 169 vítimas esperadas por este modelo.
+
+### Previsões para 2023
+
+A divulgação dos dados consolidados de óbitos em trânsito para 2022 pelo DataSUS e a atualização das bases de dados do Senatran viabilizam a repaginação do modelo linear anual, passível de uma reestruturação para acomodar os novos dados com o objetivo de prever o total de vítimas no ano de 2023. Para o treinamento deste modelo, a mesma metodologia de treinamento é utilizada nas novas observações, sendo a previsão emitida na @fig-pred2023:
+
+```{r}
+#| include: false
+
+library(fleetbr)
+library(roadtrafficdeaths)
+library(arrow)
+library(here)
+load(here("data","tabela_condutores.rda"))
+
+# carrega dados para análises posteriores
+load(here("data","tabela_total.rda"))
+load(here("data","tabela_total_mensal.rda"))
+
+# dados atualizados
+
+temp <- tempfile()
+download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip", temp)
+unzip(temp, exdir = tempdir())
+unlink(temp)
+prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
+```
+
+```{r}
+#| include: false
+
+dados_modelo_2023 <- list(
+  drop_na(count(rename(rtdeaths, ano = ano_ocorrencia), ano, name = "mortes")),
+  summarise(filter(fleetbr, modal == "TOTAL", mes == 7), 
+            .by = ano, frota = sum(frota)),
+  prf_sinistros |> 
+    filter(classificacao_acidente == "Com Vítimas Fatais") |> 
+    count(ano, name = "acids_fatais") |> 
+    collect(),
+  prf_sinistros |> 
+    count(ano, name = "acids") |> 
+    collect(),
+  tabela_condutores
+) |> 
+  reduce(full_join, by = "ano") |> 
+  arrange(ano)
+```
+
+```{r}
+#| include=FALSE
+
+rec_anual_2023 <-
+  recipe(x = drop_na(dados_modelo_2023), mortes ~ .) |> 
+  remove_role(ano, old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+modelo_anual_2023 <-
+  linear_reg() |> 
+  set_engine("lm")
+  
+wflow_anual_2023 <-
+  workflow() |> 
+  add_model(modelo_anual_2023) |> 
+  add_recipe(rec_anual_2023) |> 
+  fit(drop_na(dados_modelo_2023))
+
+pred_anual_2023 <- bind_cols(
+  dados_modelo_2023,
+  predict(wflow_anual_2023, dados_modelo_2023),
+  predict(wflow_anual_2023, dados_modelo_2023, type = "conf_int")
+)
+```
+
+```{r}
+#| echo: false
+#| label: fig-pred2023
+#| fig.cap: Previsão de mortes anuais para 2023
+#| fig.width: 7
+#| fig.height: 5
+
+pred_anual_2023 |> 
+  select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
+  pivot_longer(
+    cols = c(.pred, mortes),
+    names_to = "Tipo",
+    values_to = "Mortes"
+  ) |> 
+  mutate(
+    Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")
+  ) |> 
+  ggplot(aes(ano, Mortes, color = Tipo)) +
+    geom_ribbon(
+      aes(ymax = .pred_upper, ymin = .pred_lower),
+      fill = "grey",
+      color = "grey",
+      alpha = 0.25
+    ) +
+    geom_line(linewidth = 1, alpha = 0.25) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+    scale_x_continuous(limits = c(2011,2023), breaks = seq(2011,2023,1)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    scale_discrete_onsv() + 
+    labs(x = NULL, y = NULL) +
+    annotate("label",
+             x = 2022,
+             y = 40000,
+             label = paste0("Total de 2023:\n", 
+                            round(last(pred_anual_2023$.pred)),
+                            " vítimas"))
+```
+
+É notável um aumento expressivo de vítimas previstas em comparação à previsão de 2022, assim como uma dilatação no intervalo de confiança para dados exteriores ao conjunto de ajuste. Este fato implica que o alto desempenho do mesmo modelo em 2022 possa ter sido parcial ao acaso, podendo este ocasionar em um valor menos preciso para o caso de 2023.
+
 ## Modelo Preditivo Mensal
 
 ### Metodologia
@@ -1137,8 +1250,8 @@ frota_2022 <- frota_mensal |>
   pivot_wider(names_from = modal, values_from = frota) |> 
   mutate(
     data = ym(paste0(ano,"-",mes)),
-    automovel = AUTOMOVEL, CAMINHONETE, CAMIONETA, UTILITARIO,
-    motocicleta = MOTOCICLETA, CICLOMOTOR, MOTONETA
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
   ) |> 
   rename(total = TOTAL) |> 
   summarise(
@@ -1289,6 +1402,156 @@ bind_rows(
                            rows = Modelo == "Random Forest Mensal"),
     placement = "left"
   )
+```
+
+### Previsões para 2023
+
+Em conformidade com a renovação dos dados das bases consultadas para o ano de 2023, é viável a atualização do modelo mensal para a emissão de uma nova previsão. Sendo assim, a escolha do modelo de regressão linear mensal para esta situação é decorrente da capacidade deste algoritmo em fornecer intervalos de confiança. As predições mensais de 2023 estão destacadas na @fig-predmes2023, assim como o total de vítimas de trânsito neste período:
+
+```{r}
+#| include: false
+
+load(here("data/pib_mensal.rda"))
+
+df_frota_2023 <- fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    veiculos = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+df_mortes_2023 <- rtdeaths |> 
+  mutate(mes = month(data_ocorrencia),
+         ano = year(data_ocorrencia),
+         data = ym(paste0(ano, "-", mes))) |> 
+  count(data, name = "mortes") |> 
+  drop_na()
+
+df_pib_2023 <- pib_mensal |> 
+  mutate(data = ym(paste0(ano, "-", mes))) |> 
+  group_by(data) |> 
+  summarise(pib)
+
+df_prf_2023 <- prf_sinistros |> 
+  collect() |> 
+  mutate(
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais", 1, 0, missing = 0
+    ),
+    mes = month(data_inversa),
+    data = ym(paste0(ano, "-", mes))
+  ) |> 
+  summarise(
+    .by = data,
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortos)
+  ) |> 
+  arrange(data)
+  
+dados_mensais_2023 <- 
+  list(df_frota_2023, df_mortes_2023, df_pib_2023, df_prf_2023) |> 
+  reduce(full_join, by = "data") |> 
+  arrange(data)
+```
+
+```{r}
+#| include: false
+
+set.seed(123)
+
+split_2023 <- initial_split(drop_na(dados_mensais_2023), prop = 0.8)
+
+train_2023 <- training(split_2023)
+test_2023 <- testing(split_2023)
+
+rec_mensal_2023 <-
+  recipe(train, mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+lm_mensal_2023 <-
+  linear_reg() |> 
+  set_engine("lm")
+
+lm_wflow_mensal_2023 <-
+  workflow() |> 
+  add_model(lm_mensal_2023) |> 
+  add_recipe(rec_mensal_2023) |> 
+  fit(train_2023)
+
+pred_mensal_2023 <-
+  bind_cols(
+    dados_mensais_2023,
+    predict(lm_wflow_mensal_2023, dados_mensais_2023),
+    predict(lm_wflow_mensal_2023, dados_mensais_2023, type = "conf_int")
+  )
+```
+
+```{r}
+#| echo: false
+#| label: fig-predmes2023
+#| fig.cap: Previsão de mortes mensais para 2023
+#| fig.width: 7
+#| fig.height: 5
+
+pred_soma_2023 <- pred_mensal_2023 |> 
+  filter(year(data) == 2023) |> 
+  select(.pred) |> 
+  sum() |> 
+  round()
+
+ggplot(pred_mensal_2023, aes(data, mortes)) +
+    geom_ribbon(
+      aes(ymin = .pred_lower, ymax = .pred_upper),
+      fill = "grey70",
+      alpha = 0.7
+    ) +
+    geom_line(aes(y = .pred, color  = "Óbitos previstos"), size = 1) +
+    geom_line(aes(color  = "Óbitos reais"), size = 1) +
+    scale_x_date(limits = as.Date(c("2011-01-01", "2023-12-01")),
+                 date_breaks = "2 years",
+                 labels = label_date(format = "%Y")) +
+    scale_color_manual(values = c(
+      "Óbitos reais" = onsv_palette$blue,
+      "Óbitos previstos" = onsv_palette$yellow)
+    ) + 
+    scale_y_continuous(labels = comma_format(decimal.mark = ",",big.mark = ".")) +
+    xlab("Anos") +
+    ylab("Mortes") +
+    geom_label(x = as.Date("2022-01-01"), y = 3500, 
+             label = paste0("Total de 2023:\n", pred_soma_2023, " vítimas"))
+```
+
+Como de praxe, os valores para as métricas de avaliação do modelo ajustado são evidenciados na @tbl-erlinreg2023, demonstrando a capacidade de aprendizado e predição do mesmo.
+
+```{r}
+#| echo: false
+#| label: tbl-erlinreg2023
+#| tbl-cap: Métricas de erro para regressão linear mensal de 2023
+
+df_metricas_2023 <-
+  bind_cols(
+    test_2023,
+    predict(lm_wflow_mensal_2023, test_2023)
+  )
+
+ml_metrics(df_metricas_2023, truth = mortes, estimate = .pred) |> 
+  select(-.estimator) |> 
+  mutate(.metric = toupper(.metric)) |> 
+  rename(Métrica = .metric, Valor = .estimate) |>
+  knitr::kable(table.attr = "quarto-disable-processing=true") |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::column_spec(1, width = "6cm", bold = T)
 ```
 
 ## Conclusão

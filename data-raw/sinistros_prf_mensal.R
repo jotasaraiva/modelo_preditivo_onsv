@@ -1,46 +1,32 @@
-filepaths <- paste0(here("data-raw","datatran//"),
-                        list.files(here("data-raw/datatran")))
+library(tidyverse)
+library(arrow)
 
-read_accident <- function(paths) {
-  prf <- lapply(
-    paths,
-    read_delim,
-    delim = ";",
-    locale = locale(decimal_mark = ",",
-                    encoding = "latin1",
-                    date_format = "%d/%m/%Y")
-  )
-  
-  prf[[10]] <- prf[[10]] |> 
-    mutate(data_inversa = dmy(data_inversa))
-  
-  prf <- reduce(
-    lapply(prf, select, data_inversa, uf, causa_acidente, tipo_acidente, 
-           classificacao_acidente, pessoas, mortos,feridos), 
-    full_join
+url <- "https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip"
+
+temp_file <- tempfile()
+temp_dir <- tempdir()
+
+download.file(url, temp_file, quiet = T)
+unzip(temp_file, exdir = temp_dir)
+
+sinistros_prf_mensal <- open_dataset(file.path(temp_dir,"prf_sinistros")) |> 
+  mutate(
+    mes = month(data_inversa),
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais",
+      1, 0, missing = 0
+    )
   ) |> 
-    mutate(
-      ano = year(data_inversa),
-      mes = month(data_inversa),
-      classificacao_acidente = case_when(
-        classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos > 0 ~ "Com Vítimas Fatais",
-        classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos > 0 ~ "Com Vítimas Feridas",
-        classificacao_acidente %in% c("(null)","Ignorado",NA) & mortos == 0 & feridos == 0 ~ "Sem Vítimas",
-        TRUE ~ classificacao_acidente
-      )
-    ) |> 
-    summarise(
-      .by = c("mes","ano","uf"),
-      acidentes = n(),
-      acidentes_fatais = sum(classificacao_acidente == "Com Vítimas Fatais"),
-      feridos = sum(feridos),
-      mortes = sum(mortos)
-    ) |> 
-    arrange(ano, mes)
-  
-  return(prf)
-}
+  summarise(
+    .by = c(mes, ano, uf),
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes = sum(mortos)
+  ) |> 
+  arrange(mes, ano) |> 
+  collect()
 
-sinistros_prf_mensal <- read_accident(filepaths)
+unlink(temp_file)
 
 save(sinistros_prf_mensal, file = "data/sinistros_prf_mensal.rda")
