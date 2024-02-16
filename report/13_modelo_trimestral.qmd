@@ -1,6 +1,7 @@
 ---
 title: "Modelo Preditivo Trimestral de Mortes no Trânsito"
-format: gfm
+format: html
+editor: visual
 toc: true
 ---
 
@@ -8,10 +9,10 @@ toc: true
 
 Modelo de âmbito nacional para a previsão de número de mortos em trânsito em resolução temporal trimestral. Este modelo é criado a partir de uma regressão linear multivariada com as variáveis:
 
-- Frota (veículos totais, motocicletas e automóveis - RENAVAM);
-- PIB (em dólar - Bacen);
-- Acidentes totais, acidentes fatais e feridos em rodovias federais (PRF);
-- Óbitos em trânsito (variável dependente - DataSUS).
+-   Frota (veículos totais, motocicletas e automóveis - RENAVAM);
+-   PIB (em dólar - Bacen);
+-   Acidentes totais, acidentes fatais e feridos em rodovias federais (PRF);
+-   Óbitos em trânsito (variável dependente - DataSUS).
 
 Pacotes utilizados:
 
@@ -26,6 +27,7 @@ library(arrow)
 library(roadtrafficdeaths)
 library(onsvplot)
 library(knitr)
+library(kableExtra)
 ```
 
 ## Dados
@@ -123,10 +125,10 @@ df_trimestre <- dados_mensais_2023 |>
   ) |> 
   ungroup()
 
-kable(head(df_trimestre, 8))
+rmarkdown::paged_table(head(df_trimestre, 8))
 ```
 
-Como demonstram os gráficos de série temporal e autocorrelação, óbitos em trânsito possuem uma sazonalidade trimestral: 
+Como demonstram os gráficos de série temporal e autocorrelação, óbitos em trânsito possuem uma sazonalidade trimestral:
 
 ```{r}
 #| warning: false
@@ -150,7 +152,7 @@ plot(autocor, main = "Autocorrelação")
 
 ## Modelagem
 
-O modelo foi treinado com 75% dos dados, tendo seu desempenho avaliado com as funções de métricas `rmse()`, `mae()` e `rsq()`: 
+O modelo foi treinado com 75% dos dados, tendo seu desempenho avaliado com as funções de métricas `rmse()`, `mae()` e `rsq()`:
 
 ```{r}
 #| include: false
@@ -191,7 +193,12 @@ bind_cols(test, predict(lm_wflow_fit, test)) |>
   mutate(.metric = toupper(.metric), 
          .estimate = round(.estimate, digits = 2)) |> 
   rename(`Métrica` = .metric, Valor = .estimate) |> 
-  kable()
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
 ```
 
 ## Previsões
@@ -391,4 +398,3 @@ bind_rows(previsto2022, previsto2023) |>
     scale_discrete_onsv() +
     scale_y_continuous(labels = comma_format(big.mark = "."))
 ```
-
