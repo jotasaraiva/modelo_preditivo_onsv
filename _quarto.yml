@@ -7,20 +7,4 @@ project:
 format:
   html: 
     theme: 
-      - cosmo
       - style.scss
-
-website:
-  favicon: figures/onsv_icon.png
-  search: false
-  navbar:
-    background: "#fff"
-    logo: figures/onsv_navbar.png
-    logo-href: https://www.onsv.org.br/
-    tools: 
-      - icon: github
-        menu:
-          - text: Perfil Github
-            url: https://github.com/ONSV
-          - text: Repositório
-            url: https://github.com/ONSV/modelo_preditivo_onsv
