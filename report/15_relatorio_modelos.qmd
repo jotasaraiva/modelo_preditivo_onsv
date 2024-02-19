@@ -1,0 +1,170 @@
+---
+title: "Modelo Preditivo de Mortes no Trânsito Brasileiro"
+date: 2023-12-19
+
+smooth-scroll: true
+
+authors:
+  - name: João Pedro Melani Saraiva
+  - name: Pedro Augusto Borges dos Santos
+
+description: "Modelo de aprendizado de máquina orientado a dados de segurança viária para o reconhecimento de padrões e previsão de mortes no trânsito"
+
+title-block-banner: true
+
+format: 
+  html:
+    editor: visual
+    dpi: 300
+    number-sections: true
+
+knitr: 
+  opts_chunk: 
+    fig.align: center
+
+bibliography: references.bib
+toc: true
+toc-title: Sumário
+
+lang: pt
+---
+
+```{r include=FALSE}
+# packages
+library(tidyverse)
+library(gt)
+library(forecast)
+library(ggcorrplot)
+library(onsvplot)
+library(knitr)
+library(here)
+library(tidymodels)
+library(kableExtra)
+library(fleetbr)
+library(roadtrafficdeaths)
+library(plotly)
+
+# opções de display
+options(digits = 2)
+theme_set(theme_onsv())
+
+# load dos dados
+load(here("data","tabela_total.rda"))
+load(here("data","tabela_total_mensal.rda"))
+
+# supressão dos warnings
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+## Introdução
+
+### Referenciais Teóricos
+
+O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros de trânsito posam sérios desafios à saúde pública global, e as tendências evidenciadas pelos dados atuais indicam que esta realidade deve continuar a se manter pelo futuro próximo [@worldhealthorganization2018]. Sendo uma das causas de mortes mais comuns no mundo, as ocorrências de sinistros de trânsito afetam principalmente pedestres, ciclistas e motociclistas, além de induzir severos danos materiais, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes no trânsito e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
+
+A segurança viária pode ser um valioso indeicar ao estado de desenvolvimento de uma região, visto que é uma característica do avanço da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais do contexto urbano [@zhong-xiang2014], o que implica que elevadas taxas de sinistros viários colaboram no diagnóstico de problemas da segurança pública em geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
+
+Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, visto que fazem parte de um agravo que repercute por toda a sociedade [@andrade2019], sendo a oitava maior causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos estatísticos prévios à 2020 [@blumenberg2018], o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Neste cenário, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) foi desenvolvido para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito [@ministériodostransporte2018], na intenção de aprimorar o desempenho da segurança viária em relação a década passada, se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU). Para atingir tais metas, o Art. 3º da Resolução Contran Nº 870 relata que o PNATRANS se apoia em seis principais pilares: gestão da segurança no trânsito, vias seguras, segurança veicular, educação para o trânsito, atendimento às vítimas, e normalização e fiscalização [@conselhonacionaldetrânsito2018].
+
+A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a mortalidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas sobre a ocorrência de sinistros fatais. Em geral, a literatura pertinente apresenta diversos meios distintos para alcançar estes modelos de melhor ajuste: Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizam técnicas de análise de séries temporais, utilizando métodos autoregressivos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
+
+### Objetivos
+
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estrurais para explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto também visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno real dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do dispositivo preditivo criado com a incidência destes eventos.
+
+## Metodologia
+
+### Coleta de dados
+
+A coleta de dados foi efetuada considerando as principais variáveis teoricamente relacionadas à mortalidade em trânsito disponíveis para o pública, baseando a escolha de cada grandeza na literatura previamente revisada. Estes dados são reunidos e pré-processados para a formação de conjuntos de dados específicos para cada método de modelagem, variando com a resolução temporal temporal de cada abordagem (anual, trimestral e mensal).
+
+Dito isto, investigam-se diversas bases e fornecedores distintos a fim de compilar estas informações e extrair dados para uma análise preliminar, anterior a modelagem. Entre as fontes contempladas estão:
+
+-   PIB (Produto Interno Bruto) anual, fornecido pelo Sistema IBGE de Recuperação Automática (SIDRA) do IBGE [@institutobrasileirodegeografiaeestatística2023], coletado em milhões de reais;
+
+-   PIB mensal, fornecido pelo Sistema Gerenciador de Séries Temporais do Banco Central [@bancocentraldobrasil2023], coletado em dólares;
+
+-   População nacional residente, fornecida pelo sistema DataSUS do Ministério da Saúde [@ministériodasaúde2023b], obtida pelo TABNET;
+
+-   Sinistros em rodovias federais, fornecidos pelo portal de dados abertos da PRF [@políciarodoviáriafederal2023];
+
+-   Condutores habilitados, fornecidos pelo portal de estatísticas da Secretaria Nacional de Trânsito (Senatran) do Registro Nacional de Condutores Habiltados (RENACH) [@ministériodostransporte2023];
+
+-   Frota veicular, fornecida pelo portal de estatísticas da Senatran do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023];
+
+-   Óbitos em trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos pela biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação estatística R.
+
+### Modelos
+
+#### Escalas de tempo
+
+Em razão da escassa disponibilidade de dados temporais, os modelos confeccionados em geral contemplam uma janela de tempo de 2011 até a atualidade, sendo as prinpais unidades temporais estudadas a anual, a trimestral e a mensal. Ao criar modelos de série temporal, deve-se notar que a disponibilidade e o intervalo temporal em que os modelos operam tem uma relação direta com a capacidade de um modelo de aprender com os dados e conseguir expressá-los futuramente, impactando no desempenho do modelo.
+
+Modelos treinados em âmbito mensal conseguem emitir previsões para cada mês, mas perdem precisão quanto mais adiante prevém, enquanto modelos anuais podem predizer com alto desempenho os valores de anos posteriores, mas possuem baixa longevidade e não são capazes de prever meses ou trimestres. Assim, estas diversas abordagens temporais são aferidas a fim de comparar os desempenhos e utilidades de cada método entre si.
+
+::: panel-tabset
+## Anual
+```{r}
+rtdeaths |> 
+  summarise(.by = ano_ocorrencia, obitos = n()) |> 
+  drop_na() |> 
+  ggplot(aes(ano_ocorrencia, obitos)) +
+    geom_line(color = onsv_palette$blue) +
+    labs(x = "Ano", y = "Óbitos") +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_continuous(limits = c(1996, 2022), breaks = seq(1996, 2022, 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+## Trimestral
+```{r}
+rtdeaths |> 
+  arrange(data_ocorrencia) |> 
+  drop_na(data_ocorrencia) |> 
+  mutate(trimestre = quarter(data_ocorrencia),
+         data = as_factor(paste0(year(data_ocorrencia), "/T", 
+                                 quarter(data_ocorrencia)))) |> 
+  summarise(.by = data, obitos = n()) |> 
+  select(obitos) |> 
+  ts(frequency = 4, start = c(1996, 1), end = c(2022, 4)) |> 
+  autoplot(color = onsv_palette$blue) +
+    labs(x = "Trimestre", y = "Óbitos") +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+```
+
+## Mensal
+```{r}
+rtdeaths |> 
+  mutate(data = ym(paste0(ano_ocorrencia, "-", month(data_ocorrencia))),
+         .before = 1) |> 
+  summarise(.by = data, obitos = n()) |> 
+  drop_na() |> 
+  ggplot(aes(data, obitos)) +
+    geom_line(color = onsv_palette$blue) +
+    labs(x = "Ano", y = "Óbitos") +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ","))
+```
+:::
+
+#### Série Temporal x Determinístico
+
+#### Configurações
+
+Modelos estatísticos e de aprendizado de máquina constituem um grandioso conjunto de ferramentas e métodos matemáticos e computacionais para expressar fenômenos naturais por meio de funções e algoritmos. Visando expressar as dinâmicas dos óbitos ocasionados pelo transporte, o primeiro método escolhido por sua simplicidade e versatilidade é a regressão linear, norteada pelo conceito de correlações lineares entre diferentes grandezas numéricas.
+
+A regressão linear simples se enquadra como um método estatístico e de aprendizado de máquina que se baseia na relação de uma variável dependente quantitativa $Y$ em função de uma variável independente quantitativa $X$, com $\epsilon$ representando uma variável aleatória sobre o erro associado à estimativa, demonstrando a relação matemática linear entre as grandezas:
+
+$$ Y = \beta_0 + \beta_1X + \epsilon $$
+
+Desta forma, pode-se prever uma imagem de $Y$ ao se injetar um valor em $X$ na equação, dado que estas variáveis tenham uma correlação linear significativa e que os ditos *coeficientes* ou *parâmetros* $\beta_0$ e $\beta_1$ sejam estimados para este modelo. No contexto deste projeto, o objetivo é estimar um modelo capaz de predizer as mortes em relação a mais de uma variável independente, tratando-se então de uma regressão linear múltipla:
+
+$$ Y_i = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_nX_n + \epsilon $$
+
+## Conclusão
+
+Os modelos regressivos desenvolvidos permitem inferir que há uma tendência perceptível nas mortes causadas pelo trânsito. Mesmo que as previsões do primeiro método demonstrem que há a possibilidade de redução no ano subsequente, é visível que a predição do modelo linear anual ajustado está significativamente distante da quantidade de casos do ano de 2019, quando houve a maior redução do número de mortos desde o seu pico em 2012. Ademais, ambos os modelos mensais determinísticos e de séries temporais indicam um aumento na tendência das mortes. Isto revela um potencial relaxamento no desempenho do sistema de segurança viária e mobilidade segura nacional, visto que esta possível queda em sua eficiência precipitaria o aumento da mortalidade em sinistros de trânsito.
+
+É fundamental destacar que as soluções de segurança viária não dependem apenas de atributos da mobilidade urbana. Inúmeros fatores socioeconômicos e de infraestrutura afetam o desempenho da segurança, indiretamente variando com as condições de desenvolvimento e maturidade tecnológica da região em questão. A mobilidade urbana é uma parte integral à toda civilização moderna, o que torna as ações para a segurança viária indispensáveis.
+
+O cenário atual da segurança viária brasileira apresenta alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos mostram um desempenho abaixo do ideal no combate da mortalidade, conferindo uma perspectiva pessimista para o início da nova década no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável a ocorrência de avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
+
+## Referências
