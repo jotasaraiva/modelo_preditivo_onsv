@@ -45,7 +45,6 @@ library(roadtrafficdeaths)
 library(plotly)
 
 # opções de display
-options(digits = 2)
 theme_set(theme_onsv())
 
 # load dos dados
@@ -242,6 +241,368 @@ rtdeaths |>
 Os gráficos históricos para óbitos em trânsito denunciam uma tendência ao incremento das mortes anuais nos últimos três anos. O cenário de 2019 atingiu a menor quantidade de mortes relacionadas ao trânsito nos últimos 10 anos, quando em 2020 a têndencia voltou a crescer. No ano de 2021 houveram 33.813 vítimas, aproximadamente 2000 a mais que em 2019. Em 2022, esse tendência foi levemente atenuada, mantendo um número próximo de óbitos em relação ao ano anterior.
 
 Assim sendo, os demais atributos do conjunto de dados podem ser visualizados em função do tempo, como foi feito para o caso da variável preditada, com o intuito de destacar a evolução de cada variável preditiva ao longo dos períodos disponíveis:
+
+::: panel-tabset
+## Frota veicular (RENAVAM)
+
+::: panel-tabset
+## Anual
+
+```{r}
+#| echo: false
+
+fleetbr |>
+  filter(mes == 7) |> 
+  pivot_wider(values_from = frota, names_from = modal) |> 
+  mutate(
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA,
+    total = TOTAL
+  ) |> 
+  summarise(
+    .by = ano,
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta),
+    veiculos_total = sum(total)
+  ) |> 
+  pivot_longer(-ano) |> 
+  ggplot(aes(ano, value, color = name)) +
+    geom_line(linewidth = 1) +
+    geom_point() +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) + 
+    scale_x_continuous(n.breaks = 10) +
+    labs(x = "Data", y = "Frota") +
+    scale_discrete_onsv()
+```
+
+## Trimestral
+
+```{r}
+#| echo: false
+
+fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    veiculos = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  ) |> 
+  mutate(data = quarter(data, type = "date_last"), 
+         .before = 1) |> 
+  summarise(.by = data,
+            across(everything(), last)) |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(data, value, color = name)) + 
+    geom_line(linewidth = 1) +
+    geom_point() +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    labs(x = "Data", y = "Frota") +
+    scale_discrete_onsv()
+```
+
+## Mensal
+
+```{r}
+#| echo: false
+
+fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    veiculos = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  ) |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(data, value, color = name)) +
+    geom_line(linewidth = 1) +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    labs(x = "Data", y = "Frota") +
+    scale_discrete_onsv()
+```
+:::
+
+## PIB (IBGE, BCB)
+
+::: panel-tabset
+## Anual
+
+```{r}
+#| echo: false
+
+dados_mensais |> 
+  select(data, pib) |> 
+  mutate(data = year(data)) |> 
+  summarise(.by = data, pib = sum(pib)) |> 
+  ggplot(aes(data, pib)) +
+    geom_line()
+```
+
+## Trimestral
+
+```{r}
+#| echo: false
+
+dados_mensais |> 
+  select(data, pib) |>
+  mutate(data = quarter(data, type = "date_last")) |> 
+  summarise(.by = data, pib = sum(pib)) |> 
+  ggplot(aes(data, pib)) +
+    geom_line()
+```
+
+## Mensal
+
+```{r}
+#| echo: false
+
+dados_mensais |> 
+  select(data, pib) |> 
+  ggplot(aes(data, pib)) +
+    geom_line()
+```
+:::
+
+## População
+
+```{r}
+#| echo: false
+
+df_total |> 
+  select(populacao, ano) |> 
+  drop_na() |> 
+  ggplot(aes(ano, populacao)) +
+    geom_line()
+```
+
+## Sinistros em rodovias federais (PRF)
+
+::: panel-tabset
+## Anual
+
+```{r}
+#| echo: false
+
+df_total |> 
+  select(ano, qnt_acidentes_fatais, qnt_acidentes, qnt_feridos, qnt_mortos) |> 
+  filter(ano >= 2011) |> 
+  drop_na() |> 
+  pivot_longer(-ano) |> 
+  ggplot(aes(ano, value, color = name)) +
+    geom_line()
+```
+
+## Trimestral
+
+```{r}
+#| echo: false
+
+dados_mensais |> 
+  select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |> 
+  mutate(data = quarter(data, type = "date_last")) |> 
+  summarise(.by = data, across(everything(), sum)) |> 
+  pivot_longer(-data) |> 
+  ggplot(aes(data, value, color = name)) +
+    geom_line()
+```
+
+## Mensal
+
+```{r}
+#| echo: false
+
+dados_mensais |> 
+  select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |>
+  pivot_longer(-data) |> 
+  ggplot(aes(data, value, color = name)) +
+    geom_line()
+```
+:::
+
+## Condutores habilitados (RENACH)
+
+```{r}
+#| echo: false
+
+df_total |> 
+  select(ano, condutores) |> 
+  drop_na() |> 
+  filter(ano < 2022) |> 
+  ggplot(aes(ano, condutores)) +
+    geom_line()
+```
+:::
+
+É notavel a diferença entre as condutas de cada atributo com o tempo. Variáveis convencionalmente cumulativas como a frota, a população e o número de condutores habilitados não devem possuir variação, dispondo de um crescimento aproximadamente linear por todo o período de estudo. Todavia, detecta-se que a população se comportou de forma inesperada em alguns anos, o que infere em erros de contagem e estimativa na fonte de dados.
+
+Os dados de rodovias federais flutuam de forma análoga aos óbitos em trânsito, agindo como referências da qualidade da segurança viária nacional de determinado período, com uma sazonalidade pronunciada. Estes dados também mostram claramente como os óbitos são eventos incomuns em comparação com a quantidade de sinistros fatais e totais observados. Porém, enquanto a quantidade de sinistros pode variar intensamente ao longo dos ano, o número de mortes permanece relativamente constante.
+
+O PIB é o atributo com o comportamento mais particular ao longo do tempo em relação às outras variáveis. Foi utilizado o dólar americano em lugar do real brasileiro a fim de observar a oscilação da moeda em um contexto global e revelar a contribuição histórica da economia nacional. Modelos idealizados em @blumenberg2018 e @zhong-xiang2014 utilizam do PIB como um indício da saúde socioeconômica do país e correlata e, consequentemente, uma variável indiretamente correlata a às mortes em trânsito.
+
+### Correlação
+
+O sucesso da modelagem é inteiramente dependente da intensidade e do tipo de relação estatística que as variáveis possuem entre si. Como anteriormente citado, a regressão linear múltipla bem ajustada infere que as preditivas possuem uma correlação linear forte com a preditora, mas um modelo com baixo desempenho não é necessariamente uma evidência de baixa correlação.
+
+Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como demonstra os correlograma, a partir de método de correlação Spearman, nas três escalas temporais:
+
+::: panel-tabset
+## Anual
+
+```{r}
+#| echo: false
+
+cor_spearman_anual <- df_total |> 
+  drop_na() |> 
+  select(-c(quilometragem_10_bilhoes, mortos_por_pop, ano)) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos_total,
+    PIB = pib,
+    `População` = populacao,
+    Acidentes = qnt_acidentes,
+    `Acidentes fatais` = qnt_acidentes_fatais,
+    Feridos = qnt_feridos,
+    Condutores = condutores,
+    `Mortes PRF` = qnt_mortos
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_anual,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 3, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+## Trimestral
+
+```{r}
+#| echo: false
+
+cor_spearman_trimestral <- dados_mensais |> 
+  mutate(data = quarter(data, type = "date_last")) |> 
+  summarise(
+    .by = data,
+    veiculos = last(veiculos),
+    automovel = last(automovel),
+    motocicleta = last(motocicleta),
+    mortes = sum(mortes),
+    pib = sum(pib),
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes_prf)
+  ) |> 
+  select(-data) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos,
+    PIB = pib,
+    Acidentes = acidentes,
+    `Acidentes fatais` = acidentes_fatais,
+    Feridos = feridos,
+    `Mortes PRF` = mortes_prf
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_trimestral,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 3, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+## Mensal
+
+```{r}
+#| echo: false
+
+cor_spearman_mensal <-dados_mensais |> 
+  select(-data) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos,
+    PIB = pib,
+    Acidentes = acidentes,
+    `Acidentes fatais` = acidentes_fatais,
+    Feridos = feridos,
+    `Mortes PRF` = mortes_prf
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_mensal,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 3, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+:::
+
+### Taxas 
+
+O diagnóstico da segurança no trânsito de uma uma região em um determinado intervalo de tempo é um dos assuntos mais discutidos no campo da mobilidade segura, visto que as variáveis que influenciam a saúde no trânsito não são um consenso acadêmico absoluto. Este fato fomenta a pesquisa e desenvolvimento de novas metodologias e indicadores específicos para a análise estatística do cenário brasileiro que melhor interpretam os dados disponíveis e representam o fenômeno real da sinistralidade de maneira verossímil. @ferraz2023 disserta sobre a questão da quantificação e qualificação da sinistralidade por meio da determinação de índices utilizando de mortes, população e frota como parâmetros para estabelecer números representativos do nível de segurança do local. 
+
+Estes índices são usualmente referidos em função de altas casas decimais para salientar a significância dos valores de cada taxa calculada. As taxas que direcionaram o presente estudo na avaliação da sinistralidade anual foram as de vítimas fatais por 100 mil habitantes e vítimas fatais por 10 mil veículos, como indicado:
+
+```{r}
+#| echo: false
+
+plot_taxas <- df_total |> 
+  select(ano, veiculos_total, populacao, mortes) |> 
+  drop_na() |> 
+  mutate(taxa_hab = (mortes/populacao) * 100000,
+         taxa_veic = (mortes/veiculos_total) * 10000) |> 
+  select(ano, taxa_hab, taxa_veic) |> 
+  pivot_longer(-ano) |> 
+  ggplot(aes(ano, value, color = name)) +
+    geom_line() +
+    geom_point() +
+    facet_wrap(vars(name), scales = "free_y")
+
+ggplotly(plot_taxas)
+```
 
 ## Conclusão
 
