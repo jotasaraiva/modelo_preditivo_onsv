@@ -43,13 +43,17 @@ library(kableExtra)
 library(fleetbr)
 library(roadtrafficdeaths)
 library(plotly)
+library(arrow)
 
 # opções de display
 theme_set(theme_onsv())
+set.seed(123)
 
 # load dos dados
 load(here("data","tabela_total.rda"))
 load(here("data","tabela_total_mensal.rda"))
+load(here("data/pib_mensal.rda"))
+load(here("data","tabela_condutores.rda"))
 
 # supressão dos warnings
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
@@ -580,9 +584,9 @@ ggcorrplot(
 ```
 :::
 
-### Taxas 
+### Taxas
 
-O diagnóstico da segurança no trânsito de uma uma região em um determinado intervalo de tempo é um dos assuntos mais discutidos no campo da mobilidade segura, visto que as variáveis que influenciam a saúde no trânsito não são um consenso acadêmico absoluto. Este fato fomenta a pesquisa e desenvolvimento de novas metodologias e indicadores específicos para a análise estatística do cenário brasileiro que melhor interpretam os dados disponíveis e representam o fenômeno real da sinistralidade de maneira verossímil. @ferraz2023 disserta sobre a questão da quantificação e qualificação da sinistralidade por meio da determinação de índices utilizando de mortes, população e frota como parâmetros para estabelecer números representativos do nível de segurança do local. 
+O diagnóstico da segurança no trânsito de uma uma região em um determinado intervalo de tempo é um dos assuntos mais discutidos no campo da mobilidade segura, visto que as variáveis que influenciam a saúde no trânsito não são um consenso acadêmico absoluto. Este fato fomenta a pesquisa e desenvolvimento de novas metodologias e indicadores específicos para a análise estatística do cenário brasileiro que melhor interpretam os dados disponíveis e representam o fenômeno real da sinistralidade de maneira verossímil. @ferraz2023 disserta sobre a questão da quantificação e qualificação da sinistralidade por meio da determinação de índices utilizando de mortes, população e frota como parâmetros para estabelecer números representativos do nível de segurança do local.
 
 Estes índices são usualmente referidos em função de altas casas decimais para salientar a significância dos valores de cada taxa calculada. As taxas que direcionaram o presente estudo na avaliação da sinistralidade anual foram as de vítimas fatais por 100 mil habitantes e vítimas fatais por 10 mil veículos, como indicado:
 
@@ -600,9 +604,680 @@ plot_taxas <- df_total |>
     geom_line() +
     geom_point() +
     facet_wrap(vars(name), scales = "free_y")
-
-ggplotly(plot_taxas)
 ```
+
+As duas taxas anunciam uma diferentes tendência a cerca da sinistralidade e fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa por habitantes aparenta corroborar à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração esta que diferença de comportamente pode resultar do fato de que a frota veicular e a população nacional são variáveis que evoluem em taxas distintas.
+
+### Resultados dos modelos
+
+A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de demonstrar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição das amostras de treino e teste, inferindo que as métricas foram validadas a partir das previsões e das amostras de teste. No caso do modelo anual, que possuo um conjunto de dados menor, os dados não foram repartidos e a validação foi feita com o mesmo conjunto de treinamento.
+
+#### Regressão Linear Múltipla
+
+A análise de regressão linear múltipla foi a abordagem mais extensamente utilizada durante a produção do estudo, podendo ser destrinchada a partir das escalas temporais anual, trimestral e mensal. Cada métrica e modelo são extraídos apresentados para avaliação das suas performances, com os resultados segregados por unidade de tempo.
+
+##### Anual
+
+```{r}
+#| include: false
+
+metricas <- metric_set(rmse, mae, rsq)
+
+temp <- tempfile()
+download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip", temp)
+unzip(temp, exdir = tempdir())
+unlink(temp)
+prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
+
+dados_modelo_2023 <- list(
+  drop_na(count(rename(rtdeaths, ano = ano_ocorrencia), ano, name = "mortes")),
+  summarise(filter(fleetbr, modal == "TOTAL", mes == 7), 
+            .by = ano, frota = sum(frota)),
+  prf_sinistros |> 
+    filter(classificacao_acidente == "Com Vítimas Fatais") |> 
+    count(ano, name = "acids_fatais") |> 
+    collect(),
+  prf_sinistros |> 
+    count(ano, name = "acids") |> 
+    collect(),
+  tabela_condutores
+) |> 
+  reduce(full_join, by = "ano") |> 
+  arrange(ano)
+
+rec_anual_2023 <-
+  recipe(x = drop_na(dados_modelo_2023), mortes ~ .) |> 
+  remove_role(ano, old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+modelo_anual_2023 <-
+  linear_reg() |> 
+  set_engine("lm")
+  
+wflow_anual_2023 <-
+  workflow() |> 
+  add_model(modelo_anual_2023) |> 
+  add_recipe(rec_anual_2023) |> 
+  fit(drop_na(dados_modelo_2023))
+
+pred_anual_2023 <- bind_cols(
+  dados_modelo_2023,
+  predict(wflow_anual_2023, dados_modelo_2023),
+  predict(wflow_anual_2023, dados_modelo_2023, type = "conf_int")
+)
+
+metricas_anual <- metricas(data = pred_anual_2023, truth = mortes, estimate = .pred)
+```
+
+Para o caso da análise anual, as previsões emitidas são comparadas com as ocorrências reais, enquanto as métricas são baseadas no mesmo conjunto de ajuste do modelo:
+
+::: panel-tabset
+## Série
+
+```{r}
+#| echo: false
+
+pred_anual_2023 |> 
+  select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
+  pivot_longer(
+    cols = c(.pred, mortes),
+    names_to = "Tipo",
+    values_to = "Mortes"
+  ) |> 
+  mutate(
+    Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")
+  ) |> 
+  ggplot(aes(ano, Mortes, color = Tipo)) +
+    geom_ribbon(
+      aes(ymax = .pred_upper, ymin = .pred_lower),
+      fill = "grey",
+      color = "grey",
+      alpha = 0.25
+    ) +
+    geom_line(linewidth = 1, alpha = 0.25) +
+    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+    scale_x_continuous(limits = c(2011,2023), breaks = seq(2011,2023,1)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    scale_discrete_onsv() + 
+    labs(x = NULL, y = NULL)
+```
+
+## Previsto x Real
+
+```{r}
+#| echo: false
+
+pred_anual_2023 |> 
+  select(.pred, mortes, ano) |> 
+  drop_na() |> 
+  rename(Previsto = .pred, Real = mortes) |> 
+  ggplot(aes(x = Real, y = Previsto)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_text(aes(label = ano), vjust = 2, size = 3) + 
+  geom_abline(
+    linewidth = 1, 
+    alpha = 0.5, 
+    color = onsv_palette$blue, 
+    lty = "dashed"
+  ) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) + 
+  scale_x_continuous(labels = comma_format(big.mark = ".")) +
+  coord_obs_pred()
+```
+
+## Métricas
+
+```{r}
+#| echo: false
+
+metricas_anual |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
+```
+:::
+
+Como é demonstrado pelo amplo intervalo de confiança preditado, o fato do conjunto de dados anuais ser relativamente pequeno confere uma incerteza atribuída à essa abordagem. Para 2023, o modelo prevê 34.631, uma diferença de 1152 vítimas e um aumento de aproximadamente 3,3% em relação ao anterior.
+
+As métricas **RMSE** e **MAE** são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar a ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
+
+##### Trimestral
+
+Os dados utilizados foram obtidos por meio do agrupamento trimestral dos dados mensais, sendo constituída uma base de dados específica para o ajuste deste modelo de regressão. As métricas e visualizações para avaliação da performance foram as mesmas do modelo anual, porém, a partir deste, todos os próximos modelos são reamostrados em conjuntos de treino e teste para a validação adequada:
+
+```{r}
+#| include: false
+
+df_frota_2023 <- fleetbr |> 
+  pivot_wider(names_from = modal, values_from = frota) |> 
+  mutate(
+    data = ym(paste0(ano,"-",mes)),
+    automovel = AUTOMOVEL + CAMINHONETE + CAMIONETA + UTILITARIO,
+    motocicleta = MOTOCICLETA + CICLOMOTOR + MOTONETA
+  ) |> 
+  rename(total = TOTAL) |> 
+  summarise(
+    .by = data,
+    veiculos = sum(total),
+    automovel = sum(automovel),
+    motocicleta = sum(motocicleta)
+  )
+
+df_mortes_2023 <- rtdeaths |> 
+  mutate(mes = month(data_ocorrencia),
+         ano = year(data_ocorrencia),
+         data = ym(paste0(ano, "-", mes))) |> 
+  count(data, name = "mortes") |> 
+  drop_na()
+
+df_pib_2023 <- pib_mensal |> 
+  mutate(data = ym(paste0(ano, "-", mes))) |> 
+  group_by(data) |> 
+  summarise(pib)
+
+df_prf_2023 <- prf_sinistros |> 
+  collect() |> 
+  mutate(
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais", 1, 0, missing = 0
+    ),
+    mes = month(data_inversa),
+    data = ym(paste0(ano, "-", mes))
+  ) |> 
+  summarise(
+    .by = data,
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortos)
+  ) |> 
+  arrange(data)
+  
+dados_mensais_2023 <- 
+  list(df_frota_2023, df_mortes_2023, df_pib_2023, df_prf_2023) |> 
+  reduce(full_join, by = "data") |> 
+  arrange(data)
+
+df_trimestre_2023 <- dados_mensais_2023 |>
+  mutate(
+    trimestre = quarter(data),
+    data = quarter(data, type = "date_last")
+  ) |> 
+  group_by(data, trimestre) |> 
+  summarise(
+    veiculos = last(veiculos),
+    automovel = last(automovel),
+    motocicleta = last(motocicleta),
+    mortes = sum(mortes),
+    pib = sum(pib),
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes_prf)
+  ) |> 
+  ungroup()
+
+splits_trimestre <- initial_split(drop_na(df_trimestre_2023), prop = 3/4)
+train_trimestre <- training(splits_trimestre)
+test_trimestre <- testing(splits_trimestre)
+
+rec <- 
+  recipe(df_trimestre_2023, mortes ~ .) |> 
+  remove_role(c(mortes_prf, trimestre, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+model <-
+  linear_reg() |>
+  set_engine("lm")
+
+lm_wflow <-
+  workflow() |> 
+  add_model(model) |> 
+  add_recipe(rec)
+
+lm_wflow_fit <-
+  lm_wflow |> 
+  fit(train_trimestre)
+
+pred_trimestre_2023 <- bind_cols(
+  df_trimestre_2023,
+  predict(lm_wflow_fit, df_trimestre_2023),
+  predict(lm_wflow_fit, df_trimestre_2023, type = "conf_int")
+)
+
+metricas_trimestre <- bind_cols(
+  test_trimestre,
+  predict(lm_wflow_fit, test_trimestre)
+) |> 
+  metricas(truth = mortes, estimate = .pred)
+```
+
+::: panel-tabset
+## Série
+
+```{r}
+#| echo: false
+
+pred_trimestre_2023 |> 
+  select(data, trimestre, mortes, .pred_lower, .pred_upper, .pred) |> 
+  drop_na() |>  
+  pivot_longer(cols = c(.pred, mortes),
+               names_to = "Tipo",
+               values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes, color = Tipo)) +
+    geom_ribbon(
+      aes(ymax = .pred_upper, ymin = .pred_lower),
+      fill = "grey",
+      color = "grey",
+      alpha = 0.25
+    ) +
+    geom_line()
+```
+
+## Previsto x Real
+
+```{r}
+#| echo: false
+
+pred_trimestre_2023 |> 
+  select(.pred, mortes) |> 
+  drop_na() |> 
+  rename(Previsto = .pred, Real = mortes) |> 
+  ggplot(aes(x = Real, y = Previsto)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_abline(
+    linewidth = 1, 
+    alpha = 0.5, 
+    color = onsv_palette$blue, 
+    lty = "dashed"
+  ) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) + 
+  scale_x_continuous(labels = comma_format(big.mark = ".")) +
+  coord_obs_pred()
+```
+
+## Métricas
+
+```{r}
+#| echo: false
+
+metricas_trimestre |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
+```
+:::
+
+O grafico X espelha visualmente a periodicidade e sazonalidade trimestral da sinistralidade, revelando a existência de épocas de maior risco em trânsito em todo ano, independente da tendência da série temporal de óbitos. Como esperado, a maior disponibilidade de dados resulta em alterações positivas nas métricas de erros em relação à escala temporal anual.
+
+##### Mensal
+
+A escala mensal é a menor unidade temporal abordada para o estudo e permite observar de forma clara a sazonalidade dos sinistros:
+
+```{r}
+#| include: false
+
+split_2023 <- initial_split(drop_na(dados_mensais_2023), prop = 0.8)
+
+train_2023 <- training(split_2023)
+test_2023 <- testing(split_2023)
+
+rec_mensal_2023 <-
+  recipe(train_2023, mortes ~ .) |> 
+  remove_role(c(mortes_prf, data), old_role = "predictor") |> 
+  step_normalize(all_numeric_predictors())
+
+lm_mensal_2023 <-
+  linear_reg() |> 
+  set_engine("lm")
+
+lm_wflow_mensal_2023 <-
+  workflow() |> 
+  add_model(lm_mensal_2023) |> 
+  add_recipe(rec_mensal_2023) |> 
+  fit(train_2023)
+
+pred_mensal_2023 <-
+  bind_cols(
+    dados_mensais_2023,
+    predict(lm_wflow_mensal_2023, dados_mensais_2023),
+    predict(lm_wflow_mensal_2023, dados_mensais_2023, type = "conf_int")
+  )
+
+metricas_mensal <- metricas(pred_mensal_2023, truth = mortes, estimate = .pred)
+```
+
+::: panel-tabset
+## Série
+
+```{r}
+#| echo: false
+
+pred_mensal_2023 |> 
+  drop_na() |> 
+  pivot_longer(cols = c(.pred, mortes),
+               names_to = "Tipo",
+               values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes, color = Tipo)) +
+    geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower),
+                fill = "grey", color = "grey", alpha = 0.25) +
+    geom_line()
+```
+
+## Previsto x Real
+
+```{r}
+#| echo: false
+
+pred_mensal_2023 |> 
+  select(.pred, mortes) |> 
+  drop_na() |> 
+  rename(Previsto = .pred, Real = mortes) |> 
+  ggplot(aes(x = Real, y = Previsto)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_abline(
+    linewidth = 1, 
+    alpha = 0.5, 
+    color = onsv_palette$blue, 
+    lty = "dashed"
+  ) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) + 
+  scale_x_continuous(labels = comma_format(big.mark = ".")) +
+  coord_obs_pred()
+```
+
+## Métricas
+
+```{r}
+#| echo: false
+
+metricas_mensal |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
+```
+:::
+
+Uma das características notáveis deste modelo é sua capacidade de descrever observações anômalas ao decorrer dos anos, onde os óbitos ultrapassam os intervalos de confiança estipulados pelo modelo, mesmo que este apresenta com uma alta performance e capacidade preditiva pelas métricas.
+
+As métricas apresentam alterações positivas novamente, associado ao incremento de dados. Estes métricas serão aplicadas para comparar a perfomance e avaliar a utilidade das técnicas contempladas nos modelos posteriores.
+
+#### Regressor Random Forest
+
+O segundo modelo utilizada para a análise de regressão, como anteriormente explicado, foi o Regressor Random Forest, ajustado apenas para o contexto mensal. Esta técnica dispensa a seleção de atributos manual que fora necessária para o caso da regressão linear, já que possui um algoritmo seletor interno. Sendo assim, este modelo é treinado e validado no mesmo conjunto mensal que anteriormente discutido:
+
+```{r}
+#| include: false
+
+rf <- 
+  rand_forest(
+    mode = "regression",
+    mtry = 5,
+    trees = 5000
+  ) |> 
+  set_engine("ranger")
+
+rf_wflow <- 
+  workflow() |> 
+  add_model(rf) |> 
+  add_recipe(rec_mensal_2023) |>
+  fit(train_2023)
+
+rf_pred <- bind_cols(
+  predict(rf_wflow, drop_na(dados_mensais_2023, veiculos)),
+  drop_na(dados_mensais_2023, veiculos)
+)
+
+metricas_rf <- bind_cols(
+  predict(rf_wflow, test_2023),
+  test_2023
+) |> 
+  metricas(truth = mortes, estimate = .pred)
+```
+
+::: panel-tabset
+## Série
+
+```{r}
+#| echo: false
+
+rf_pred |> 
+  pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
+  ggplot(aes(data, Mortes, color = Tipo)) +
+    geom_line()
+```
+
+## Previsto x Real
+
+```{r}
+#| echo: false
+
+rf_pred |> 
+  select(.pred, mortes) |> 
+  drop_na() |> 
+  rename(Previsto = .pred, Real = mortes) |> 
+  ggplot(aes(x = Real, y = Previsto)) +
+  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_abline(
+    linewidth = 1, 
+    alpha = 0.5, 
+    color = onsv_palette$blue, 
+    lty = "dashed"
+  ) +
+  scale_y_continuous(labels = comma_format(big.mark = ".")) + 
+  scale_x_continuous(labels = comma_format(big.mark = ".")) +
+  coord_obs_pred()
+```
+
+## Métricas
+
+```{r}
+#| echo: false
+
+metricas_rf |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
+```
+:::
+
+O Random Forest se sobressai visualmente no gráfico de valores previstos sobre valores reais, visto que as predições aparentam convergir com mais facilidade ao valor verdadeiro que no modelo anterior. Apesar da incapacidade do algoritmo em gerar intervalos de confiança, o Random Forest raramente estima valores anômalos, apontando que é menos sensível a *outliers* que a regressão linear. Como mencionado na descrição teórica deste algoritmo, este efeito é associado a reamostragem que o modelo faz enquanto está construindo as "árvores" pela técnica *bagging*, reduzindo o enviesamento dos valores discrepantes.
+
+#### SARIMA
+
+```{r}
+#| include: false
+
+df_mortes <- rtdeaths |> 
+  arrange(data_ocorrencia) |> 
+  mutate(data = ym(paste0(ano_ocorrencia, '-', month(data_ocorrencia))),
+         .before = 1) |> 
+  summarise(.by = data, mortes = n()) |> 
+  drop_na()
+
+ts <- ts(df_mortes$mortes, start = c(1996, 1), end = c(2022, 12), frequency = 12)
+
+decomposed <- decompose(ts)
+```
+
+Após as análises regressivas, a próxima abordagem estátistica estudada é a análise de séries temporais univariadas, sobretudo iniciada pela condução de experimentos utilizando do método SARIMA. Entretanto, antes da modelagem propriamente dita, algumas evidências podem ser reunidas para indicar a viabilidade destes métodos temporais, como a decomposição da série temporal:
+
+::: panel-tabset
+## Série Original
+
+```{r}
+#| echo: false
+
+autoplot(
+  ts, 
+  color = onsv_palette$blue, 
+  ylab = "Mortes", xlab = "Data")
+```
+
+## Tendência
+
+```{r}
+#| echo: false
+
+autoplot(
+  decomposed$trend,
+  color = onsv_palette$blue,
+  ylab = "Mortes", xlab = "Data")
+```
+
+## Sazonalidade
+
+```{r}
+#| echo: false
+
+autoplot(
+  decomposed$seasonal,
+  color = onsv_palette$blue,
+  ylab = "Mortes", xlab = "Data")
+```
+
+## Residual
+
+```{r}
+#| echo: false
+
+autoplot(
+  decomposed$random,
+  color = onsv_palette$blue,
+  ylab = "Mortes", xlab = "Data")
+```
+:::
+
+A série decomposta é observada para determinar se o comportamento das mortes ao longo do tempo é característico de uma série modelável pelo SARIMA. A tendência é um forte indicativo de que há uma média móvel neste fenômeno, mas a grande quantidade de resíduo aponta que não uma sazonalidade tão bem estabelicida e cíclica. Assim, outros métodos para o entendimento da sinistrilidade no tempo são os gráficos ACF (Fator de Autocorrelação) e PACF (Fator de Autocorrelação Parcial):
+
+```{r}
+#| echo: false
+
+par(mfrow = c(1, 2))
+acf(ts, main = "ACF")
+pacf(ts, main = "PACF")
+par(mfrow = c(1, 1))
+```
+
+Desta maneira, atenta-se que os dados possuem altas correlações com diversos períodos de atraso de forma indireta e indireta. Em especial, a ocorrência de óbitos de um mês aparenta estar profundamente relacionada ao número de óbitos no mesmo mês no ano anterior, visto que há uma alta correlação no *lag* de 12 meses para ambos os gráficos.
+
+Estas análises são úteis para a decisão manual de valores iniciais para os parâmetros do SARIMA. Entretanto, outra forma mais adequada e automatizada de chegar ao ajuste ideal para o modelo é a função de ajuste automático `auto.arima()` do pacote [`forecast`](https://github.com/robjhyndman/forecast) [@hyndman2008], uma implementação do método que busca a melhor combinação de parâmetros baseado nos critérios de seleção de modelo AIC (*Akaike Information Criterion*) e BIC (*Bayesian Information Criterion*).
+
+```{r}
+#| include: false
+
+sarima <- auto.arima(
+  ts,
+  stationary = F,
+  seasonal = T
+)
+
+sarima_pred <- sarima |> 
+  forecast(h=12) |>
+  data.frame() |> 
+  rownames_to_column() |> 
+  mutate(data = my(rowname)) |> 
+  select(-rowname) |> 
+  full_join(df_mortes) |> 
+  arrange(data)
+```
+
+::: panel-tabset
+## Previsão
+
+```{r}
+#| echo: false
+
+sarima_pred |> 
+  pivot_longer(c(mortes, Point.Forecast), 
+               names_to = "Tipo", values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", 
+                        "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes)) +
+    geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey80", alpha = 0.5) +
+    geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey90", alpha = 0.5) +
+    geom_line(aes(color = Tipo)) +
+    scale_x_date(limits = as_date(c("2011-12-01", NA)))
+```
+
+## Métricas
+
+```{r}
+#| echo: false
+
+sarima |> 
+  forecast::accuracy() |> 
+  data.frame() |> 
+  select(RMSE, MAE, MAPE) |> 
+  remove_rownames() |> 
+  pivot_longer(everything(), names_to = "Métrica", values_to = "Valor") |>  
+  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
+```
+:::
 
 ## Conclusão
 
