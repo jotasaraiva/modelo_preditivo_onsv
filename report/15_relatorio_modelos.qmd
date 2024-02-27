@@ -1230,18 +1230,17 @@ sarima <- auto.arima(
   seasonal = T
 )
 
-sarima_pred <- sarima |> 
-  forecast(h=12) |>
-  data.frame() |> 
-  rownames_to_column() |> 
-  mutate(data = my(rowname)) |> 
-  select(-rowname) |> 
-  full_join(df_mortes) |> 
-  arrange(data)
+sarima_pred <- cbind(fit = sarima$fitted, 
+                  forecast = forecast(sarima, h = 12)$mean, 
+                  mortes = sarima$x,
+                  .pred_lower = forecast(sarima, h = 12)$lower,
+                  .pred_upper = forecast(sarima, h = 12)$upper)
+sarima_pred <- 
+  data.frame(sarima_pred, data = zoo::as.Date(time(sarima_pred))) |> 
+  mutate(.pred = coalesce(forecast, fit), .before = 1) |> 
+  select(-c(fit, forecast))
 
-metricas_sarima <- cbind(ts, ets = sarima$fitted) |> 
-  data.frame() |> 
-  metricas(truth = ts, estimate = ets)
+metricas_ets <- metricas(ets_pred, truth = mortes, estimate = .pred)
 ```
 
 ::: panel-tabset
@@ -1251,13 +1250,12 @@ metricas_sarima <- cbind(ts, ets = sarima$fitted) |>
 #| echo: false
 
 sarima_pred |> 
-  pivot_longer(c(mortes, Point.Forecast), 
-               names_to = "Tipo", values_to = "Mortes") |> 
+  pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
   mutate(Tipo = if_else(Tipo == "mortes", 
                         "Óbitos reais", "Óbitos previstos")) |> 
   ggplot(aes(data, Mortes)) +
-    geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey80", alpha = 0.5) +
-    geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey90", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .pred_lower.80., ymax = .pred_upper.80.), fill = "grey80", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .pred_lower.95., ymax = .pred_upper.95.), fill = "grey90", alpha = 0.5) +
     geom_line(aes(color = Tipo)) +
     scale_x_date(limits = as_date(c("2011-12-01", NA)))
 ```
@@ -1297,19 +1295,17 @@ Por ser um modelo autoregressivo univariado, as previsões emitidas pelo SARIMA 
 
 ets <- HoltWinters(ts)
 
-ets_pred <- ets |> 
-  forecast(h=12) |>
-  data.frame() |> 
-  rownames_to_column() |> 
-  mutate(data = my(rowname)) |> 
-  select(-rowname) |> 
-  full_join(df_mortes) |> 
-  arrange(data)
+ets_pred <- cbind(fit = ets$fitted[, "xhat"], 
+                  forecast = forecast(ets, h = 12)$mean, 
+                  mortes = ets$x,
+                  .pred_lower = forecast(ets, h = 12)$lower,
+                  .pred_upper = forecast(ets, h = 12)$upper)
+ets_pred <- 
+  data.frame(ets_pred, data = zoo::as.Date(time(ets_pred))) |> 
+  mutate(.pred = coalesce(forecast, fit), .before = 1) |> 
+  select(-c(fit, forecast))
 
-metricas_ets <- 
-  cbind(ts, ets = ets$fitted[,1]) |> 
-  data.frame() |> 
-  metricas(truth = ts, estimate = ets)
+metricas_ets <- metricas(ets_pred, truth = mortes, estimate = .pred)
 ```
 
 A Suavização Exponencial Holt-Winters, ou Suavização Exponencial Tripla, é o segundo modelo de análise de séries temporais estudado, o qual possui uma abordagem teórica distinta do anterior. Sendo um modelo de suavização, este pretende aproximar uma função que filtre a série temporal original e expresse o comportamento dos dados de forma simplificada.
@@ -1321,13 +1317,12 @@ A Suavização Exponencial Holt-Winters, ou Suavização Exponencial Tripla, é 
 #| echo: false
 
 ets_pred |> 
-  pivot_longer(c(mortes, Point.Forecast), 
-               names_to = "Tipo", values_to = "Mortes") |> 
+  pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
   mutate(Tipo = if_else(Tipo == "mortes", 
                         "Óbitos reais", "Óbitos previstos")) |> 
   ggplot(aes(data, Mortes)) +
-    geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey80", alpha = 0.5) +
-    geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey90", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .pred_lower.80., ymax = .pred_upper.80.), fill = "grey80", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .pred_lower.95., ymax = .pred_upper.95.), fill = "grey90", alpha = 0.5) +
     geom_line(aes(color = Tipo)) +
     scale_x_date(limits = as_date(c("2011-12-01", NA)))
 ```
@@ -1396,7 +1391,31 @@ rbind(
 
 
 ```{r}
+pred_list <- list(
+  rename(pred_anual_2023, pred.anual = .pred),
+  summarise(mutate(pred_trimestre_2023, ano = year(data)), .by = ano, pred.trimestral = sum(.pred)),
+  summarise(mutate(pred_mensal_2023, ano = year(data)), .by = ano, pred.mensal = sum(.pred)),
+  summarise(mutate(rf_pred, ano = year(data)), .by = ano, pred.rf = sum(.pred)),
+  summarise(mutate(sarima_pred, ano = year(data)), .by = ano, pred.sarima = sum(.pred)),
+  summarise(mutate(ets_pred, ano = year(data)), .by = ano, pred.ets = sum(.pred))
+)
 
+pred_list |> 
+  reduce(left_join, by = "ano") |> 
+  select(c(ano, mortes, starts_with("pred"))) |> 
+  pivot_longer(starts_with("pred"), names_to = "tipo", values_to = "pred") |>
+  mutate(tipo = case_match(tipo,
+                           "pred.anual" ~ "Linear Anual",
+                           "pred.trimestral" ~ "Linear Trimestral",
+                           "pred.mensal" ~ "Linear Mensal",
+                           "pred.rf" ~ "RF Mensal",
+                           "pred.sarima" ~ "SARIMA Mensal",
+                           "pred.ets" ~ "ETS Mensal")) |> 
+  ggplot(aes(ano, mortes)) +
+    geom_line(aes(y = pred, shape = tipo, color = "Óbitos previstos")) +
+    geom_point(aes(y = pred, shape = tipo, color = "Óbitos previstos")) +
+    geom_line(aes(color = "Óbitos reais")) +
+    scale_x_continuous(limits = c(2011, NA))
 ```
 
 
