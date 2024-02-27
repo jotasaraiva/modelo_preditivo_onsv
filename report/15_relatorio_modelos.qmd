@@ -1238,6 +1238,10 @@ sarima_pred <- sarima |>
   select(-rowname) |> 
   full_join(df_mortes) |> 
   arrange(data)
+
+metricas_sarima <- cbind(ts, ets = sarima$fitted) |> 
+  data.frame() |> 
+  metricas(truth = ts, estimate = ets)
 ```
 
 ::: panel-tabset
@@ -1263,12 +1267,17 @@ sarima_pred |>
 ```{r}
 #| echo: false
 
-sarima |> 
-  forecast::accuracy() |> 
-  data.frame() |> 
-  select(RMSE, MAE, MAPE) |> 
-  remove_rownames() |> 
-  pivot_longer(everything(), names_to = "Métrica", values_to = "Valor") |>  
+metricas_sarima |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",")) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
@@ -1278,6 +1287,118 @@ sarima |>
   column_spec(1, width = "6cm", bold = T)
 ```
 :::
+
+Por ser um modelo autoregressivo univariado, as previsões emitidas pelo SARIMA são ruidosas, produzindo amplos intervalos de confiança. Modelos dessa categoria possuem baixa longevidade visto que seu desempenho diminui conforme a distância da previsão ao conjunto original, mas em comparação a modelos determinísticos, não necessitam de outras variáveis para ter resultados e são, em geral, mais simples computacionalmente.
+
+#### Suavização Exponencial
+
+```{r}
+#| include: false
+
+ets <- HoltWinters(ts)
+
+ets_pred <- ets |> 
+  forecast(h=12) |>
+  data.frame() |> 
+  rownames_to_column() |> 
+  mutate(data = my(rowname)) |> 
+  select(-rowname) |> 
+  full_join(df_mortes) |> 
+  arrange(data)
+
+metricas_ets <- 
+  cbind(ts, ets = ets$fitted[,1]) |> 
+  data.frame() |> 
+  metricas(truth = ts, estimate = ets)
+```
+
+A Suavização Exponencial Holt-Winters, ou Suavização Exponencial Tripla, é o segundo modelo de análise de séries temporais estudado, o qual possui uma abordagem teórica distinta do anterior. Sendo um modelo de suavização, este pretende aproximar uma função que filtre a série temporal original e expresse o comportamento dos dados de forma simplificada.
+
+::: panel-tabset
+## Previsão
+
+```{r}
+#| echo: false
+
+ets_pred |> 
+  pivot_longer(c(mortes, Point.Forecast), 
+               names_to = "Tipo", values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", 
+                        "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes)) +
+    geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), fill = "grey80", alpha = 0.5) +
+    geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), fill = "grey90", alpha = 0.5) +
+    geom_line(aes(color = Tipo)) +
+    scale_x_date(limits = as_date(c("2011-12-01", NA)))
+```
+
+## Métricas
+
+```{r}
+#| echo: false
+
+metricas_ets |> 
+  select(-.estimator) |> 
+  mutate(
+    .metric = case_match(
+      .metric,
+      "rmse" ~ "RMSE",
+      "mae" ~ "MAE",
+      "rsq" ~ "R²"
+    )
+  ) |> 
+  rename(Métrica = .metric, Valor = .estimate) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  kable(
+    caption = "Métricas de Erros", align = c("l","r"), 
+    table.attr = "quarto-disable-processing=true"
+  ) |> 
+  kable_styling(full_width = F) |> 
+  column_spec(1, width = "6cm", bold = T)
+```
+:::
+
+Modelos de suavização são ainda mais simplistas que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura indica que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor com séries altamente sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais recentes, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do último valor.
+
+::: callout-note
+## referencia
+
+por a literatura
+:::
+
+### Comparação de Modelos
+
+Em conformidade com os experimentos, a seleção de um modelo final é feita de forma comparativa, considerando não apenas os índices calculados de métricas de erros, mas também as características e capacidades de cada modelo individualmente. A tabela X demonstra os valores de desempenho dos modelos:
+
+```{r}
+#| echo: false
+
+rbind(
+  mutate(metricas_anual, modelo = "Regressão Linear", resol = "Anual"),
+  mutate(metricas_trimestre, modelo = "Regressão Linear", resol = "Trimestral"),
+  mutate(metricas_mensal, modelo = "Regressão Linear", resol = "Mensal"),
+  mutate(metricas_rf, modelo = "Random Forest Regressor", resol = "Mensal"),
+  mutate(metricas_ets, modelo = "Exponential Smoothing", resol = "Mensal"),
+  mutate(metricas_sarima, modelo = "SARIMA", resol = "Mensal")) |> 
+  select(-.estimator) |> 
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  rename_with(toupper, rmse:rsq) |>
+  group_by(resol) |> 
+  gt(rowname_col = "model") |>
+  cols_label(modelo = "Modelo") |> 
+  fmt_number(decimals = 2, sep_mark = ".", dec_mark = ",") |> 
+  tab_header("Métricas de Erros") |> 
+  tab_options(column_labels.background.color = onsv_palette$blue,
+              column_labels.font.weight = "bold") |> 
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title())
+```
+
+
+```{r}
+
+```
+
 
 ## Conclusão
 
