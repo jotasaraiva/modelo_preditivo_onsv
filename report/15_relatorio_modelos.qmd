@@ -462,7 +462,7 @@ O PIB é o atributo com o comportamento mais particular ao longo do tempo em rel
 
 O sucesso da modelagem é inteiramente dependente da intensidade e do tipo de relação estatística que as variáveis possuem entre si. Como anteriormente citado, a regressão linear múltipla bem ajustada infere que as preditivas possuem uma correlação linear forte com a preditora, mas um modelo com baixo desempenho não é necessariamente uma evidência de baixa correlação.
 
-Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como demonstra os correlograma, a partir de método de correlação Spearman, nas três escalas temporais:
+Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como aponta os correlograma, a partir de método de correlação Spearman, nas três escalas temporais:
 
 ::: panel-tabset
 ## Anual
@@ -604,13 +604,15 @@ plot_taxas <- df_total |>
     geom_line() +
     geom_point() +
     facet_wrap(vars(name), scales = "free_y")
+
+ggplotly(plot_taxas)
 ```
 
 As duas taxas anunciam uma diferentes tendência a cerca da sinistralidade e fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa por habitantes aparenta corroborar à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração esta que diferença de comportamente pode resultar do fato de que a frota veicular e a população nacional são variáveis que evoluem em taxas distintas.
 
 ### Resultados dos modelos
 
-A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de demonstrar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição das amostras de treino e teste, inferindo que as métricas foram validadas a partir das previsões e das amostras de teste. No caso do modelo anual, que possuo um conjunto de dados menor, os dados não foram repartidos e a validação foi feita com o mesmo conjunto de treinamento.
+A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição das amostras de treino e teste, inferindo que as métricas foram validadas a partir das previsões e das amostras de teste. No caso do modelo anual, que possuo um conjunto de dados menor, os dados não foram repartidos e a validação foi feita com o mesmo conjunto de treinamento.
 
 #### Regressão Linear Múltipla
 
@@ -1353,7 +1355,7 @@ metricas_ets |>
 ```
 :::
 
-Modelos de suavização são ainda mais simplistas que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura indica que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor com séries altamente sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais recentes, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do último valor.
+Modelos de suavização são ainda mais simplistas que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura destaca que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor com séries altamente sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais recentes, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do último valor.
 
 ::: callout-note
 ## referencia
@@ -1374,58 +1376,127 @@ rbind(
   mutate(metricas_mensal, modelo = "Regressão Linear", resol = "Mensal"),
   mutate(metricas_rf, modelo = "Random Forest Regressor", resol = "Mensal"),
   mutate(metricas_ets, modelo = "Exponential Smoothing", resol = "Mensal"),
-  mutate(metricas_sarima, modelo = "SARIMA", resol = "Mensal")) |> 
-  select(-.estimator) |> 
+  mutate(metricas_sarima, modelo = "SARIMA", resol = "Mensal")
+) |>
+  select(-.estimator) |>
   pivot_wider(names_from = .metric, values_from = .estimate) |>
   rename_with(toupper, rmse:rsq) |>
-  group_by(resol) |> 
+  group_by(resol) |>
   gt(rowname_col = "model") |>
-  cols_label(modelo = "Modelo") |> 
-  fmt_number(decimals = 2, sep_mark = ".", dec_mark = ",") |> 
-  tab_header("Métricas de Erros") |> 
-  tab_options(column_labels.background.color = onsv_palette$blue,
-              column_labels.font.weight = "bold") |> 
+  cols_label(modelo = "Modelo") |>
+  fmt_number(decimals = 2,
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_header("Métricas de Erros") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
   tab_style(style = cell_text(color = onsv_palette$blue),
             locations = cells_title())
 ```
 
+As métricas de erros aparentam melhorar conforme diminuem as unidades de tempo, sendo consequência indireta da maior disponibilidade de dados para o treinamento do modelo. Mesmo assim, será perceptível que, por exemplo, um modelo mensal bem ajustado não prevê um ano inteiro melhor que um modelo anual, por efeito da acumulação de erros associados às previsões de cada mês. Como implica a Tabela x, o modelo linear anual aparenta ter resultados mais plausíveis que o mensal, mesmo tendo um desempenho teórico inferior:
 
 ```{r}
 #| include: false
 
 pred_list <- list(
-  rename(pred_anual_2023, pred.anual = .pred),
-  summarise(mutate(pred_trimestre_2023, ano = year(data)), .by = ano, pred.trimestral = sum(.pred)),
-  summarise(mutate(pred_mensal_2023, ano = year(data)), .by = ano, pred.mensal = sum(.pred)),
-  summarise(mutate(rf_pred, ano = year(data)), .by = ano, pred.rf = sum(.pred)),
-  summarise(mutate(sarima_pred, ano = year(data)), .by = ano, pred.sarima = sum(.pred)),
-  summarise(mutate(ets_pred, ano = year(data)), .by = ano, pred.ets = sum(.pred))
+  rename(
+    pred_anual_2023, 
+    pred.anual = .pred, 
+    upper.anual = .pred_upper, 
+    lower.anual = .pred_lower
+  ),
+  summarise(
+    mutate(pred_trimestre_2023, ano = year(data)),
+    .by = ano,
+    pred.trimestral = sum(.pred),
+    upper.trimestral = sum(.pred_upper),
+    lower.trimestral = sum(.pred_lower)
+  ),
+  summarise(
+    mutate(pred_mensal_2023, ano = year(data)),
+    .by = ano,
+    pred.mensal = sum(.pred),
+    upper.mensal = sum(.pred_upper),
+    lower.mensal = sum(.pred_lower)
+  ),
+  summarise(
+    mutate(rf_pred, ano = year(data)),
+    .by = ano,
+    pred.rf = sum(.pred)
+  ),
+  summarise(
+    mutate(sarima_pred, ano = year(data)),
+    .by = ano,
+    pred.sarima = sum(.pred),
+    upper.sarima = sum(.pred_upper.80.),
+    lower.sarima = sum(.pred_lower.80.)
+  ),
+  summarise(
+    mutate(ets_pred, ano = year(data)),
+    .by = ano,
+    pred.ets = sum(.pred),
+    upper.ets = sum(.pred_upper.80.),
+    lower.ets = sum(.pred_lower.80.)
+  )
 )
 ```
 
 ```{r}
+#| echo: false
+
 pred_list |> 
   reduce(left_join, by = "ano") |> 
-  select(c(ano, starts_with("pred"))) |> 
+  select(c(ano, starts_with(c("pred","upper","lower")))) |> 
   last() |> 
-  pivot_longer(starts_with("pred"), names_to = "Modelo", values_to = "pred") |> 
-  select(-ano) |> 
-  mutate(Modelo = case_match(Modelo,
-                           "pred.anual" ~ "Linear Anual",
-                           "pred.trimestral" ~ "Linear Trimestral",
-                           "pred.mensal" ~ "Linear Mensal",
-                           "pred.rf" ~ "RF Mensal",
-                           "pred.sarima" ~ "SARIMA Mensal",
-                           "pred.ets" ~ "ETS Mensal")) |> 
+  pivot_longer(-ano) |> 
+  mutate(
+    modelo = str_remove(str_extract(name, "\\..*"), "\\."),
+    tipo = str_remove(str_extract(name, "^(.*?)\\."), "\\.")
+  ) |> 
+  select(-c(ano, name)) |> 
+  pivot_wider(values_from = value, names_from = tipo) |> 
+  mutate(
+    modelo = case_match(
+      modelo,
+      "anual" ~ "Linear Anual",
+      "trimestral" ~ "Linear Trimestral",
+      "mensal" ~ "Linear Mensal",
+      "rf" ~ "RF Mensal",
+      "sarima" ~ "SARIMA Mensal",
+      "ets" ~ "ETS Mensal"
+    )
+  ) |> 
   gt() |> 
-  cols_label(pred = "Previsão") |> 
-  fmt_number(decimals = 0, sep_mark = ".", dec_mark = ",") |> 
-  tab_header("Previsões para 2023") |> 
-  tab_options(column_labels.background.color = onsv_palette$blue,
-              column_labels.font.weight = "bold") |> 
+  cols_label(
+    modelo = "Modelo",
+    pred = "Previsão",
+    upper = "Máx.",
+    lower = "Mín."
+  ) |> 
+  fmt_number(decimals = 0,
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_header("Previsões para 2023") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
   tab_style(style = cell_text(color = onsv_palette$blue),
-            locations = cells_title())
+            locations = cells_title()) |> 
+  sub_missing(missing_text = "-") |> 
+  tab_footnote(
+    footnote = "Algoritmo não produz intervalo de confiança",
+    locations = cells_body(columns = modelo,
+                           rows = modelo == "RF Mensal"),
+    placement = "left"
+  ) |> 
+  opt_footnote_marks("standard")
 ```
+
+Nota-se que ambos métodos de análise de séries temporais prevêem uma queda, enquanto os modelos regressivos estipulam que as fatalidades crescem, o que induz a discussção acerca da sinistrilidade fatal como um fenômeno possivelmente incapaz de ser modelado pela abordagem temporal. Na figura X, os resultados de cada modelo foram agrupados e somados por ano para visualização de cada série temporal individualmente:
 
 ```{r}
 #| echo: false
@@ -1458,21 +1529,88 @@ plot_comparison <- pred_list |>
 ggplotly(plot_comparison, tooltip = "text")
 ```
 
-
 ```{r}
-load(here("data/populacao.rda"))
+#| include: false
 
-pred_list |> 
-  append(list(populacao)) |> 
-  reduce(left_join, by = "ano")
+load(here("data/populacao.rda"))
 ```
 
+Em questão das taxas anteriormente discutidas para quantificação dos óbitos em relação à população e à frota veicular, novos valores podem ser calculados sobre as previsões a fim de averiguar a evolução destas taxas em função do tempo e tipo de modelo:
+
+::: panel-tabset
+## Óbitos por Habitantes
+
+```{r}
+#| echo: false
+
+plot_taxa_popul <- pred_list |> 
+  append(list(populacao)) |> 
+  reduce(left_join, by = "ano") |> 
+  select(c(ano, mortes, populacao, starts_with("pred"))) |> 
+  pivot_longer(starts_with("pred"), names_to = "tipo", values_to = "pred") |> 
+  mutate(taxa_pred = round((pred/populacao) * 100000, 2),
+         taxa_real = round((mortes/populacao) * 100000, 2),
+         tipo = case_match(tipo,
+                           "pred.anual" ~ "Linear Anual",
+                           "pred.trimestral" ~ "Linear Trimestral",
+                           "pred.mensal" ~ "Linear Mensal",
+                           "pred.rf" ~ "RF Mensal",
+                           "pred.sarima" ~ "SARIMA Mensal",
+                           "pred.ets" ~ "ETS Mensal")) |> 
+  ggplot(aes(ano, taxa_real)) +
+    geom_line(aes(y = taxa_pred, color = "Óbitos previstos")) +
+    geom_point(aes(y = taxa_pred, color = "Óbitos previstos", 
+                   text = paste("Taxa prevista:", taxa_pred))) +
+    geom_line(aes(color = "Óbitos reais")) +
+    geom_point(aes(color = "Óbitos reais", 
+                   text = paste("Taxa real:", taxa_real))) +
+    scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
+    scale_x_continuous(breaks = seq(2011, 2021, 1), limits = c(2011, 2021)) +
+    theme(axis.text.x = element_text(angle = 90)) +
+    facet_wrap(tipo ~ .)
+  
+ggplotly(plot_taxa_popul, tooltip = "text") 
+```
+
+## Óbitos por Frota Veicular
+
+```{r}
+#| echo: false
+
+plot_taxa_frota <- pred_list |> 
+  reduce(left_join, by = "ano") |> 
+  select(c(ano, mortes, frota, starts_with("pred"))) |> 
+  pivot_longer(starts_with("pred"), names_to = "tipo", values_to = "pred") |> 
+  mutate(taxa_pred = round((pred/frota) * 10000, 2),
+         taxa_real = round((mortes/frota) * 10000, 2),
+         tipo = case_match(tipo,
+                           "pred.anual" ~ "Linear Anual",
+                           "pred.trimestral" ~ "Linear Trimestral",
+                           "pred.mensal" ~ "Linear Mensal",
+                           "pred.rf" ~ "RF Mensal",
+                           "pred.sarima" ~ "SARIMA Mensal",
+                           "pred.ets" ~ "ETS Mensal")) |> 
+  ggplot(aes(ano, taxa_real)) +
+    geom_line(aes(y = taxa_pred, color = "Óbitos previstos")) +
+    geom_point(aes(y = taxa_pred, color = "Óbitos previstos", 
+                   text = paste("Taxa prevista:", taxa_pred))) +
+    geom_line(aes(color = "Óbitos reais")) +
+    geom_point(aes(color = "Óbitos reais", 
+                   text = paste("Taxa real:", taxa_real))) +
+    scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
+    scale_x_continuous(breaks = seq(2011, 2021, 1), limits = c(2011, 2021)) +
+    theme(axis.text.x = element_text(angle = 90)) +
+    facet_wrap(tipo ~ .)
+
+ggplotly(plot_taxa_frota, tooltip = "text")
+```
+:::
 
 ## Conclusão
 
-Os modelos regressivos desenvolvidos permitem inferir que há uma tendência perceptível nas mortes causadas pelo trânsito. Mesmo que as previsões do primeiro método demonstrem que há a possibilidade de redução no ano subsequente, é visível que a predição do modelo linear anual ajustado está significativamente distante da quantidade de casos do ano de 2019, quando houve a maior redução do número de mortos desde o seu pico em 2012. Ademais, ambos os modelos mensais determinísticos e de séries temporais indicam um aumento na tendência das mortes. Isto revela um potencial relaxamento no desempenho do sistema de segurança viária e mobilidade segura nacional, visto que esta possível queda em sua eficiência precipitaria o aumento da mortalidade em sinistros de trânsito.
+Os modelos regressivos desenvolvidos antecipam uma tendência ao aumento relativo nas vítimas de sinistros de trânsito em 2023, uma revelação preocupante à presente situação dos sistemas de segurânça viária brasileiros. Em contrapartida, os modelos temporais prevêem uma possível diminuição, provavelmente devido a sensibilidade destes tipos de técnicas à sazonalidade. Por isso, a análise de regressão permanece como a abordagem mais interessante no contexto do fenômeno estudado, tanto pela qualidade da previsão quanto pela capacidade explicativa deste tipo de metodologia. O resultado da análise induz, no mínimo, um estado de alerta sobre o ineficiênia das tecnologias e políticas de controle e mitigação da mortalidade no trânsito.
 
-É fundamental destacar que as soluções de segurança viária não dependem apenas de atributos da mobilidade urbana. Inúmeros fatores socioeconômicos e de infraestrutura afetam o desempenho da segurança, indiretamente variando com as condições de desenvolvimento e maturidade tecnológica da região em questão. A mobilidade urbana é uma parte integral à toda civilização moderna, o que torna as ações para a segurança viária indispensáveis.
+É fundamental também destacar que as soluções de segurança viária não dependem apenas de atributos da mobilidade urbana. Inúmeros fatores socioeconômicos e de infraestrutura afetam o desempenho da segurança, indiretamente variando com as condições de desenvolvimento e maturidade tecnológica da região em questão. A mobilidade urbana é uma parte integral à toda civilização moderna, o que torna as ações para a segurança viária indispensáveis no processo de planejamento urbano.
 
 O cenário atual da segurança viária brasileira apresenta alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos mostram um desempenho abaixo do ideal no combate da mortalidade, conferindo uma perspectiva pessimista para o início da nova década no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável a ocorrência de avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
