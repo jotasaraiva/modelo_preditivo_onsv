@@ -1240,7 +1240,7 @@ sarima_pred <-
   mutate(.pred = coalesce(forecast, fit), .before = 1) |> 
   select(-c(fit, forecast))
 
-metricas_ets <- metricas(ets_pred, truth = mortes, estimate = .pred)
+metricas_sarima <- metricas(sarima_pred, truth = mortes, estimate = .pred)
 ```
 
 ::: panel-tabset
@@ -1391,6 +1391,8 @@ rbind(
 
 
 ```{r}
+#| include: false
+
 pred_list <- list(
   rename(pred_anual_2023, pred.anual = .pred),
   summarise(mutate(pred_trimestre_2023, ano = year(data)), .by = ano, pred.trimestral = sum(.pred)),
@@ -1399,8 +1401,38 @@ pred_list <- list(
   summarise(mutate(sarima_pred, ano = year(data)), .by = ano, pred.sarima = sum(.pred)),
   summarise(mutate(ets_pred, ano = year(data)), .by = ano, pred.ets = sum(.pred))
 )
+```
 
+```{r}
 pred_list |> 
+  reduce(left_join, by = "ano") |> 
+  select(c(ano, starts_with("pred"))) |> 
+  last() |> 
+  pivot_longer(starts_with("pred"), names_to = "Modelo", values_to = "pred") |> 
+  select(-ano) |> 
+  mutate(Modelo = case_match(Modelo,
+                           "pred.anual" ~ "Linear Anual",
+                           "pred.trimestral" ~ "Linear Trimestral",
+                           "pred.mensal" ~ "Linear Mensal",
+                           "pred.rf" ~ "RF Mensal",
+                           "pred.sarima" ~ "SARIMA Mensal",
+                           "pred.ets" ~ "ETS Mensal")) |> 
+  gt() |> 
+  cols_label(pred = "Previsão") |> 
+  fmt_number(decimals = 0, sep_mark = ".", dec_mark = ",") |> 
+  tab_header("Previsões para 2023") |> 
+  tab_options(column_labels.background.color = onsv_palette$blue,
+              column_labels.font.weight = "bold") |> 
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title())
+```
+
+```{r}
+#| echo: false
+
+dodge <- position_dodge(1)
+
+plot_comparison <- pred_list |> 
   reduce(left_join, by = "ano") |> 
   select(c(ano, mortes, starts_with("pred"))) |> 
   pivot_longer(starts_with("pred"), names_to = "tipo", values_to = "pred") |>
@@ -1412,10 +1444,27 @@ pred_list |>
                            "pred.sarima" ~ "SARIMA Mensal",
                            "pred.ets" ~ "ETS Mensal")) |> 
   ggplot(aes(ano, mortes)) +
-    geom_line(aes(y = pred, shape = tipo, color = "Óbitos previstos")) +
-    geom_point(aes(y = pred, shape = tipo, color = "Óbitos previstos")) +
+    geom_line(aes(y = pred, color = "Óbitos previstos")) +
+    geom_point(aes(y = pred, color = "Óbitos previstos", 
+                   text = paste("Previstos:", round(pred)))) +
     geom_line(aes(color = "Óbitos reais")) +
-    scale_x_continuous(limits = c(2011, NA))
+    geom_point(aes(color = "Óbitos reais", 
+                   text = paste("Óbitos:", mortes))) +
+    scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
+    scale_x_continuous(breaks = seq(2011, 2023, 1), limits = c(2011, NA)) +
+    theme(axis.text.x = element_text(angle = 90)) +
+    facet_wrap(tipo ~ .)
+    
+ggplotly(plot_comparison, tooltip = "text")
+```
+
+
+```{r}
+load(here("data/populacao.rda"))
+
+pred_list |> 
+  append(list(populacao)) |> 
+  reduce(left_join, by = "ano")
 ```
 
 
