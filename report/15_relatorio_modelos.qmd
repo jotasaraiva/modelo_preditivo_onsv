@@ -63,9 +63,9 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ### Referenciais Teóricos
 
-O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros de trânsito posam sérios desafios à saúde pública global, e as tendências evidenciadas pelos dados atuais indicam que esta realidade deve continuar a se manter pelo futuro próximo [@worldhealthorganization2018]. Sendo uma das causas de mortes mais comuns no mundo, as ocorrências de sinistros de trânsito afetam principalmente pedestres, ciclistas e motociclistas, além de induzir severos danos materiais, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes no trânsito e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
+O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros de trânsito posam sérios desafios à saúde pública global, e as tendências evidenciadas pelos dados atuais indicam que esta realidade deve perdurar pelo futuro próximo [@worldhealthorganization2018]. Sendo uma das causas de mortes mais comuns no mundo, as ocorrências de sinistros de trânsito afetam principalmente pedestres, ciclistas e motociclistas, além de induzir severos danos materiais, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes no trânsito e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
 
-A segurança viária pode ser um valioso indeicar ao estado de desenvolvimento de uma região, visto que é uma característica do avanço da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais do contexto urbano [@zhong-xiang2014], o que implica que elevadas taxas de sinistros viários colaboram no diagnóstico de problemas da segurança pública em geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
+A segurança viária pode ser um valioso indicador do estado de desenvolvimento de uma região, visto que é uma característica do avanço da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais do contexto urbano [@zhong-xiang2014], o que implica que elevadas taxas de sinistros viários colaboram no diagnóstico de problemas da segurança pública em geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência dos sistemas da união em combater estes eventos.
 
 Apesar da crescente adesão por itens de segurança veicular, os sinistros de trânsito permanecem como um problema de saúde pública, já que fazem parte de um agravo que repercute por toda a sociedade [@andrade2019], sendo a oitava maior causa de óbitos em todas as faixas etárias e a principal entre indivíduos de 5 a 29 anos [@worldhealthorganization2018]. Como previsto por modelos estatísticos prévios à 2020 [@blumenberg2018], o Brasil apresentou baixo desempenho em cumprir a meta estabelecida pela Primeira Década de Ações pela Segurança no Trânsito. Neste cenário, o Plano Nacional de Redução de Mortes e Lesões no Trânsito (PNATRANS) foi desenvolvido para guiar as ações pela mobilidade segura nacional durante o período da Segunda Década de Ação pela Segurança no Trânsito [@ministériodostransporte2018], na intenção de aprimorar o desempenho da segurança viária em relação a década passada, se alinhando aos Objetivos de Desenvolvimento Sustentável estabelecidos pela Agenda 2030 da Organização das Nações Unidas (ONU). Para atingir tais metas, o Art. 3º da Resolução Contran Nº 870 relata que o PNATRANS se apoia em seis principais pilares: gestão da segurança no trânsito, vias seguras, segurança veicular, educação para o trânsito, atendimento às vítimas, e normalização e fiscalização [@conselhonacionaldetrânsito2018].
 
@@ -73,49 +73,47 @@ A busca pela fundamentação técnica para a proposição de políticas pública
 
 ### Objetivos
 
-Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estrurais para explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto também visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno real dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do dispositivo preditivo criado com a incidência destes eventos.
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto também visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno real dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do dispositivo preditivo criado com a incidência destes eventos.
 
 ## Metodologia
 
 ### Coleta de dados
 
-A coleta de dados foi efetuada considerando as principais variáveis teoricamente relacionadas à mortalidade em trânsito disponíveis para o pública, baseando a escolha de cada grandeza na literatura previamente revisada. Estes dados são reunidos e pré-processados para a formação de conjuntos de dados específicos para cada método de modelagem, variando com a resolução temporal temporal de cada abordagem (anual, trimestral e mensal).
+A coleta de dados foi efetuada considerando as principais variáveis teoricamente relacionadas à mortalidade em trânsito disponíveis para o público, amparando a escolha de cada grandeza na literatura previamente revisada. Estes dados são reunidos e pré-processados para a formação de conjuntos de dados específicos para cada método de modelagem, variando com a resolução temporal de cada abordagem (anual, trimestral e mensal).
 
 Dito isto, investigam-se diversas bases e fornecedores distintos a fim de compilar estas informações e extrair dados para uma análise preliminar, anterior a modelagem. Entre as fontes contempladas estão:
-
--   PIB (Produto Interno Bruto) anual, fornecido pelo Sistema IBGE de Recuperação Automática (SIDRA) do IBGE [@institutobrasileirodegeografiaeestatística2023], coletado em milhões de reais;
 
 -   PIB mensal, fornecido pelo Sistema Gerenciador de Séries Temporais do Banco Central [@bancocentraldobrasil2023], coletado em dólares;
 
 -   População nacional residente, fornecida pelo sistema DataSUS do Ministério da Saúde [@ministériodasaúde2023b], obtida pelo TABNET;
 
--   Sinistros em rodovias federais, fornecidos pelo portal de dados abertos da PRF [@políciarodoviáriafederal2023];
+-   Sinistros em rodovias federais, fornecidos pelo portal de dados abertos da Polícia Rodoviária Federal [@políciarodoviáriafederal2023];
 
 -   Condutores habilitados, fornecidos pelo portal de estatísticas da Secretaria Nacional de Trânsito (Senatran) do Registro Nacional de Condutores Habiltados (RENACH) [@ministériodostransporte2023];
 
 -   Frota veicular, fornecida pelo portal de estatísticas da Senatran do Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023];
 
--   Óbitos em trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos pela biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação estatística R.
+-   Óbitos em trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos pela biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação estatística *R*.
 
-Vale ressaltar que nem todos os atributos tem disponibilidade em todas as unidades, por isso não foram inclusas no processo de criação de certos modelos. As bases de condutores habilitados e população residente, por exemplo, são unicamente anuais, impossibilitando sua utilização no modo trimestral e mensal.
+Vale ressaltar que nem todos os atributos estão disponíves em todas as unidades de tempo estudadas, por isso não foram inclusas no processo de criação de certos modelos. As bases de condutores habilitados e população residente, por exemplo, são unicamente anuais, impossibilitando sua utilização no modo trimestral e mensal.
 
 ### Modelos
 
 #### Escalas de tempo
 
-Em razão da escassa disponibilidade de dados temporais, os modelos confeccionados em geral contemplam uma janela de tempo de 2011 até a atualidade, sendo as prinpais unidades temporais estudadas a anual, a trimestral e a mensal. Ao criar modelos de série temporal, deve-se notar que a disponibilidade e o intervalo temporal em que os modelos operam tem uma relação direta com a capacidade de um modelo de aprender com os dados e conseguir expressá-los futuramente, impactando no desempenho do modelo.
+Em razão da escassa disponibilidade de dados temporais, os modelos confeccionados em geral contemplam uma janela de tempo de 2011 até a atualidade, sendo as principais unidades de tempo estudadas a anual, a trimestral e a mensal. Ao criar modelos de série temporal, deve-se notar que a abundância de dados a serem modelados tem uma relação direta com a capacidade do modelo em questão de aprender e conseguir expressá-los futuramente, impactando no seu desempenho.
 
-Modelos treinados em âmbito mensal conseguem emitir previsões para cada mês, mas perdem precisão quanto mais adiante prevém, enquanto modelos anuais podem predizer com alto desempenho os valores de anos posteriores, mas possuem baixa longevidade e não são capazes de prever meses ou trimestres. Assim, estas diversas abordagens são aferidas a fim de comparar os desempenhos e utilidades de cada método entre si.
+Modelos treinados em âmbito mensal conseguem emitir previsões todo mês, porém perdem precisão quanto mais adiante prevém, enquanto modelos anuais podem predizer com alto desempenho os valores de anos posteriores, mas não são capazes de prever meses ou trimestres. Assim, estas diversas abordagens são aferidas a fim de comparar os desempenhos e utilidades de cada método entre si.
 
-#### Série Temporal x Determinístico
+#### Análise de Série Temporal x Análise Determinística
 
-É importante ressaltar que há mais de uma maneira de se entender as relações entre os dados e, portanto, mais de uma maneira de interpretá-los em questão do processo de modelagem estatística do problema. Neste sentido, as metodologias de análise propostas a partir da observação dos dados disponíveis implicam duas possíveis linhas de racioncínio no que se diz a análise estatística: a análise de série temporal e a análise de regressão.
+É importante ressaltar que há mais de uma maneira de se entender as relações entre os dados e, portanto, mais de uma maneira de interpretá-los em questão do processo de modelagem estatística do problema em mãos. Neste sentido, as metodologias de análise propostas a partir da observação dos dados disponíveis implicam duas possíveis linhas de racioncínio no que se diz a análise estatística: a análise de série temporal e a análise de regressão ou determinística.
 
-A análise de série temporal se apoia no conceito de séries temporais, sendo um conjunto de dados de alguma grandeza ordenados em sequência cronológica, para criar um modelo generalista visando prever as observações futuras baseado nas observações passadas. Este tipo de modelagem assuma que o que ocorre no momento atual, neste caso óbitos no trânsito, dependeria, ou possui relação, com o que ocorreu anteriormente. Este tipo de modelo também leva em consideração o comportamento ao longo do tempo, como sazonalidade, tendência e heteroscedasticidade, e é altamente dependente da autocorrelação.
+A análise de série temporal se apoia no conceito de séries temporais, sendo um conjunto de dados de alguma grandeza ordenada em sequência cronológica, para criar um modelo generalista visando prever as observações futuras baseado nas ocorrências passadas. Este tipo de modelagem assume que o que ocorre no momento atual, neste caso óbitos no trânsito, dependeria, ou possui relação, com o que ocorreu anteriormente. Este tipo de modelo também leva em consideração o comportamento ao longo do tempo, como sazonalidade, tendência e heteroscedasticidade, e é altamente dependente da *autocorrelação*.
 
-Já a análise de regressão tem como base a criação de um modelo de variáveis *preditadas* que dependem de variáveis *preditivas* ou *preditoras*, criando uma função generalista que expressa a relação destes tipos de variáveis entre si. Diferentemente da análise temporal, a regessão independe da sequência cronológica dos fatos, mas é diretamente afetada pela correlação das variáveis independentes com a variável dependente que se deseja prever.
+Já a análise de regressão tem como base a criação de um modelo de variáveis *preditadas* que dependem de variáveis *preditivas* ou *preditoras*, criando uma função generalista que expressa a relação destas categorias de variáveis entre si. Diferentemente da análise temporal, a regessão independe da sequência cronológica dos fatos, mas é diretamente afetada pela correlação das variáveis independentes com a variável dependente que se deseja prever.
 
-À vista disso, o processo de modelagem pretende essencialmente englobar estas duas principais metodologias de análise de dados, criando modelos de ambas as categorias. Conforme o embasamente teórico acerca da segurança viária, estes modelagens são possíveis pelo fato de que o fenômeno das mortes em trânsito possuem tanto uma correlação expressiva com variáveis externas, quanto comportamentos temporais característicos de eventos moldáveis por técnicas de séries temporais.
+À vista disso, o processo de modelagem pretende essencialmente englobar estas duas principais metodologias de análise de dados, criando modelos de ambas as categorias. Conforme o embasamente teórico acerca da segurança viária, estas modelagens são possíveis pelo fato de que o fenômeno das mortes em trânsito possuem tanto uma correlação expressiva com variáveis externas, quanto dados temporais bem ordenados.
 
 #### Configurações
 
@@ -129,7 +127,7 @@ Desta forma, pode-se prever uma imagem de $Y$ ao se injetar um valor em $X$ na e
 
 $$ Y_i = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_nX_n + \epsilon $$
 
-Neste estudo, esta técnica de regressão é amplamente utilizada em todas as resoluções temporais em razão de sua versatilidade, facilidade de explicação e pelas altas correlações lineares entre as variáveis. Estas correlações estatísticas são expressas em valores pelas técnicas de correlação linear (de Pearson) e a correlação de Spearman, como diz a figura X. Sendo assim, serão apresentados os modelo lineares anual, trimestral e mensal confeccionados com este método.
+Neste estudo, esta técnica de regressão é amplamente utilizada em todas as resoluções temporais em razão de sua facilidade de explicação e pelas altas correlações lineares entre as variáveis. Estas correlações estatísticas são expressas em índices numéricos pelas técnicas de correlação linear (de Pearson) e a correlação de Spearman, como diz a figura X. Sendo assim, serão apresentados os modelo lineares anual, trimestral e mensal confeccionados com este método.
 
 ::: callout-important
 ## Figura
@@ -137,9 +135,9 @@ Neste estudo, esta técnica de regressão é amplamente utilizada em todas as re
 linkar a figura das correlações na figura X
 :::
 
-Adiante, é demonstrável que alguns tipos de modelos necessitam de uma quantidade maior de dados disponíveis para obterem resultados significantes. Modelos de série temporal possuem apenas uma variável, e necesitam de um conjunto extenso e "limpo" de observações para serem adequadamente ajustados, enquanto modelos regressivos mais complexos, como o Random Forest exemplificado, são propensos a sobreajuste de não treinados e testados devidamente, algo que é impossível em conjuntos de dados curtos.
+Adiante, é esperado que alguns tipos de modelos necessitem de uma quantidade maior de dados disponíveis para obterem resultados significantes. Modelos de série temporal possuem apenas uma variável, e necessitam de um conjunto extenso e "limpo" de observações para serem adequadamente ajustados, enquanto modelos regressivos mais complexos, como o Random Forest, são propensos a sobreajuste se não treinados e testados devidamente, algo que é impossível em conjuntos de dados curtos.
 
-A base de dados extraída com maior número de observações foi a base em resolução mensal, então os modelos de série temporal SARIMA e Suavização Exponencial assim como o modelo regressor Random Forest foram efetuados apenas no contexto mensal, como indica a tabela X. Deste modo, após a regressão linear anual, trimestral e mensal, o modelo Random Forest mensal foi concebido utilizando o mesmo intervalo de dados e variáveis:
+A base de dados extraída com maior número de observações foi a base em resolução mensal, então os modelos de série temporal SARIMA e Suavização Exponencial assim como o modelo regressor Random Forest foram efetuados apenas no contexto de meses, como indica a tabela X. Deste modo, após a regressão linear anual, trimestral e mensal, o modelo Random Forest mensal foi concebido utilizando o mesmo intervalo de dados e variáveis:
 
 ::: callout-important
 ## Tabela
@@ -147,7 +145,7 @@ A base de dados extraída com maior número de observações foi a base em resol
 Tabela mostrando todos os modelos, o tipo de análise e para que resoluções foram utilizadas
 :::
 
-O Random Forest é um método da família de técnicas conhecidas como árvores de decisão que, por sua vez, se baseia em algoritmos que segregram os dados em estratos ou *ramos*, separando os dados baseado em regras de decisão previamente estabelecidas pelo algoritmo. Assim, estas árvores "crescem" com base na necessidade do algoritmo em otimizar o processo de divisão dos dados em conjunto menores para melhor expressá-los. O resultado deste algoritmo é uma função estatística que irá retornar um valor preditado com base nas regras de decisões impostas em cada variável preditiva.
+O Random Forest é um método da família de técnicas conhecidas como árvores de decisão que se baseiam em algoritmos que segregram os dados em estratos ou *ramos*, separando os dados conforme regras de decisão previamente estabelecidas pelo método. Assim, estas árvores "crescem" com base na necessidade do algoritmo em otimizar o processo de divisão dos dados em conjunto menores para melhor expressá-los. O resultado deste algoritmo é uma função estatística que irá retornar um valor preditado com base nas regras de decisões impostas em cada variável preditiva.
 
 ::: callout-important
 ## Figura
@@ -159,9 +157,9 @@ O *Bagged Trees* é uma evolução da árvore de decisões convencional, onde di
 
 Diversas técnicas de aprendizado de máquina requerem valores pré-estabelecidos de hiperparâmetros para o treinamento. Neste caso, este tipo de modelo requer valores iniciais para o número de árvores que se deseja treinar (parâmetro `trees`) e o número de atributos que se deseja reamostrar para cada árvore (parâmetros `mtry`). Estes valores foram arbitrariamente escolhidos como 5000 e 5 respectivamente neste estudo, mas outra possível abordagem seria a otimização de hiperparâmetros, utilizando técnicas como *grid search*.
 
-Em seguida, o estudo é dirigido à análise de série temporal, iniciando pelo modelo SARIMA (**S**easonal **A**uto**r**egressive **I**ntegrated **M**oving **A**verage). Este é um método da família ARMA, mais especificamente uma alteração do método ARIMA, conhecido por reduzir ou remover completamente a componente sazonal de uma série temporal univariada. O modelo ARIMA possui três parâmetros que espelham as componentes no seu nome: $p$ para a autoregressão (AR), $d$ para diferenciação (I) e $q$ para média móvel (MA), criando o algoritmo $Arima(p, d, q)$.
+Em seguida, o estudo é dirigido à análise de série temporal, iniciando pelo modelo SARIMA (***S**easonal **A**uto**r**egressive **I**ntegrated **M**oving **A**verage*). Este é um método da família ARMA, mais especificamente uma alteração do método ARIMA, conhecido por reduzir ou remover completamente a componente sazonal de uma série temporal univariada. O modelo ARIMA possui três parâmetros que espelham as componentes no seu nome: $p$ para a autoregressão (AR), $d$ para diferenciação (I) e $q$ para média móvel (MA), criando o algoritmo $Arima(p, d, q)$.
 
-A autoregressão é simplesmente uma variação da regressão linear que utiliza de valores anteriores à observação presente como variáveis preditivas invés de outro atributo, construindo um modelo univariado que gera previsões baseadas em valores prévios. A diferenciação, como citada no parágrafo anterior, visa remover a sazonalidade, enquanto a componente de média móvel têm o objetivo de atualizar a predição conforme a tendência da média. A alteração do modelo SARIMA em relação ao último seria a adição de três novos parâmetros para especificar um ARIMA para a componente sazonal da série temporal, assim como um quarto componente $m$ para a periodicidade, tornando a fórmula $Sarima(p,d,q)(P,D,Q)m$.
+A autoregressão é simplesmente uma variação da regressão linear que utiliza de valores anteriores à observação presente como variáveis preditivas invés de outra grandeza, construindo um modelo univariado que gera previsões baseadas em valores prévios. A diferenciação, como citada no parágrafo anterior, visa remover a sazonalidade, enquanto a componente de média móvel têm o objetivo de atualizar a predição conforme a tendência da média. A alteração do modelo SARIMA em relação ao último seria a adição de três novos parâmetros para gerar um ARIMA específico para a componente sazonal da série temporal, assim como um quarto componente $m$ para a periodicidade, tornando a fórmula $Sarima(p,d,q)(P,D,Q)m$.
 
 O último método utilizado foi a Suavização Exponencial de Holt-Winters, ou Suavização Exponencial Tripla. Este método é basicamente uma aplicação de filtragem de sinais, visando aproximar uma função matemática generalista sobre uma série ruidosa para melhor interpretar seu comportamento. Este *alisamento* da série resulta em um modelo simples, mas que pode ser tão eficaz em prever novas observações quanto um modelo ARMA, dependendo da sazonalidade do conjunto de dados.
 
