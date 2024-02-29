@@ -2,7 +2,7 @@ project:
   type: website
   output-dir: docs
   render:
-    - "report/05_paper.qmd"
+    - "report/15_relatorio_modelos.qmd"
     
 format:
   html: 

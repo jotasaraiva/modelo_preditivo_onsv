@@ -1,6 +1,6 @@
 ---
 title: "Modelo Preditivo de Mortes no Trânsito Brasileiro"
-date: 2023-12-19
+date: 2024-02-29
 
 smooth-scroll: true
 
@@ -127,7 +127,7 @@ Já a análise de regressão tem como base a criação de um modelo de variávei
 
 Modelos estatísticos e de aprendizado de máquina constituem um grandioso conjunto de ferramentas e métodos matemáticos e computacionais para expressar fenômenos naturais por meio de funções e algoritmos. Visando expressar as dinâmicas dos óbitos ocasionados pelo transporte, o primeiro método escolhido por sua simplicidade e versatilidade é a regressão linear, norteada pelo conceito de correlações lineares entre diferentes grandezas numéricas.
 
-A regressão linear simples se enquadra como um método estatístico e de aprendizado de máquina que se baseia na relação de uma variável dependente quantitativa $Y$ em função de uma variável independente quantitativa $X$, com $\epsilon$ representando uma variável aleatória sobre o erro associado à estimativa, demonstrando a relação matemática linear entre as grandezas:
+Como discutido em @james2021, a regressão linear simples se enquadra como um método estatístico e de aprendizado de máquina que se baseia na relação de uma variável dependente quantitativa $Y$ em função de uma variável independente quantitativa $X$, com $\epsilon$ representando uma variável aleatória sobre o erro associado à estimativa, demonstrando a relação matemática linear entre as grandezas:
 
 $$ Y = \beta_0 + \beta_1X + \epsilon $$
 
@@ -153,7 +153,7 @@ A base de dados extraída com maior número de observações foi a base em resol
 Tabela mostrando todos os modelos, o tipo de análise e para que resoluções foram utilizadas
 :::
 
-O Random Forest é um método da família de técnicas conhecidas como árvores de decisão que se baseiam em algoritmos que segregram os dados em estratos ou *ramos*, separando os dados conforme regras de decisão previamente estabelecidas pelo método. Assim, estas árvores "crescem" com base na necessidade do algoritmo em otimizar o processo de divisão dos dados em conjunto menores para melhor expressá-los. O resultado deste algoritmo é uma função estatística que irá retornar um valor preditado com base nas regras de decisões impostas em cada variável preditiva.
+Conforme @james2021, o Random Forest é um método da família de técnicas conhecidas como árvores de decisão que se baseiam em algoritmos que segregram os dados em estratos ou *ramos*, separando os dados conforme regras de decisão previamente estabelecidas pelo método. Assim, estas árvores "crescem" com base na necessidade do algoritmo em otimizar o processo de divisão dos dados em conjunto menores para melhor expressá-los. O resultado deste algoritmo é uma função estatística que irá retornar um valor preditado com base nas regras de decisões impostas em cada variável preditiva.
 
 ::: callout-important
 ## Figura
@@ -165,7 +165,7 @@ O *Bagged Trees* é uma evolução da árvore de decisões convencional, onde di
 
 Diversas técnicas de aprendizado de máquina requerem valores pré-estabelecidos de hiperparâmetros para o treinamento. Neste caso, este tipo de modelo requer valores iniciais para o número de árvores que se deseja treinar (parâmetro `trees`) e o número de atributos que se deseja reamostrar para cada árvore (parâmetros `mtry`). Estes valores foram arbitrariamente escolhidos como 5000 e 5 respectivamente neste estudo, mas outra possível abordagem seria a otimização de hiperparâmetros, utilizando técnicas como *grid search*.
 
-Em seguida, o estudo é dirigido à análise de série temporal, iniciando pelo modelo SARIMA (***S**easonal **A**uto**r**egressive **I**ntegrated **M**oving **A**verage*). Este é um método da família ARMA, mais especificamente uma alteração do método ARIMA, conhecido por reduzir ou remover completamente a componente sazonal de uma série temporal univariada. O modelo ARIMA possui três parâmetros que espelham as componentes no seu nome: $p$ para a autoregressão (AR), $d$ para diferenciação (I) e $q$ para média móvel (MA), criando o algoritmo $Arima(p, d, q)$.
+Em seguida, o estudo é dirigido à análise de série temporal, iniciando pelo modelo SARIMA (***S**easonal **A**uto**r**egressive **I**ntegrated **M**oving **A**verage*). Como relatado em @shumway2017, este é um método da família ARMA, mais especificamente uma alteração do método ARIMA, conhecido por reduzir ou remover completamente a componente sazonal de uma série temporal univariada. O modelo ARIMA possui três parâmetros que espelham as componentes no seu nome: $p$ para a autoregressão (AR), $d$ para diferenciação (I) e $q$ para média móvel (MA), criando o algoritmo $Arima(p, d, q)$.
 
 A autoregressão é simplesmente uma variação da regressão linear que utiliza de valores anteriores à observação presente como variáveis preditivas invés de outra grandeza, construindo um modelo univariado que gera previsões baseadas em valores prévios. A diferenciação, como citada no parágrafo anterior, visa remover a sazonalidade, enquanto a componente de média móvel têm o objetivo de atualizar a predição conforme a tendência da média. A alteração do modelo SARIMA em relação ao último seria a adição de três novos parâmetros para gerar um ARIMA específico para a componente sazonal da série temporal, assim como um quarto componente $m$ para a periodicidade, tornando a fórmula $Sarima(p,d,q)(P,D,Q)m$.
 
@@ -175,7 +175,7 @@ O último método utilizado foi a Suavização Exponencial de Holt-Winters, ou S
 
 ### Análise Exploratória de Dados
 
-Os conjuntos de dados extraídos e pré-processados em função das unidades de tempo denunciam os comportamentos de cada atributo em relação a passagem dos anos, trimestres e meses. Em destaque, os óbitos servem como um dos principais indicadores da qualidade e disseminação dos sistemas de segurança viária da união, mostrando a evolução das mortes ao longo do tempo:
+Os conjuntos de dados extraídos e pré-processados em função das unidades de tempo denunciam os comportamentos de cada atributo em relação a passagem dos anos, trimestres e meses. Em destaque, os óbitos servem como um dos principais indicadores da qualidade e disseminação dos sistemas de segurança viária do país, mostrando a evolução das mortes ao longo do tempo:
 
 ::: panel-tabset
 ## Anual
@@ -245,9 +245,9 @@ rtdeaths |>
 ```
 :::
 
-Os gráficos históricos para óbitos em trânsito denunciam uma tendência ao incremento das mortes anuais nos últimos três anos. O cenário de 2019 atingiu a menor quantidade de mortes relacionadas ao trânsito nos últimos 10 anos, quando em 2020 a têndencia voltou a crescer. No ano de 2021 houveram 33.813 vítimas, aproximadamente 2000 a mais que em 2019. Em 2022, esse tendência foi levemente atenuada, mantendo um número próximo de óbitos em relação ao ano anterior.
+Os gráficos históricos para óbitos em trânsito mostram uma tendência ao incremento das vítimas anuais nos últimos três anos. O cenário de 2019 atingiu a menor quantidade de mortes relacionadas à trânsito nos últimos 10 anos, quando em 2020 a têndencia tornou a crescer. No ano de 2021 houveram 33.813 vítimas, aproximadamente 2000 a mais que em 2019. Em 2022, esse tendência foi levemente atenuada, mantendo um número próximo de óbitos em relação ao ano anterior.
 
-Assim sendo, os demais atributos do conjunto de dados podem ser visualizados em função do tempo, como foi feito para o caso da variável preditada, com o intuito de destacar a evolução de cada variável preditiva ao longo dos períodos disponíveis:
+Assim sendo, os demais atributos do conjunto de dados podem ser visualizados em função do tempo, como foi feito para o caso da variável preditada, com o intuito de destacar cada variável preditiva ao longo dos períodos disponíveis:
 
 ::: panel-tabset
 ## Frota veicular (RENAVAM)
@@ -581,17 +581,17 @@ ggplotly(plot_condutores, tooltip = "text") |>
 ```
 :::
 
-É notavel a diferença entre as condutas de cada atributo com o tempo. Variáveis convencionalmente cumulativas como a frota, a população e o número de condutores habilitados não devem possuir variação, dispondo de um crescimento aproximadamente linear por todo o período de estudo. Todavia, detecta-se que a população se comportou de forma inesperada em alguns anos, o que infere em erros de contagem e estimativa na fonte de dados.
+É notavel a diferença entre as condutas de cada atributo com o tempo. Variáveis convencionalmente cumulativas como a frota, a população e o número de condutores habilitados não devem possuir variação, dispondo de um crescimento aproximadamente linear por todo o período de estudo. Todavia, detecta-se que a população se comportou de forma inesperada em alguns anos, o que infere em erros de contagem e estimativa na fonte dos dados.
 
 Os dados de rodovias federais flutuam de forma análoga aos óbitos em trânsito, agindo como referências da qualidade da segurança viária nacional de determinado período, com uma sazonalidade pronunciada. Estes dados também mostram claramente como os óbitos são eventos incomuns em comparação com a quantidade de sinistros fatais e totais observados. Porém, enquanto a quantidade de sinistros pode variar intensamente ao longo dos ano, o número de mortes permanece relativamente constante.
 
-O PIB é o atributo com o comportamento mais particular ao longo do tempo em relação às outras variáveis. Foi utilizado o dólar americano em lugar do real brasileiro a fim de observar a oscilação da moeda em um contexto global e revelar a contribuição histórica da economia nacional. Modelos idealizados em @blumenberg2018 e @zhong-xiang2014 utilizam do PIB como um indício da saúde socioeconômica do país e correlata e, consequentemente, uma variável indiretamente correlata a às mortes em trânsito.
+O PIB é o atributo com o comportamento mais particular ao longo do tempo em relação às outras variáveis. Foi utilizado o dólar americano em lugar do real brasileiro a fim de observar a oscilação da moeda em um contexto global e revelar a contribuição histórica da economia nacional. Modelos idealizados em @blumenberg2018 e @zhong-xiang2014 utilizam do PIB como um indício da saúde socioeconômica do país sendo, consequentemente, uma variável indiretamente correlata às mortes em trânsito.
 
 ### Correlação
 
 O sucesso da modelagem é inteiramente dependente da intensidade e do tipo de relação estatística que as variáveis possuem entre si. Como anteriormente citado, a regressão linear múltipla bem ajustada infere que as preditivas possuem uma correlação linear forte com a preditora, mas um modelo com baixo desempenho não é necessariamente uma evidência de baixa correlação.
 
-Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como aponta os correlograma, a partir de método de correlação Spearman, nas três escalas temporais:
+Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como aponta os correlogramas, a partir do método de correlação Spearman, nas três escalas temporais:
 
 ::: panel-tabset
 ## Anual
@@ -621,7 +621,7 @@ ggcorrplot(
   cor_spearman_anual,
   lab_col = "white",
   type = "lower",
-  lab = TRUE, 
+  lab = T,
   hc.order = T,
   lab_size = 3, 
   tl.srt = 60,
@@ -715,9 +715,9 @@ ggcorrplot(
 
 ### Taxas
 
-O diagnóstico da segurança no trânsito de uma uma região em um determinado intervalo de tempo é um dos assuntos mais discutidos no campo da mobilidade segura, visto que as variáveis que influenciam a saúde no trânsito não são um consenso acadêmico absoluto. Este fato fomenta a pesquisa e desenvolvimento de novas metodologias e indicadores específicos para a análise estatística do cenário brasileiro que melhor interpretam os dados disponíveis e representam o fenômeno real da sinistralidade de maneira verossímil. @ferraz2023 disserta sobre a questão da quantificação e qualificação da sinistralidade por meio da determinação de índices utilizando de mortes, população e frota como parâmetros para estabelecer números representativos do nível de segurança do local.
+O diagnóstico da segurança no trânsito de uma uma região em um determinado intervalo de tempo é um dos principais tópicos no campo da mobilidade segura, visto que as variáveis que influenciam a saúde no trânsito não são um consenso acadêmico absoluto. Este fato fomenta a pesquisa e desenvolvimento de novas metodologias e indicadores específicos para a análise estatística do cenário brasileiro que melhor interpretem os dados disponíveis e representem o fenômeno real da sinistralidade de maneira verossímil. @ferraz2023 disserta sobre a questão da quantificação e qualificação da sinistralidade por meio da determinação de índices utilizando das mortes, população e frota como parâmetros para estabelecer valores representativos do nível de segurança do local.
 
-Estes índices são usualmente referidos em função de altas casas decimais para salientar a significância dos valores de cada taxa calculada. As taxas que direcionaram o presente estudo na avaliação da sinistralidade anual foram as de vítimas fatais por 100 mil habitantes e vítimas fatais por 10 mil veículos, como indicado:
+Estes índices são usualmente referidos em função de altas casas decimais para salientar a significância dos valores de cada taxa calculada. As taxas que direcionaram o presente estudo na avaliação da sinistralidade anual foram as vítimas fatais por 100 mil habitantes e vítimas fatais por 10 mil veículos, como indicado:
 
 ```{r}
 #| echo: false
@@ -735,7 +735,7 @@ plot_taxas <- df_total |>
   pivot_longer(-ano) |> 
   ggplot(aes(ano, value, color = name)) +
     geom_line() +
-    geom_point(aes(text = paste0(name,": ", round(value, 2))), size = 0.5) +
+    geom_point(aes(text = paste0(name,": ", round(value, 2)))) +
     facet_wrap(vars(name), scales = "free_y") +
     labs(y = "Índices", x = "Data") +
     scale_color_manual(values = paleta)
@@ -744,15 +744,15 @@ ggplotly(plot_taxas, tooltip = "text") |>
   layout(legend = list(title = list(text = "")))
 ```
 
-As duas taxas anunciam uma diferentes tendência a cerca da sinistralidade e fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa por habitantes aparenta corroborar à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração esta que diferença de comportamente pode resultar do fato de que a frota veicular e a população nacional são variáveis que evoluem em taxas distintas.
+As duas taxas anunciam tendências distintas a cerca da sinistralidade e fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa de habitantes corrobora à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração que esta diferença de comportamente pode resultar da evolução da frota veicular e da população nacional em taxas distintas.
 
 ### Resultados dos modelos
 
-A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição das amostras de treino e teste, inferindo que as métricas foram validadas a partir das previsões e das amostras de teste. No caso do modelo anual, que possuo um conjunto de dados menor, os dados não foram repartidos e a validação foi feita com o mesmo conjunto de treinamento.
+A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição das amostras de treino e teste, inferindo que as métricas foram validadas a partir das previsões e das amostras de teste. No caso do modelo anual, que possui um conjunto menor, os dados não foram repartidos e a validação foi feita com o mesmo conjunto de treinamento.
 
 #### Regressão Linear Múltipla
 
-A análise de regressão linear múltipla foi a abordagem mais extensamente utilizada durante a produção do estudo, podendo ser destrinchada a partir das escalas temporais anual, trimestral e mensal. Cada métrica e modelo são extraídos apresentados para avaliação das suas performances, com os resultados segregados por unidade de tempo.
+A análise de regressão linear múltipla foi a abordagem mais extensamente utilizada durante a produção do estudo, podendo ser dividida entre as escalas temporais anual, trimestral e mensal. Cada métrica e modelo são extraídos apresentados para avaliação das suas performances, com os resultados segregados por unidade de tempo.
 
 ##### Anual
 
@@ -809,7 +809,7 @@ Para o caso da análise anual, as previsões emitidas são comparadas com as oco
 ```{r}
 #| echo: false
 
-pred_anual_2023 |> 
+plot_pred_anual <- pred_anual_2023 |> 
   select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
   pivot_longer(
     cols = c(.pred, mortes),
@@ -819,6 +819,7 @@ pred_anual_2023 |>
   mutate(
     Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")
   ) |> 
+  filter(ano>2010) |> 
   ggplot(aes(ano, Mortes, color = Tipo)) +
     geom_ribbon(
       aes(ymax = .pred_upper, ymin = .pred_lower),
@@ -826,12 +827,14 @@ pred_anual_2023 |>
       color = "grey",
       alpha = 0.25
     ) +
-    geom_line(linewidth = 1, alpha = 0.25) +
-    geom_point() +
-    scale_x_continuous(limits = c(2011,2023), breaks = seq(2011,2023,1)) +
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size = 0.5) +
+    scale_x_continuous(breaks = seq(2011,2023,1)) +
     scale_y_continuous(labels = comma_format(big.mark = ".")) +
-    scale_discrete_onsv() + 
+    scale_color_manual(values = paleta) + 
     labs(x = NULL, y = NULL)
+
+ggplotly(plot_pred_anual, tooltip = "text")
 ```
 
 ## Previsto x Real
@@ -839,13 +842,12 @@ pred_anual_2023 |>
 ```{r}
 #| echo: false
 
-pred_anual_2023 |> 
+plot_qq_anual <- pred_anual_2023 |> 
   select(.pred, mortes, ano) |> 
   drop_na() |> 
   rename(Previsto = .pred, Real = mortes) |> 
   ggplot(aes(x = Real, y = Previsto)) +
-  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
-  geom_text(aes(label = ano), vjust = 2, size = 3) + 
+  geom_point(aes(text = paste0("Óbitos reais: ", Real, "<br>Óbitos previstos: ", round(Previsto, 0), "<br>Data: ", ano)), color = onsv_palette$blue) +
   geom_abline(
     linewidth = 1, 
     alpha = 0.5, 
@@ -855,6 +857,8 @@ pred_anual_2023 |>
   scale_y_continuous(labels = comma_format(big.mark = ".")) + 
   scale_x_continuous(labels = comma_format(big.mark = ".")) +
   coord_obs_pred()
+
+ggplotly(plot_qq_anual, tooltip = "text")
 ```
 
 ## Métricas
@@ -885,7 +889,7 @@ metricas_anual |>
 
 Como é demonstrado pelo amplo intervalo de confiança preditado, o fato do conjunto de dados anuais ser relativamente pequeno confere uma incerteza atribuída à essa abordagem. Para 2023, o modelo prevê 34.631, uma diferença de 1152 vítimas e um aumento de aproximadamente 3,3% em relação ao anterior.
 
-As métricas **RMSE** e **MAE** são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar a ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
+As métricas **RMSE** e **MAE** são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar as ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
 
 ##### Trimestral
 
@@ -1004,9 +1008,9 @@ metricas_trimestre <- bind_cols(
 ```{r}
 #| echo: false
 
-pred_trimestre_2023 |> 
+plot_pred_tri <- pred_trimestre_2023 |> 
   select(data, trimestre, mortes, .pred_lower, .pred_upper, .pred) |> 
-  drop_na() |>  
+  filter(year(data) > 2010) |>  
   pivot_longer(cols = c(.pred, mortes),
                names_to = "Tipo",
                values_to = "Mortes") |> 
@@ -1018,7 +1022,14 @@ pred_trimestre_2023 |>
       color = "grey",
       alpha = 0.25
     ) +
-    geom_line()
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size = 0.5) +
+    scale_color_manual(values = paleta) + 
+    labs(x = NULL, y = NULL)
+
+ggplotly(plot_pred_tri, tooltip = "text")
 ```
 
 ## Previsto x Real
@@ -1026,12 +1037,12 @@ pred_trimestre_2023 |>
 ```{r}
 #| echo: false
 
-pred_trimestre_2023 |> 
-  select(.pred, mortes) |> 
+plot_qq_tri <- pred_trimestre_2023 |> 
+  select(data, .pred, mortes) |> 
   drop_na() |> 
   rename(Previsto = .pred, Real = mortes) |> 
   ggplot(aes(x = Real, y = Previsto)) +
-  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_point(aes(text = paste0("Óbitos reais: ", Real, "<br>Óbitos previstos: ", round(Previsto, 0), "<br>Data: ", data)), color = onsv_palette$blue) +
   geom_abline(
     linewidth = 1, 
     alpha = 0.5, 
@@ -1041,6 +1052,8 @@ pred_trimestre_2023 |>
   scale_y_continuous(labels = comma_format(big.mark = ".")) + 
   scale_x_continuous(labels = comma_format(big.mark = ".")) +
   coord_obs_pred()
+
+ggplotly(plot_qq_tri, tooltip = "text")
 ```
 
 ## Métricas
@@ -1069,7 +1082,7 @@ metricas_trimestre |>
 ```
 :::
 
-O grafico X espelha visualmente a periodicidade e sazonalidade trimestral da sinistralidade, revelando a existência de épocas de maior risco em trânsito em todo ano, independente da tendência da série temporal de óbitos. Como esperado, a maior disponibilidade de dados resulta em alterações positivas nas métricas de erros em relação à escala temporal anual.
+O grafico X espelha visualmente a periodicidade e sazonalidade trimestral da sinistralidade, revelando a existência de épocas de maior risco no trânsito em todos os anos, independente da tendência da série temporal de óbitos. Como esperado, a maior disponibilidade de dados resulta em alterações positivas nas métricas de erros em relação à escala temporal anual.
 
 ##### Mensal
 
@@ -1114,8 +1127,8 @@ metricas_mensal <- metricas(pred_mensal_2023, truth = mortes, estimate = .pred)
 ```{r}
 #| echo: false
 
-pred_mensal_2023 |> 
-  drop_na() |> 
+plot_pred_mensal <- pred_mensal_2023 |> 
+  filter(year(data) > 2010) |> 
   pivot_longer(cols = c(.pred, mortes),
                names_to = "Tipo",
                values_to = "Mortes") |> 
@@ -1123,7 +1136,14 @@ pred_mensal_2023 |>
   ggplot(aes(data, Mortes, color = Tipo)) +
     geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower),
                 fill = "grey", color = "grey", alpha = 0.25) +
-    geom_line()
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size = 0.5) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    labs(x = NULL, y = NULL) +
+    scale_color_manual(values = paleta)
+
+ggplotly(plot_pred_mensal, tooltip = "text")
 ```
 
 ## Previsto x Real
@@ -1131,12 +1151,12 @@ pred_mensal_2023 |>
 ```{r}
 #| echo: false
 
-pred_mensal_2023 |> 
-  select(.pred, mortes) |> 
+plot_qq_mensal <- pred_mensal_2023 |> 
+  select(data, .pred, mortes) |> 
   drop_na() |> 
   rename(Previsto = .pred, Real = mortes) |> 
   ggplot(aes(x = Real, y = Previsto)) +
-  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_point(aes(text = paste0("Óbitos reais: ", Real, "<br>Óbitos previstos: ", round(Previsto, 0), "<br>Data: ", data)), color = onsv_palette$blue) +
   geom_abline(
     linewidth = 1, 
     alpha = 0.5, 
@@ -1146,6 +1166,8 @@ pred_mensal_2023 |>
   scale_y_continuous(labels = comma_format(big.mark = ".")) + 
   scale_x_continuous(labels = comma_format(big.mark = ".")) +
   coord_obs_pred()
+
+ggplotly(plot_qq_mensal, tooltip = "text")
 ```
 
 ## Métricas
@@ -1174,13 +1196,11 @@ metricas_mensal |>
 ```
 :::
 
-Uma das características notáveis deste modelo é sua capacidade de descrever observações anômalas ao decorrer dos anos, onde os óbitos ultrapassam os intervalos de confiança estipulados pelo modelo, mesmo que este apresenta com uma alta performance e capacidade preditiva pelas métricas.
-
-As métricas apresentam alterações positivas novamente, associado ao incremento de dados. Estes métricas serão aplicadas para comparar a perfomance e avaliar a utilidade das técnicas contempladas nos modelos posteriores.
+Uma das características notáveis deste modelo é sua capacidade de descrever observações anômalas ao decorrer dos anos, onde os óbitos ultrapassam os intervalos de confiança estipulados pelo modelo, mesmo que este apresente uma alta performance e capacidade preditiva segundo as métricas.
 
 #### Regressor Random Forest
 
-O segundo modelo utilizada para a análise de regressão, como anteriormente explicado, foi o Regressor Random Forest, ajustado apenas para o contexto mensal. Esta técnica dispensa a seleção de atributos manual que fora necessária para o caso da regressão linear, já que possui um algoritmo seletor interno. Sendo assim, este modelo é treinado e validado no mesmo conjunto mensal que anteriormente discutido:
+O segundo modelo utilizado para a análise de regressão, como anteriormente explicado, foi o Regressor Random Forest, ajustado apenas para o contexto mensal. Esta técnica dispensa a seleção de atributos manual que fora necessária para o caso da regressão linear, já que possui um algoritmo seletor interno. Sendo assim, este modelo é treinado e validado no mesmo conjunto mensal anteriormente processado:
 
 ```{r}
 #| include: false
@@ -1217,10 +1237,18 @@ metricas_rf <- bind_cols(
 ```{r}
 #| echo: false
 
-rf_pred |> 
+plot_pred_rf <- rf_pred |> 
   pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")) |> 
   ggplot(aes(data, Mortes, color = Tipo)) +
-    geom_line()
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size=0.5) +
+    scale_color_manual(values = paleta) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    labs(x = NULL, y = NULL)
+
+ggplotly(plot_pred_rf, tooltip = "text")
 ```
 
 ## Previsto x Real
@@ -1228,12 +1256,12 @@ rf_pred |>
 ```{r}
 #| echo: false
 
-rf_pred |> 
-  select(.pred, mortes) |> 
+plot_qq_rf <- rf_pred |> 
+  select(data, .pred, mortes) |> 
   drop_na() |> 
   rename(Previsto = .pred, Real = mortes) |> 
   ggplot(aes(x = Real, y = Previsto)) +
-  geom_point(shape = 21, size = 1.5, stroke = 1.5, color = onsv_palette$blue) +
+  geom_point(aes(text = paste0("Óbitos reais: ", Real, "<br>Óbitos previstos: ", round(Previsto, 0), "<br>Data: ", data)), color = onsv_palette$blue) +
   geom_abline(
     linewidth = 1, 
     alpha = 0.5, 
@@ -1243,6 +1271,8 @@ rf_pred |>
   scale_y_continuous(labels = comma_format(big.mark = ".")) + 
   scale_x_continuous(labels = comma_format(big.mark = ".")) +
   coord_obs_pred()
+
+ggplotly(plot_qq_rf, tooltip = "text")
 ```
 
 ## Métricas
@@ -1271,7 +1301,7 @@ metricas_rf |>
 ```
 :::
 
-O Random Forest se sobressai visualmente no gráfico de valores previstos sobre valores reais, visto que as predições aparentam convergir com mais facilidade ao valor verdadeiro que no modelo anterior. Apesar da incapacidade do algoritmo em gerar intervalos de confiança, o Random Forest raramente estima valores anômalos, apontando que é menos sensível a *outliers* que a regressão linear. Como mencionado na descrição teórica deste algoritmo, este efeito é associado a reamostragem que o modelo faz enquanto está construindo as "árvores" pela técnica *bagging*, reduzindo o enviesamento dos valores discrepantes.
+O Random Forest se sobressai visualmente no gráfico de valores previstos sobre valores reais, visto que as previsões aparentam se aproximar mais à linha de convergência em relação ao modelo anterior. Apesar da incapacidade do algoritmo em gerar intervalos de confiança, o Random Forest raramente estima valores anômalos, apontando que é menos sensível a *outliers*. Como mencionado na descrição teórica deste algoritmo, este efeito é associado a reamostragem que o modelo faz enquanto está construindo as "árvores" pela técnica *bagging*, reduzindo o enviesamento dos valores discrepantes.
 
 #### SARIMA
 
@@ -1338,7 +1368,7 @@ autoplot(
 ```
 :::
 
-A série decomposta é observada para determinar se o comportamento das mortes ao longo do tempo é característico de uma série modelável pelo SARIMA. A tendência é um forte indicativo de que há uma média móvel neste fenômeno, mas a grande quantidade de resíduo aponta que não uma sazonalidade tão bem estabelicida e cíclica. Assim, outros métodos para o entendimento da sinistrilidade no tempo são os gráficos ACF (Fator de Autocorrelação) e PACF (Fator de Autocorrelação Parcial):
+A série decomposta é observada para determinar se o comportamento das mortes ao longo do tempo é característico de uma série modelável pelo SARIMA. A tendência é um forte indicativo de que há uma média móvel neste fenômeno, mas a grande quantidade de resíduo aponta que não há uma sazonalidade tão bem estabelicida e cíclica. Assim, outros métodos usados para o entendimento da sinistrilidade no tempo são os gráficos ACF (Fator de Autocorrelação) e PACF (Fator de Autocorrelação Parcial):
 
 ```{r}
 #| echo: false
@@ -1349,9 +1379,9 @@ pacf(ts, main = "PACF")
 par(mfrow = c(1, 1))
 ```
 
-Desta maneira, atenta-se que os dados possuem altas correlações com diversos períodos de atraso de forma indireta e indireta. Em especial, a ocorrência de óbitos de um mês aparenta estar profundamente relacionada ao número de óbitos no mesmo mês no ano anterior, visto que há uma alta correlação no *lag* de 12 meses para ambos os gráficos.
+Desta maneira, atenta-se que os dados possuem altas correlações com diversos períodos de atraso de forma indireta e direta. Em especial, a quantidade de óbitos em um certo mês aparenta estar profundamente relacionada ao número de óbitos no mesmo mês no ano anterior, visto que há uma alta correlação no *lag* de 12 meses para ambos os gráficos.
 
-Estas análises são úteis para a decisão manual de valores iniciais para os parâmetros do SARIMA. Entretanto, outra forma mais adequada e automatizada de chegar ao ajuste ideal para o modelo é a função de ajuste automático `auto.arima()` do pacote [`forecast`](https://github.com/robjhyndman/forecast) [@hyndman2008], uma implementação do método que busca a melhor combinação de parâmetros baseado nos critérios de seleção de modelo AIC (*Akaike Information Criterion*) e BIC (*Bayesian Information Criterion*).
+Estas análises são úteis para a decisão manual de valores iniciais para os parâmetros do SARIMA. Todavia, outra forma mais adequada e automatizada de chegar ao ajuste ideal para o modelo é a função de ajuste automático `auto.arima()` do pacote [`forecast`](https://github.com/robjhyndman/forecast) [@hyndman2008], uma implementação do método que busca a melhor combinação de parâmetros baseado nos critérios de seleção de modelo AIC (*Akaike Information Criterion*) e BIC (*Bayesian Information Criterion*).
 
 ```{r}
 #| include: false
@@ -1381,15 +1411,22 @@ metricas_sarima <- metricas(sarima_pred, truth = mortes, estimate = .pred)
 ```{r}
 #| echo: false
 
-sarima_pred |> 
+plot_pred_sarima <- sarima_pred |> 
+  filter(year(data) > 2010) |> 
   pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
   mutate(Tipo = if_else(Tipo == "mortes", 
                         "Óbitos reais", "Óbitos previstos")) |> 
   ggplot(aes(data, Mortes)) +
     geom_ribbon(aes(ymin = .pred_lower.80., ymax = .pred_upper.80.), fill = "grey80", alpha = 0.5) +
     geom_ribbon(aes(ymin = .pred_lower.95., ymax = .pred_upper.95.), fill = "grey90", alpha = 0.5) +
-    geom_line(aes(color = Tipo)) +
-    scale_x_date(limits = as_date(c("2011-12-01", NA)))
+    geom_line(aes(color = Tipo)) + 
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0)), color = Tipo), size = 0.5) +
+    scale_color_manual(values = paleta) +
+    labs(x = NULL, y = NULL) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years")
+
+ggplotly(plot_pred_sarima, tooltip = "text")
 ```
 
 ## Métricas
@@ -1418,7 +1455,7 @@ metricas_sarima |>
 ```
 :::
 
-Por ser um modelo autoregressivo univariado, as previsões emitidas pelo SARIMA são ruidosas, produzindo amplos intervalos de confiança. Modelos dessa categoria possuem baixa longevidade visto que seu desempenho diminui conforme a distância da previsão ao conjunto original, mas em comparação a modelos determinísticos, não necessitam de outras variáveis para ter resultados e são, em geral, mais simples computacionalmente.
+Por ser um modelo autoregressivo univariado, as previsões emitidas pelo SARIMA são ruidosas, produzindo amplos intervalos de confiança. Modelos dessa categoria possuem baixa longevidade visto que seu desempenho diminui conforme a distância da previsão ao conjunto original. Em comparação a modelos determinísticos, não necessitam de outras variáveis para ter resultados e são, em geral, mais simples computacionalmente.
 
 #### Suavização Exponencial
 
@@ -1440,7 +1477,7 @@ ets_pred <-
 metricas_ets <- metricas(ets_pred, truth = mortes, estimate = .pred)
 ```
 
-A Suavização Exponencial Holt-Winters, ou Suavização Exponencial Tripla, é o segundo modelo de análise de séries temporais estudado, o qual possui uma abordagem teórica distinta do anterior. Sendo um modelo de suavização, este pretende aproximar uma função que filtre a série temporal original e expresse o comportamento dos dados de forma simplificada.
+A Suavização Exponencial Holt-Winters é o segundo modelo de análise de séries temporais estudado, o qual possui uma abordagem teórica distinta do anterior. Sendo um modelo de suavização, este pretende aproximar uma função que filtre a série temporal original e expresse o comportamento dos dados de forma simplificada.
 
 ::: panel-tabset
 ## Previsão
@@ -1448,7 +1485,8 @@ A Suavização Exponencial Holt-Winters, ou Suavização Exponencial Tripla, é 
 ```{r}
 #| echo: false
 
-ets_pred |> 
+plot_pre_ets <- ets_pred |> 
+  filter(year(data) > 2010) |> 
   pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
   mutate(Tipo = if_else(Tipo == "mortes", 
                         "Óbitos reais", "Óbitos previstos")) |> 
@@ -1456,7 +1494,13 @@ ets_pred |>
     geom_ribbon(aes(ymin = .pred_lower.80., ymax = .pred_upper.80.), fill = "grey80", alpha = 0.5) +
     geom_ribbon(aes(ymin = .pred_lower.95., ymax = .pred_upper.95.), fill = "grey90", alpha = 0.5) +
     geom_line(aes(color = Tipo)) +
-    scale_x_date(limits = as_date(c("2011-12-01", NA)))
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0)), color = Tipo), size = 0.5) +
+    scale_color_manual(values = paleta) +
+    labs(x = NULL, y = NULL) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years")
+
+ggplotly(plot_pre_ets, tooltip = "text")
 ```
 
 ## Métricas
@@ -1485,7 +1529,7 @@ metricas_ets |>
 ```
 :::
 
-Modelos de suavização são ainda mais simplistas que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura destaca que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor com séries altamente sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais recentes, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do último valor.
+Modelos de suavização são ainda mais simplistas que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura destaca que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor à séries sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais novos, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do valor mais recente.
 
 ::: callout-note
 ## referencia
@@ -1495,7 +1539,7 @@ por a literatura
 
 ### Comparação de Modelos
 
-Em conformidade com os experimentos, a seleção de um modelo final é feita de forma comparativa, considerando não apenas os índices calculados de métricas de erros, mas também as características e capacidades de cada modelo individualmente. A tabela X demonstra os valores de desempenho dos modelos:
+Após os experimentos, a seleção de um modelo final é feita de forma comparativa, considerando não apenas os índices de métricas de erros calculados mas também as características e capacidades de cada modelo individualmente. A tabela X demonstra os valores de desempenho dos modelos:
 
 ```{r}
 #| echo: false
@@ -1526,7 +1570,7 @@ rbind(
             locations = cells_title())
 ```
 
-As métricas de erros aparentam melhorar conforme diminuem as unidades de tempo, sendo consequência indireta da maior disponibilidade de dados para o treinamento do modelo. Mesmo assim, será perceptível que, por exemplo, um modelo mensal bem ajustado não prevê um ano inteiro melhor que um modelo anual, por efeito da acumulação de erros associados às previsões de cada mês. Como implica a Tabela x, o modelo linear anual aparenta ter resultados mais plausíveis que o mensal, mesmo tendo um desempenho teórico inferior:
+Todos os valores de métricas melhoram conforme diminuem as unidades de tempo, sendo consequência indireta da maior disponibilidade de dados para o treinamento do modelo. Mesmo assim, será perceptível que, por exemplo, um modelo mensal bem ajustado não prevê um ano inteiro melhor que um modelo anual, por efeito da acumulação de erros associados às previsões de cada mês. Como implica a Tabela x, o modelo linear anual aparenta ter resultados mais plausíveis que o mensal, mesmo tendo um desempenho teórico inferior:
 
 ```{r}
 #| include: false
@@ -1626,7 +1670,7 @@ pred_list |>
   opt_footnote_marks("standard")
 ```
 
-Nota-se que ambos métodos de análise de séries temporais prevêem uma queda, enquanto os modelos regressivos estipulam que as fatalidades crescem, o que induz a discussção acerca da sinistrilidade fatal como um fenômeno possivelmente incapaz de ser modelado pela abordagem temporal. Na figura X, os resultados de cada modelo foram agrupados e somados por ano para visualização de cada série temporal individualmente:
+Nota-se que ambos os métodos de análise de séries temporais prevêem uma queda, enquanto os modelos regressivos estipulam que as fatalidades crescem, o que induz a discussão acerca da sinistrilidade fatal como um fenômeno possivelmente incapaz de ser modelado pela abordagem temporal. Na figura X, os resultados de cada modelo foram agrupados e somados por ano para visualização de cada série temporal individualmente:
 
 ```{r}
 #| echo: false
@@ -1653,10 +1697,13 @@ plot_comparison <- pred_list |>
                    text = paste("Óbitos:", mortes))) +
     scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
     scale_x_continuous(breaks = seq(2011, 2023, 1), limits = c(2011, NA)) +
+    scale_y_continuous(labels = label_comma(decimal.mark = ",", big.mark = ".")) +
     theme(axis.text.x = element_text(angle = 90)) +
-    facet_wrap(tipo ~ .)
+    facet_wrap(tipo ~ .) +
+    labs(x = NULL, y = NULL)
     
-ggplotly(plot_comparison, tooltip = "text")
+ggplotly(plot_comparison, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 ```{r}
@@ -1665,7 +1712,7 @@ ggplotly(plot_comparison, tooltip = "text")
 load(here("data/populacao.rda"))
 ```
 
-Em questão das taxas anteriormente discutidas para quantificação dos óbitos em relação à população e à frota veicular, novos valores podem ser calculados sobre as previsões a fim de averiguar a evolução destas taxas em função do tempo e tipo de modelo:
+Em questão das taxas anteriormente discutidas para quantificação dos óbitos em relação à população e à frota veicular, novos valores podem ser calculados sobre as previsões a fim de averiguar a mudança destas taxas em função do tempo e tipo de modelo:
 
 ::: panel-tabset
 ## Óbitos por Habitantes
@@ -1697,9 +1744,11 @@ plot_taxa_popul <- pred_list |>
     scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
     scale_x_continuous(breaks = seq(2011, 2021, 1), limits = c(2011, 2021)) +
     theme(axis.text.x = element_text(angle = 90)) +
-    facet_wrap(tipo ~ .)
+    facet_wrap(tipo ~ .) +
+    labs(x = NULL, y = NULL)
   
-ggplotly(plot_taxa_popul, tooltip = "text") 
+ggplotly(plot_taxa_popul, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 ## Óbitos por Frota Veicular
@@ -1730,9 +1779,11 @@ plot_taxa_frota <- pred_list |>
     scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
     scale_x_continuous(breaks = seq(2011, 2021, 1), limits = c(2011, 2021)) +
     theme(axis.text.x = element_text(angle = 90)) +
-    facet_wrap(tipo ~ .)
+    facet_wrap(tipo ~ .) +
+    labs(x = NULL, y = NULL)
 
-ggplotly(plot_taxa_frota, tooltip = "text")
+ggplotly(plot_taxa_frota, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 :::
 
