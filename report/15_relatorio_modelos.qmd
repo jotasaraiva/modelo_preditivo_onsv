@@ -55,6 +55,9 @@ load(here("data","tabela_total_mensal.rda"))
 load(here("data/pib_mensal.rda"))
 load(here("data","tabela_condutores.rda"))
 
+# paleta
+paleta = as_vector(unname(onsv_palette))
+
 # supressão dos warnings
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
@@ -187,8 +190,7 @@ rtdeaths |>
   layout(yaxis = list(exponentformat = "none",
                       title = "Óbitos"),
          xaxis = list(title = "Data"),
-         separators = ",.",
-         font = list(family = "Arial"))
+         separators = ",.")
 ```
 
 ## Trimestral
@@ -211,8 +213,7 @@ rtdeaths |>
   layout(yaxis = list(exponentformat = "none",
                       title = "Óbitos"),
          xaxis = list(title = "Data"),
-         separators = ",.",
-         font = list(family = "Arial"))
+         separators = ",.")
 ```
 
 ## Mensal
@@ -235,8 +236,7 @@ rtdeaths |>
   layout(yaxis = list(exponentformat = "none",
                       title = "Óbitos"),
          xaxis = list(title = "Data"),
-         separators = ",.",
-         font = list(family = "Arial"))
+         separators = ",.")
 ```
 :::
 
@@ -253,7 +253,7 @@ Assim sendo, os demais atributos do conjunto de dados podem ser visualizados em 
 ```{r}
 #| echo: false
 
-fleetbr |>
+plot_frota_anual <- fleetbr |>
   filter(mes == 7) |> 
   pivot_wider(values_from = frota, names_from = modal) |> 
   mutate(
@@ -267,14 +267,22 @@ fleetbr |>
     motocicleta = sum(motocicleta),
     veiculos_total = sum(total)
   ) |> 
+  rename(
+    "Automóveis" = automovel,
+    "Motocicletas" = motocicleta,
+    "Veículos totais" = veiculos_total
+  ) |> 
   pivot_longer(-ano) |> 
   ggplot(aes(ano, value, color = name)) +
     geom_line(linewidth = 1) +
-    geom_point() +
+    geom_point(aes(text = paste("Frota:", value))) +
     scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) + 
     scale_x_continuous(n.breaks = 10) +
     labs(x = "Data", y = "Frota") +
-    scale_discrete_onsv()
+    scale_color_manual(values = paleta)
+
+ggplotly(plot_frota_anual, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 ## Trimestral
@@ -282,7 +290,7 @@ fleetbr |>
 ```{r}
 #| echo: false
 
-fleetbr |> 
+plot_frota_tri <- fleetbr |> 
   pivot_wider(names_from = modal, values_from = frota) |> 
   mutate(
     data = ym(paste0(ano,"-",mes)),
@@ -299,15 +307,23 @@ fleetbr |>
   mutate(data = quarter(data, type = "date_last"), 
          .before = 1) |> 
   summarise(.by = data,
-            across(everything(), last)) |> 
+            across(everything(), last)) |>
+  rename(
+    "Automóveis" = automovel,
+    "Motocicletas" = motocicleta,
+    "Veículos totais" = veiculos
+  ) |> 
   pivot_longer(-data) |> 
   ggplot(aes(data, value, color = name)) + 
     geom_line(linewidth = 1) +
-    geom_point() +
+    geom_point(aes(text = paste("Frota:", value))) +
     scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
     scale_x_date(date_breaks = "2 years") +
     labs(x = "Data", y = "Frota") +
-    scale_discrete_onsv()
+    scale_color_manual(values = paleta)
+
+ggplotly(plot_frota_tri, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 ## Mensal
