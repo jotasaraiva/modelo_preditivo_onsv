@@ -466,13 +466,44 @@ ggplotly(plot_populacao, tooltip = "text") |>
 ```{r}
 #| echo: false
 
-df_total |> 
-  select(ano, qnt_acidentes_fatais, qnt_acidentes, qnt_feridos, qnt_mortos) |> 
-  filter(ano >= 2011) |> 
-  drop_na() |> 
+df_prf_plot <- prf_sinistros |> 
+  mutate(
+    mes = month(data_inversa),
+    acidentes_fatais = if_else(
+      classificacao_acidente == "Com Vítimas Fatais",
+      1, 0, missing = 0
+    )
+  ) |> 
+  summarise(
+    .by = c(mes, ano, uf),
+    acidentes = n(),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes = sum(mortos)
+  ) |> 
+  arrange(mes, ano) |> 
+  collect()
+
+plot_prf_anual <- df_prf_plot |> 
+  summarise(.by = ano, across(.fns = sum, acidentes:mortes)) |> 
+  filter(ano > 2010) |> 
+  rename(
+    "Acidentes" = acidentes,
+    "Acidentes fatais" = acidentes_fatais,
+    "Feridos" = feridos,
+    "Mortos" = mortes
+  ) |> 
   pivot_longer(-ano) |> 
   ggplot(aes(ano, value, color = name)) +
-    geom_line()
+    geom_line() +
+    geom_point(aes(text = paste0(name,": ", value)), size = 0.5) +
+    scale_x_continuous(breaks = seq(2011, 2023, 1)) +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    scale_color_manual(values = paleta) +
+    labs(x = "Data", y = NULL)
+
+ggplotly(plot_prf_anual, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 ## Trimestral
@@ -480,13 +511,27 @@ df_total |>
 ```{r}
 #| echo: false
 
-dados_mensais |> 
-  select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |> 
-  mutate(data = quarter(data, type = "date_last")) |> 
-  summarise(.by = data, across(everything(), sum)) |> 
+plot_prf_tri <- df_prf_plot |> 
+  mutate(data = quarter(ym(paste0(ano,"-",mes)), type = "date_last")) |> 
+  summarise(.by = data, across(.fns = sum, acidentes:mortes)) |> 
+  filter(year(data) > 2010) |> 
+  rename(
+    "Acidentes" = acidentes,
+    "Acidentes fatais" = acidentes_fatais,
+    "Feridos" = feridos,
+    "Mortos" = mortes
+  ) |> 
   pivot_longer(-data) |> 
   ggplot(aes(data, value, color = name)) +
-    geom_line()
+    geom_line() +
+    geom_point(aes(text = paste0(name,": ", value)), size = 0.5) +
+    scale_x_date(date_breaks = "2 years") +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    scale_color_manual(values = paleta) +
+    labs(x = "Data", y = NULL)
+
+ggplotly(plot_prf_tri, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 ## Mensal
@@ -494,11 +539,27 @@ dados_mensais |>
 ```{r}
 #| echo: false
 
-dados_mensais |> 
-  select(data, acidentes, acidentes_fatais, feridos, mortes_prf) |>
+plot_prf_mensal <- df_prf_plot |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(.by = data, across(.fns = sum, acidentes:mortes)) |> 
+  filter(year(data) > 2010) |> 
+  rename(
+    "Acidentes" = acidentes,
+    "Acidentes fatais" = acidentes_fatais,
+    "Feridos" = feridos,
+    "Mortos" = mortes
+  ) |> 
   pivot_longer(-data) |> 
   ggplot(aes(data, value, color = name)) +
-    geom_line()
+    geom_line() +
+    geom_point(aes(text = paste0(name,": ", value)), size = 0.5) +
+    scale_x_date(date_breaks = "2 years") +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    scale_color_manual(values = paleta) +
+    labs(x = "Data", y = NULL)
+
+ggplotly(plot_prf_mensal, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 :::
 
@@ -507,12 +568,16 @@ dados_mensais |>
 ```{r}
 #| echo: false
 
-df_total |> 
-  select(ano, condutores) |> 
-  drop_na() |> 
-  filter(ano < 2022) |> 
+plot_condutores <- tabela_condutores |> 
   ggplot(aes(ano, condutores)) +
-    geom_line()
+    geom_line(color = onsv_palette$blue) +
+    geom_point(aes(text = paste("Condutores:",condutores)), color = onsv_palette$blue, size = 0.5) +
+    scale_x_continuous(breaks = seq(2011, 2023, 1)) +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    labs(x = "Data", y = "Condutores")
+
+ggplotly(plot_condutores, tooltip = "text") |> 
+  layout(yaxis = list(title = list(standoff = 5)))
 ```
 :::
 
@@ -663,13 +728,20 @@ plot_taxas <- df_total |>
   mutate(taxa_hab = (mortes/populacao) * 100000,
          taxa_veic = (mortes/veiculos_total) * 10000) |> 
   select(ano, taxa_hab, taxa_veic) |> 
+  rename(
+    "Óbitos por 100.000 hab" = taxa_hab,
+    "Óbitos por 10.000 veículos" = taxa_veic
+  ) |> 
   pivot_longer(-ano) |> 
   ggplot(aes(ano, value, color = name)) +
     geom_line() +
-    geom_point() +
-    facet_wrap(vars(name), scales = "free_y")
+    geom_point(aes(text = paste0(name,": ", round(value, 2))), size = 0.5) +
+    facet_wrap(vars(name), scales = "free_y") +
+    labs(y = "Índices", x = "Data") +
+    scale_color_manual(values = paleta)
 
-ggplotly(plot_taxas)
+ggplotly(plot_taxas, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")))
 ```
 
 As duas taxas anunciam uma diferentes tendência a cerca da sinistralidade e fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa por habitantes aparenta corroborar à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração esta que diferença de comportamente pode resultar do fato de que a frota veicular e a população nacional são variáveis que evoluem em taxas distintas.
@@ -755,7 +827,7 @@ pred_anual_2023 |>
       alpha = 0.25
     ) +
     geom_line(linewidth = 1, alpha = 0.25) +
-    geom_point(shape = 21, size = 1.5, stroke = 1.5) +
+    geom_point() +
     scale_x_continuous(limits = c(2011,2023), breaks = seq(2011,2023,1)) +
     scale_y_continuous(labels = comma_format(big.mark = ".")) +
     scale_discrete_onsv() + 
