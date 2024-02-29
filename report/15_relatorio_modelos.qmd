@@ -54,6 +54,11 @@ load(here("data","tabela_total.rda"))
 load(here("data","tabela_total_mensal.rda"))
 load(here("data/pib_mensal.rda"))
 load(here("data","tabela_condutores.rda"))
+temp <- tempfile()
+download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip", temp)
+unzip(temp, exdir = tempdir())
+unlink(temp)
+prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
 
 # paleta
 paleta = as_vector(unname(onsv_palette))
@@ -274,15 +279,16 @@ plot_frota_anual <- fleetbr |>
   ) |> 
   pivot_longer(-ano) |> 
   ggplot(aes(ano, value, color = name)) +
-    geom_line(linewidth = 1) +
-    geom_point(aes(text = paste("Frota:", value))) +
+    geom_line() +
+    geom_point(aes(text = paste("Frota:", value)), size = 0.5) +
     scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) + 
     scale_x_continuous(n.breaks = 10) +
     labs(x = "Data", y = "Frota") +
     scale_color_manual(values = paleta)
 
 ggplotly(plot_frota_anual, tooltip = "text") |> 
-  layout(legend = list(title = list(text = "")))
+  layout(legend = list(title = list(text = "")),
+         yaxis = list(title = list(standoff = 5)))
 ```
 
 ## Trimestral
@@ -315,15 +321,16 @@ plot_frota_tri <- fleetbr |>
   ) |> 
   pivot_longer(-data) |> 
   ggplot(aes(data, value, color = name)) + 
-    geom_line(linewidth = 1) +
-    geom_point(aes(text = paste("Frota:", value))) +
+    geom_line() +
+    geom_point(aes(text = paste("Frota:", value)), size = 0.5) +
     scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
     scale_x_date(date_breaks = "2 years") +
     labs(x = "Data", y = "Frota") +
     scale_color_manual(values = paleta)
 
 ggplotly(plot_frota_tri, tooltip = "text") |> 
-  layout(legend = list(title = list(text = "")))
+  layout(legend = list(title = list(text = "")),
+         yaxis = list(title = list(standoff = 5)))
 ```
 
 ## Mensal
@@ -331,7 +338,7 @@ ggplotly(plot_frota_tri, tooltip = "text") |>
 ```{r}
 #| echo: false
 
-fleetbr |> 
+plot_frota_mensal <- fleetbr |> 
   pivot_wider(names_from = modal, values_from = frota) |> 
   mutate(
     data = ym(paste0(ano,"-",mes)),
@@ -345,13 +352,23 @@ fleetbr |>
     automovel = sum(automovel),
     motocicleta = sum(motocicleta)
   ) |> 
+  rename(
+    "Automóveis" = automovel,
+    "Motocicletas" = motocicleta,
+    "Veículos totais" = veiculos
+  ) |> 
   pivot_longer(-data) |> 
   ggplot(aes(data, value, color = name)) +
-    geom_line(linewidth = 1) +
+    geom_line() + 
+    geom_point(aes(text = paste("Frota:", value)), size = 0.5) +
     scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
     scale_x_date(date_breaks = "2 years") +
     labs(x = "Data", y = "Frota") +
-    scale_discrete_onsv()
+    scale_color_manual(values = paleta)
+
+ggplotly(plot_frota_mensal, tooltip = "text") |> 
+  layout(legend = list(title = list(text = "")),
+         yaxis = list(title = list(standoff = 5)))
 ```
 :::
 
@@ -363,12 +380,21 @@ fleetbr |>
 ```{r}
 #| echo: false
 
-dados_mensais |> 
-  select(data, pib) |> 
-  mutate(data = year(data)) |> 
-  summarise(.by = data, pib = sum(pib)) |> 
-  ggplot(aes(data, pib)) +
-    geom_line()
+plot_pib_anual <- pib_mensal |> 
+  summarise(
+    .by = ano, 
+    pib = sum(pib)
+  ) |> 
+  filter(ano > 2010) |> 
+  ggplot(aes(ano, pib)) +
+    geom_line(color = onsv_palette$blue) +
+    geom_point(aes(text = paste("PIB:",pib,"Mi US$")), color = onsv_palette$blue, size = 0.5) +
+    scale_x_continuous(n.breaks = 10) +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    labs(x = "Data", y = "PIB (Mi US$)")
+
+ggplotly(plot_pib_anual, tooltip = "text") |> 
+  layout(yaxis = list(title = list(standoff = 5)))
 ```
 
 ## Trimestral
@@ -376,12 +402,19 @@ dados_mensais |>
 ```{r}
 #| echo: false
 
-dados_mensais |> 
-  select(data, pib) |>
-  mutate(data = quarter(data, type = "date_last")) |> 
+plot_pib_tri <- pib_mensal |> 
+  mutate(data = quarter(ym(paste0(ano,"-",mes)), type = "date_last")) |> 
   summarise(.by = data, pib = sum(pib)) |> 
+  filter(year(data) > 2010) |> 
   ggplot(aes(data, pib)) +
-    geom_line()
+    geom_line(color = onsv_palette$blue) +
+    geom_point(aes(text = paste("PIB:",pib,"Mi US$")), color = onsv_palette$blue, size = 0.5) +
+    scale_x_date(date_breaks = "2 years") +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    labs(x = "Data", y = "PIB (Mi US$)")
+
+ggplotly(plot_pib_tri, tooltip = "text") |> 
+  layout(yaxis = list(title = list(standoff = 5)))
 ```
 
 ## Mensal
@@ -389,10 +422,19 @@ dados_mensais |>
 ```{r}
 #| echo: false
 
-dados_mensais |> 
-  select(data, pib) |> 
+plot_pib_mensal <- pib_mensal |> 
+  mutate(data = ym(paste0(ano,"-",mes))) |> 
+  summarise(.by = data, pib = sum(pib)) |>
+  filter(year(data) > 2010) |> 
   ggplot(aes(data, pib)) +
-    geom_line()
+    geom_line(color = onsv_palette$blue) +
+    geom_point(aes(text = paste("PIB:",pib,"Mi US$")), color = onsv_palette$blue, size = 0.5) +
+    scale_x_date(date_breaks = "2 years") +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    labs(x = "Data", y = "PIB (Mi US$)")
+
+ggplotly(plot_pib_mensal, tooltip = "text") |> 
+  layout(yaxis = list(title = list(standoff = 5)))
 ```
 :::
 
@@ -401,11 +443,19 @@ dados_mensais |>
 ```{r}
 #| echo: false
 
-df_total |> 
+plot_populacao <- df_total |> 
   select(populacao, ano) |> 
   drop_na() |> 
+  filter(ano > 2010) |> 
   ggplot(aes(ano, populacao)) +
-    geom_line()
+    geom_line(color = onsv_palette$blue) +
+    geom_point(aes(text = paste("População:", populacao)), color = onsv_palette$blue, size = 0.5) +
+    scale_x_continuous(breaks = seq(2011, 2021, 1)) +
+    scale_y_continuous(labels = label_comma(big.mark = ".", decimal.mark = ",")) +
+    labs(x = "Data", y = "População")
+
+ggplotly(plot_populacao, tooltip = "text") |> 
+  layout(yaxis = list(title = list(standoff = 5)))
 ```
 
 ## Sinistros em rodovias federais (PRF)
@@ -638,12 +688,6 @@ A análise de regressão linear múltipla foi a abordagem mais extensamente util
 #| include: false
 
 metricas <- metric_set(rmse, mae, rsq)
-
-temp <- tempfile()
-download.file("https://github.com/ONSV/prfdata/releases/download/v0.2.0/prf_sinistros.zip", temp)
-unzip(temp, exdir = tempdir())
-unlink(temp)
-prf_sinistros <- open_dataset(paste(sep = "\\", file.path(tempdir()), "prf_sinistros"))
 
 dados_modelo_2023 <- list(
   drop_na(count(rename(rtdeaths, ano = ano_ocorrencia), ano, name = "mortes")),
