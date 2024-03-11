@@ -25,6 +25,7 @@ knitr:
     fig.align: center
 
 bibliography: references.bib
+csl: associacao-brasileira-de-normas-tecnicas.csl
 toc: true
 toc-title: Sumário
 
@@ -823,7 +824,9 @@ As duas taxas anunciam tendências distintas a cerca da fatalidade no trânsito 
 
 ### Resultados dos modelos
 
-A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição das amostras de treino e teste, inferindo que as métricas foram validadas a partir das previsões e das amostras de teste. No caso do modelo anual, que possui um conjunto menor, os dados não foram repartidos e a validação foi feita com o mesmo conjunto de treinamento.
+A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição de amostras para treino e para teste.
+
+A repartição dividiu as amostras com uma proporção de 75% dos dados para o treinamento dos modelos, sendo o restante utilizado na validação das previsões pelo cálculo do Erro Quadrado Médio Absoluto (*Root Mean Squared Error* - RMSE), Erro Médio Absoluto *(Mean Squared Error* - MAE) e o 𝑅^2^, ou coeficiente de determinação. A técnica de repartição de treino e teste é consideravelmente mais simples que o método de validação cruzada comumente utilizado em modelos de aprendizado de máquina mais robustos, mas pode ser mais adequada à *databases* menores, dado que a validação cruzada não influenciou na performance dos modelos e foi abandonada devido ao gasto computacional desnecessário. Já no caso do modelo anual, que possui um conjunto ainda menor de dados, a repartição é inviável e a validação foi dada com o mesmo conjunto do treinamento.
 
 #### Regressão Linear Múltipla
 
@@ -960,7 +963,7 @@ metricas_anual |>
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
-    caption = "Métricas de Erros", align = c("l","r"), 
+    align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
   ) |> 
   kable_styling(full_width = F) |> 
@@ -970,7 +973,41 @@ metricas_anual |>
 
 Como é demonstrado pelo amplo intervalo de confiança preditado (área em cinza no gráfico), o fato do conjunto de dados anuais ser relativamente pequeno confere uma incerteza atribuída à essa abordagem. Para 2023, o modelo prevê 34.631 óbitos no trânsito brasileiro, uma diferença de 737 vítimas e um aumento de aproximadamente 2,1% em relação ao valor real do ano anterior (2022).
 
-As métricas **RMSE** e **MAE** são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar as ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
+As métricas RMSE e MAE são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar as ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
+
+Como este modelo em específico possui maior variedade de atributos, a combinação de diversas configurações de preditivas foi feita manualmente para melhor filtrar as variáveis úteis. Componentes como a população, o PIB e as mortes em rodovias federais foram considerados muito colineares, prejudicando a performance do modelo. Na @tbl-coefs, estão explicitados os melhores atributos e seus coeficientes:
+
+```{r}
+#| echo: false
+#| tbl-cap: Coeficientes para modelo anual
+#| label: tbl-coefs
+
+wflow_anual_2023 |>
+  tidy() |>
+  mutate(
+    "Variável" = c(
+      "Intercepto Y",
+      "Frota",
+      "Acidentes fatais",
+      "Acidentes",
+      "Condutores"
+    ),
+    .before = 1
+  ) |> 
+  select(1, 3, 6) |> 
+  rename(
+    Coeficientes = estimate,
+    `P-valor` = p.value
+  ) |> 
+  mutate(across(where(is.numeric), round, 2)) |> 
+  gt() |> 
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title())
+```
 
 ##### Trimestral
 
@@ -1161,7 +1198,7 @@ metricas_trimestre |>
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
-    caption = "Métricas de Erros", align = c("l","r"), 
+    align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
   ) |> 
   kable_styling(full_width = F) |> 
@@ -1281,7 +1318,7 @@ metricas_mensal |>
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
-    caption = "Métricas de Erros", align = c("l","r"), 
+    align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
   ) |> 
   kable_styling(full_width = F) |> 
@@ -1392,7 +1429,7 @@ metricas_rf |>
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
-    caption = "Métricas de Erros", align = c("l","r"), 
+    align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
   ) |> 
   kable_styling(full_width = F) |> 
@@ -1560,7 +1597,7 @@ metricas_sarima |>
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
-    caption = "Métricas de Erros", align = c("l","r"), 
+    align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
   ) |> 
   kable_styling(full_width = F) |> 
@@ -1638,7 +1675,7 @@ metricas_ets |>
   rename(Métrica = .metric, Valor = .estimate) |> 
   mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
-    caption = "Métricas de Erros", align = c("l","r"), 
+    align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
   ) |> 
   kable_styling(full_width = F) |> 
@@ -1654,7 +1691,7 @@ Após os experimentos, a seleção de um modelo final é feita de forma comparat
 
 ```{r}
 #| echo: false
-#| tbl-cap: Comparação de Métricas para todos os modelos
+#| tbl-cap: Comparação de métricas para todos os modelos
 #| label: tbl-compare
 
 rbind(
@@ -1674,7 +1711,6 @@ rbind(
   fmt_number(decimals = 2,
              sep_mark = ".",
              dec_mark = ",") |>
-  tab_header("Métricas de Erros") |>
   tab_options(
     column_labels.background.color = onsv_palette$blue,
     column_labels.font.weight = "bold"
@@ -1768,7 +1804,6 @@ pred_list |>
   fmt_number(decimals = 0,
              sep_mark = ".",
              dec_mark = ",") |>
-  tab_header("Previsões para 2023") |>
   tab_options(
     column_labels.background.color = onsv_palette$blue,
     column_labels.font.weight = "bold"
