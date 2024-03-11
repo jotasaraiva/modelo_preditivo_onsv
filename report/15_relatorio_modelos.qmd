@@ -71,8 +71,6 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ## Introdução
 
-### Referenciais Teóricos
-
 O presente cenário mundial acerca de mortes e lesões relacionadas à sinistros de trânsito posa sérios desafios à saúde pública global, e as tendências evidenciadas pelos dados atuais indicam que esta realidade deve perdurar pelo futuro próximo [@worldhealthorganization2023]. Sendo uma das causas de mortes mais comuns no mundo, as ocorrências de sinistros de trânsito afetam principalmente pedestres, ciclistas e motociclistas, além de induzir severos danos materiais, tanto em questão de propriedade particular quanto pública. Isto estimula países a buscarem métodos estimativos sobre os efeitos sociais, econômicos e epidemiológicos da taxa de mortes no trânsito e como se traduzem em custos e perdas na produtividade da sociedade em geral [@rodríguez2020].
 
 A segurança viária pode ser um indicador da situação de desenvolvimento de uma região, visto que é uma característica do desempenho da mobilidade urbana. Entende-se que as mortes no trânsito dependem de diversos fatores estruturais, socioeconômicos e ambientais do contexto urbano [@zhong-xiang2014], o que implica que elevadas taxas de sinistros viários colaboram no diagnóstico de problemas da mobilidade e saúde pública em geral, despertando o debate político sobre a regulamentação das normas viárias e apontando a carência da sociedade em combater estes eventos.
@@ -95,7 +93,9 @@ Em relação à Resolução Contran N° 870, de 13 de setembro de 2021 [@conselh
 
 A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a sinistralidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas sobre a ocorrência de sinistros fatais. Em geral, a literatura pertinente apresenta diversos meios distintos para alcançar estes modelos de melhor ajuste: Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizam técnicas de análise de séries temporais, utilizando métodos autoregressivos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
-### Objetivos
+O código-fonte do trabalho todo está abertamente disponibilizado para acesso como repositório no [perfil do GitHub](https://github.com/ONSV) do Observatório Nacional de Segurança Viária.
+
+## Objetivos
 
 Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto também visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno real dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado com a incidência destes eventos.
 
@@ -656,7 +656,7 @@ O PIB é o atributo com o comportamento mais particular ao longo do tempo em rel
 
 O sucesso da modelagem é inteiramente dependente da intensidade e do tipo de relação estatística que as variáveis possuem entre si. Como anteriormente citado, a regressão linear múltipla bem ajustada infere que as preditivas possuem uma correlação linear forte com a preditora, mas um modelo com baixo desempenho não é necessariamente uma evidência de baixa correlação.
 
-Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como aponta os correlogramas, a partir do método de correlação Spearman, nas três escalas temporais:
+Grandezas que variam juntas em uma correlação linear são ditas colineares, e o fenômeno da colinearidade entre variáveis preditivas pode vir a ocasionar sobreajuste ao modelo. Por isso, é necessário avaliar as correlações não lineares, como apontam os correlogramas, a partir do método de correlação Spearman, nas três escalas temporais:
 
 ::: panel-tabset
 ## Anual
@@ -783,6 +783,8 @@ ggcorrplot(
 )
 ```
 :::
+
+Em todos os correlagramas se encontram valores significativos para praticamente todas as variáveis, sendo que as matrizes de 𝑝-valores calculados rejeitam a hipótese nula com facilidade para todos os atributos, todos os casos.
 
 ### Taxas de óbitos
 
@@ -956,7 +958,7 @@ metricas_anual |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
@@ -1157,7 +1159,7 @@ metricas_trimestre |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
@@ -1277,7 +1279,7 @@ metricas_mensal |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
@@ -1388,7 +1390,7 @@ metricas_rf |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
@@ -1556,7 +1558,7 @@ metricas_sarima |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
@@ -1634,7 +1636,7 @@ metricas_ets |>
     )
   ) |> 
   rename(Métrica = .metric, Valor = .estimate) |> 
-  mutate(Valor = format(Valor, decimal.mark = ",")) |> 
+  mutate(Valor = format(Valor, decimal.mark = ",", digits = 2)) |> 
   kable(
     caption = "Métricas de Erros", align = c("l","r"), 
     table.attr = "quarto-disable-processing=true"
