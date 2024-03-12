@@ -90,23 +90,21 @@ Apesar da crescente adesão por itens de segurança veicular, os sinistros de tr
 
 -   Normalização e Fiscalização.
 
-Em relação à Resolução Contran N° 870, de 13 de setembro de 2021 [@conselhonacionaldetrânsito2018], a N° 1004 ratifica o quinto pilar, expandindo a visão de atendimento as vítimas no trânsito. A resolução mais recente ainda adiciona ao PNATRANS os princípios e diretrizes que constituem um sistema seguro de mobilidade, aprofundando os conceitos de iniciativas, ações e produtos promovidos pelos orgãos do Sistema Nacional de Trânsito para cada pilar.
+Em relação à Resolução Contran N° 870, de 13 de setembro de 2021 [@conselhonacionaldetrânsito2018], a N° 1004 ratifica o quinto pilar, expandindo a visão de atendimento às vítimas no trânsito. A resolução mais recente ainda adiciona ao PNATRANS os princípios e diretrizes que constituem um sistema seguro de mobilidade, aprofundando os conceitos de iniciativas, ações e produtos promovidos pelos orgãos do Sistema Nacional de Trânsito para cada pilar.
 
-A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a sinistralidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas sobre a ocorrência de sinistros fatais. Em geral, a literatura pertinente apresenta diversos meios distintos para alcançar estes modelos de melhor ajuste: Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizam técnicas de análise de séries temporais, utilizando métodos autoregressivos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
-
-O código-fonte do trabalho todo está abertamente disponibilizado para acesso como repositório no [perfil do GitHub](https://github.com/ONSV) do Observatório Nacional de Segurança Viária.
+A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a sinistralidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas sobre a ocorrência de sinistros fatais. Em geral, a literatura pertinente apresenta alguns meios distintos para alcançar estes modelos de melhor ajuste: Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizam técnicas de análise de séries temporais, utilizando métodos autoregressivos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
 ## Objetivos
 
-Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto também visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno real dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado com a incidência destes eventos.
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto ainda visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno dos óbitos em trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado para a incidência destes eventos. O código-fonte do trabalho todo está abertamente disponibilizado para acesso como repositório no [perfil do GitHub](https://github.com/ONSV) do Observatório Nacional de Segurança Viária.
 
 ## Metodologia
 
 ### Coleta de dados
 
-A coleta de dados foi efetuada considerando as principais variáveis teoricamente relacionadas à mortalidade no trânsito, e também considerando os dados disponíveis para o público, amparando a escolha de cada grandeza na literatura previamente revisada. Estes dados são reunidos e pré-processados para a formação de conjuntos de dados específicos para cada método de modelagem, variando com a resolução temporal de cada abordagem (anual, trimestral e mensal).
+A coleta de dados foi efetuada considerando as principais variáveis teoricamente relacionadas à mortalidade no trânsito disponíveis ao público, amparando a escolha de cada grandeza na literatura previamente revisada. Estes dados são reunidos e pré-processados para a formação de conjuntos específicos para cada método de modelagem, variando com a resolução temporal de cada abordagem (anual, trimestral e mensal).
 
-Dito isto, investigam-se diversas bases a fim de compilar estas informações e extrair dados para uma análise preliminar, anterior a modelagem. Entre as fontes contempladas estão:
+Dito isto, investigam-se diversas bases de dados a fim de compilar e extrair estas informações para uma análise preliminar, anterior à modelagem. Entre as fontes contempladas estão:
 
 -   PIB mensal, fornecido pelo Sistema Gerenciador de Séries Temporais do Banco Central [@bancocentraldobrasil2023], mensurado em dólares;
 
@@ -116,29 +114,29 @@ Dito isto, investigam-se diversas bases a fim de compilar estas informações e 
 
 -   Condutores habilitados, fornecidos pelo portal de estatísticas da Secretaria Nacional de Trânsito (Senatran), provenientes do Registro Nacional de Condutores Habiltados (RENACH) [@ministériodostransporte2023];
 
--   Frota veicular, fornecida pelo portal de estatísticas da Senatran, provenientes Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023];
+-   Frota veicular, fornecida pelo portal de estatísticas da Senatran, provida pelo Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023];
 
--   Óbitos em sinistros de trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos com auxílio da biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação *R*.
+-   Óbitos em sinistros de trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos com auxílio da biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação científica *R*.
 
-Vale ressaltar que nem todos os dados estão disponíveis em todas as unidades de tempo estudadas, por isso não foram inclusas no processo de criação de certos modelos. As bases de condutores habilitados e população residente, por exemplo, são unicamente anuais, impossibilitando sua utilização no modo trimestral e mensal.
+Vale ressaltar que nem todos os dados estão disponíveis em todas as escalas de tempo estudadas, por isso não foram inclusas no processo de criação de certos modelos. As bases de condutores habilitados e população residente, por exemplo, são unicamente anuais, impossibilitando sua utilização no modo trimestral e mensal.
 
 ### Modelos
 
 #### Escalas de tempo
 
-Em razão da baixa disponibilidade de dados, os modelos confeccionados em geral contemplam uma janela de tempo de 2011 até a atualidade (2022), sendo as principais unidades de tempo estudadas a anual, a trimestral e a mensal. Ao criar modelos de série temporal, deve-se notar que a abundância de dados a serem modelados tem uma relação direta com a capacidade do modelo em questão de aprender e conseguir expressá-los futuramente, impactando no seu desempenho.
+Em razão da indisponibilidade de dados, os modelos confeccionados em geral contemplam uma janela de tempo de 2011 até a atualidade (2023), sendo as principais unidades de tempo estudadas a anual, trimestral e mensal. Ao criar modelos de série temporal, deve-se notar que a abundância de dados a serem modelados tem uma relação direta com a capacidade do modelo de aprender e conseguir expressá-los em instantes futuros.
 
 Modelos treinados em âmbito mensal conseguem emitir previsões todo mês, porém perdem precisão quanto mais adiante realizam previsões, enquanto modelos anuais podem predizer com alto desempenho os valores de anos posteriores, mas não são capazes de prever meses ou trimestres. Assim, estas diversas abordagens são testadas a fim de comparar os desempenhos e utilidades de cada método.
 
 #### Análise de Série Temporal x Análise Determinística
 
-É importante ressaltar que há mais de uma maneira de se entender as relações entre os dados e, portanto, mais de uma maneira de interpretá-los em questão do processo de modelagem estatística do problema em mãos. Neste sentido, as metodologias de análise propostas a partir da observação dos dados disponíveis implicam duas possíveis linhas de raciocínio no que se diz a análise estatística: a análise de série temporal e a análise de regressão ou determinística.
+É importante ressaltar que há mais de uma maneira de se entender as relações entre os dados e, portanto, mais de uma maneira de interpretá-los em questão do processo de modelagem do problema em mãos. Neste sentido, as metodologias propostas a partir da observação dos dados disponíveis implicam duas possíveis linhas de raciocínio de análise estatística: a análise de série temporal e a análise de regressão, ou determinística.
 
-A análise de série temporal se apoia no conceito de séries temporais, sendo um conjunto de dados de alguma grandeza ordenada em sequência cronológica, para criar um modelo generalista visando prever as observações futuras baseado nas ocorrências passadas. Este tipo de modelagem assume que o que ocorre no momento atual, neste caso óbitos no trânsito, dependeria, ou possui relação, com o que ocorreu anteriormente. O modelo também leva em consideração o comportamento ao longo do tempo, como sazonalidade, tendência e heteroscedasticidade, e é altamente dependente da *autocorrelação*.
+A análise de série temporal se apoia no conceito de séries temporais: um conjunto de dados de alguma grandeza ordenada em sequência cronológica. Logo, seu propósito é criar um modelo generalista que prevê as observações futuras baseado nas ocorrências passadas. Este tipo de modelagem assume que o que ocorre no momento atual, neste caso os óbitos no trânsito, possui relação com o que ocorreu anteriormente. O modelo também leva em consideração o comportamento ao longo do tempo, como sazonalidade, tendência e heteroscedasticidade, e é altamente dependente da *autocorrelação*.
 
 Já a análise de regressão tem como base a criação de um modelo de variáveis *preditadas* (ou dependentes) que dependem de variáveis *preditivas* ou *preditoras* (independentes), criando uma função generalista que expressa a relação destas categorias de variáveis entre si. Diferentemente da análise temporal, a regressão **independe da sequência cronológica dos fatos**, mas é diretamente afetada pela correlação das variáveis independentes com a variável dependente que se deseja prever.
 
-À vista disso, o processo de modelagem pretende essencialmente englobar estas duas principais metodologias de análise de dados, criando modelos de ambas as categorias. Conforme o embasamento teórico acerca da segurança viária, estas modelagens são possíveis pelo fato de que o fenômeno das mortes no trânsito possuem tanto uma correlação expressiva com variáveis externas, quanto dados temporais bem ordenados.
+À vista disso, o processo de modelagem pretende essencialmente englobar estas duas principais metodologias de análise de dados, criando modelos de ambas as categorias. Conforme o embasamento teórico acerca da segurança viária, estas modelagens são possíveis pelo fato de que o fenômeno das mortes no trânsito possui tanto uma correlação expressiva com variáveis externas quanto um comportamentos temporal bem ordenado.
 
 #### Configurações
 
@@ -148,15 +146,15 @@ Como discutido em @james2021, a regressão linear simples se enquadra como um m�
 
 $$ Y = \beta_0 + \beta_1X + \epsilon $$
 
-Desta forma, pode-se prever uma imagem de $Y$ ao se injetar um valor em $X$ na equação, dado que estas variáveis tenham uma correlação linear significativa e que os ditos *coeficientes* ou *parâmetros* $\beta_0$ e $\beta_1$ sejam estimados para este modelo. No contexto deste projeto, o objetivo é estimar um modelo capaz de predizer as mortes em relação a mais de uma variável independente, tratando-se então de uma regressão linear múltipla:
+Desta forma, pode-se prever uma imagem $Y$ ao se injetar um valor em $X$ na equação, dado que estas variáveis tenham uma correlação linear significativa e que os ditos *coeficientes* ou *parâmetros* $\beta_0$ e $\beta_1$ sejam estimados para este modelo. No contexto deste projeto, o objetivo é estimar um modelo capaz de predizer o número de vítimas em relação a mais de uma variável independente, tratando-se então de uma regressão linear múltipla:
 
 $$ Y_i = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_nX_n + \epsilon $$
 
-Neste estudo, esta técnica de regressão é amplamente utilizada em todas as resoluções temporais em razão de sua facilidade de explicação e pelas altas correlações lineares entre as variáveis. Estas correlações estatísticas são expressas em índices numéricos pelas técnicas de correlação linear (de Pearson) e a correlação de Spearman, como diz a @fig-ycorr. Sendo assim, serão apresentados os modelo lineares anual, trimestral e mensal confeccionados com este método.
+Neste estudo, esta técnica de regressão é amplamente utilizada em todas as resoluções temporais em razão de sua facilidade de explicação e pelas altas correlações lineares entre as variáveis. Estas correlações estatísticas são expressas em índices numéricos pelas técnicas de correlação linear (de Pearson) e correlação de Spearman, como visto na @fig-ycorr. Sendo assim, serão apresentados os modelo lineares anual, trimestral e mensal confeccionados com este método.
 
-Adiante, é esperado que alguns tipos de modelos necessitem de uma quantidade maior de dados disponíveis para obterem resultados significantes. Modelos de série temporal possuem apenas uma variável, e necessitam de um conjunto extenso e "limpo" de observações para serem adequadamente ajustados, enquanto modelos regressivos mais complexos, como o Random Forest, são propensos a sobreajuste se não treinados e testados devidamente, algo que é representa uma dificuldade em conjuntos de dados reduzidos.
+Adiante, é esperado que alguns tipos de modelos necessitem de uma quantidade maior de dados disponíveis para obterem resultados significantes. Modelos autorregressivos são univariados, e necessitam de um conjunto extenso e "limpo" de observações para serem adequadamente ajustados, enquanto modelos regressivos mais complexos, como o Random Forest, são propensos a sobreajuste se não treinados e testados devidamente, algo que representa uma dificuldade em conjuntos de dados reduzidos.
 
-A base de dados extraída com maior número de observações foi a base em resolução mensal, então os modelos de série temporal SARIMA e Suavização Exponencial assim como o modelo regressor Random Forest foram efetuados apenas no contexto de meses, como indica a @tbl-modelos. Deste modo, após a regressão linear anual, trimestral e mensal, o modelo Random Forest mensal foi concebido utilizando o mesmo intervalo de dados e variáveis:
+A base de dados extraída com maior número de observações foi a base em resolução mensal, logo os modelos de série temporal SARIMA e Suavização Exponencial, bem como o modelo regressor Random Forest, foram testados apenas no contexto de meses, como indica a @tbl-modelos. Deste modo, após a regressão linear anual, trimestral e mensal, o modelo Random Forest mensal foi concebido utilizando o mesmo intervalo de dados e variáveis:
 
 ```{r}
 #| echo: false
@@ -289,7 +287,7 @@ rtdeaths |>
 ```
 :::
 
-Os gráficos de óbitos no trânsito apresentam uma tendência de incremento das vítimas fatais nos últimos três anos. O ano de 2019 atingiu a menor quantidade de óbitos relacionadas ao trânsito nos últimos 10 anos, quando em 2020 a têndencia tornou a crescer. No ano de 2021 houveram 33.813 vítimas fatais, aproximadamente 2000 a mais que em 2019. Em 2022, esse tendência foi levemente atenuada, mantendo um número próximo de óbitos em relação ao ano anterior.
+Os gráficos de óbitos no trânsito levantam uma tendência crescente nas vítimas fatais nos últimos três anos. O ano de 2019 aintgiu a menor quantidade de óbitos relacionadas ao trânsito nos últimos 10 anos, quando em 2020 a têndencia tornou a crescer. No ano de 2021 houveram 33.813 vítimas fatais, aproximadamente 2000 a mais que em 2019. Em 2022, essa tendência foi levemente atenuada, mantendo um número similar de óbitos em relação ao ano anterior.
 
 Assim sendo, os demais atributos do conjunto de dados podem ser visualizados em função do tempo, como foi feito para o caso da variável preditada, com o intuito de destacar cada variável preditiva ao longo dos períodos disponíveis:
 
@@ -649,7 +647,7 @@ ggplotly(plot_condutores, tooltip = "text") |>
 
 Observa-se uma diferença entre os comportamentos de cada atributo ao longo do tempo. Variáveis convencionalmente cumulativas como a frota, a população e o número de condutores habilitados dispõe de um crescimento aproximadamente linear por todo o período de estudo. Todavia, detecta-se que a contagem da população se comportou de forma inesperada em alguns anos. Isso pode representar a diferença entre a população censitária e a população estimada pelo IBGE.
 
-Os dados de rodovias federais flutuam de forma análoga aos óbitos no trânsito, agindo como referência do desempenho da segurança viária em nível nacional de determinado período, com uma sazonalidade pronunciada. Estes dados também mostram claramente como os óbitos são eventos incomuns em comparação com a quantidade de sinistros totais observados. Porém, enquanto a quantidade de sinistros pode variar intensamente ao longo dos anos, o número de óbitos permanece relativamente constante, com uma redução ao longo da janela analisada.
+Os dados de rodovias federais flutuam de forma análoga aos óbitos no trânsito, agindo como referência do desempenho da segurança viária em nível nacional de determinado período, com uma sazonalidade pronunciada. Estes dados também mostram claramente como os óbitos são eventos incomuns em comparação à quantidade de sinistros totais observados. Porém, enquanto a quantidade de sinistros pode variar intensamente ao longo dos anos, o número de óbitos permanece relativamente constante, com uma redução ao longo da janela de tempo analisada.
 
 O PIB é o atributo com o comportamento mais particular ao longo do tempo em relação às outras variáveis. Foi utilizado o dólar americano em lugar do real brasileiro a fim de observar a oscilação da moeda em um contexto global e revelar a contribuição histórica da economia nacional. Modelos realizados por @blumenberg2018 e @zhong-xiang2014 utilizam do PIB como um indicador do desempenho socioeconômico do país.
 
@@ -785,7 +783,7 @@ ggcorrplot(
 ```
 :::
 
-Em todos os correlagramas se encontram valores significativos para praticamente todas as variáveis, sendo que as matrizes de 𝑝-valores calculados rejeitam a hipótese nula com facilidade para todos os atributos, todos os casos.
+Em todos os correlagramas se encontram valores significativos para praticamente todas as variáveis, sendo que as matrizes de 𝑝-valores calculadas rejeitam a hipótese nula com facilidade para todos os atributos em todas as escalas de tempo.
 
 ### Taxas de óbitos
 
@@ -820,17 +818,17 @@ ggplotly(plot_taxas, tooltip = "text") |>
   layout(legend = list(title = list(text = "")))
 ```
 
-As duas taxas anunciam tendências distintas a cerca da fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa de habitantes corrobora à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração que esta diferença de comportamente pode resultar da evolução da frota veicular e da população nacional em taxas distintas.
+As duas taxas anunciam tendências distintas a cerca da fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa de habitantes corrobora à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração que esta diferença de comportamente pode resultar da evolução da frota veicular e da população nacional em velocidades distintas.
 
 ### Resultados dos modelos
 
-A avaliação de desempenho de cada modelo foi gerada a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais. Métricas de erros são utilizadas para quantificar a taxa de acertos de cada modelo, notando-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição de amostras para treino e para teste.
+A avaliação de desempenho de cada modelo foi feita a partir da necessidade e especificações de cada caso. Visualizações podem ser criadas para todos os modelos a fim de apresentar a proximidade das previsões em relação aos valores reais, com métricas de erros sendo utilizadas para quantificar a taxa de acertos de cada modelo. Nota-se que em modelos com maior disponibilidade de dados (trimestral e mensal) foi efetuada a repartição de amostras em conjuntos de treino e teste.
 
-A repartição dividiu as amostras com uma proporção de 75% dos dados para o treinamento dos modelos, sendo o restante utilizado na validação das previsões pelo cálculo do Erro Quadrado Médio Absoluto (*Root Mean Squared Error* - RMSE), Erro Médio Absoluto *(Mean Squared Error* - MAE) e o 𝑅^2^, ou coeficiente de determinação. A técnica de repartição de treino e teste é consideravelmente mais simples que o método de validação cruzada comumente utilizado em modelos de aprendizado de máquina mais robustos, mas pode ser mais adequada a *databases* menores, dado que a validação cruzada não influenciou na performance dos modelos e foi abandonada devido ao gasto computacional desnecessário. Já no caso do modelo anual, que possui um conjunto ainda menor de dados, a repartição é inviável e a validação foi dada com o mesmo conjunto do treinamento.
+A repartição visa dividir as amostras com uma proporção de 75% dos dados para o treinamento dos modelos, sendo o restante utilizado na validação das previsões pelo cálculo do Erro Quadrado Médio Absoluto (*Root Mean Squared Error* - RMSE), Erro Médio Absoluto *(Mean Squared Error* - MAE) e o 𝑅^2^, ou coeficiente de determinação. A técnica de repartição de treino e teste é consideravelmente mais simples que o método de *Cross validation* comumente utilizado em modelos de aprendizado de máquina mais robustos, mas pode ser mais adequada a *databases* menores. Neste estudo, a validação cruzada não influenciou na performance dos modelos e foi abandonada devido ao gasto computacional desnecessário. Já no caso do modelo anual, que possui um conjunto ainda menor de dados, a repartição ou reamostragem é inviável e a validação foi dada com o mesmo conjunto utilizado no treinamento.
 
 #### Regressão Linear Múltipla
 
-A análise de regressão linear múltipla foi a abordagem mais extensamente utilizada durante a produção do estudo, podendo ser dividida entre as escalas temporais anual, trimestral e mensal. Cada métrica e modelo são extraídos apresentados para avaliação das suas performances, com os resultados segregados por unidade de tempo.
+A análise de regressão linear múltipla foi a abordagem mais extensamente utilizada durante a produção do estudo, podendo ser dividida entre as escalas temporais anual, trimestral e mensal. Cada métrica e modelo são extraídos e apresentados para avaliação das suas performances, com os resultados segregados por unidade de tempo.
 
 ##### Anual
 
@@ -975,7 +973,7 @@ Como é demonstrado pelo amplo intervalo de confiança preditado (área em cinza
 
 As métricas RMSE e MAE são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar as ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
 
-Como este modelo em específico possui maior variedade de atributos, a combinação de diversas configurações de preditivas foi feita manualmente para melhor filtrar as variáveis úteis. Componentes como a população, o PIB e as mortes em rodovias federais foram considerados muito colineares, prejudicando a performance do modelo. Na @tbl-coefs, estão explicitados os melhores atributos e seus coeficientes:
+Como este modelo em específico possui maior variedade de atributos, a combinação de diversas configurações das variáveis preditivas foi feita manualmente para filtrar as de maior utilidade. Componentes como a população, o PIB e as mortes em rodovias federais foram considerados muito colineares, prejudicando a performance do modelo. Na @tbl-coefs, estão explicitados os melhores atributos e seus coeficientes:
 
 ```{r}
 #| echo: false
@@ -1512,7 +1510,7 @@ autoplot(
 ```
 :::
 
-A série decomposta é observada para determinar se o comportamento da quantidade de mortes ao longo do tempo é característico de uma série modelável pelo SARIMA. A tendência é um forte indicativo de que há uma média móvel neste fenômeno, mas a grande quantidade de resíduo aponta que não há uma sazonalidade tão bem estabelicida e cíclica. Assim, outros métodos usados para o entendimento da sinistrilidade no tempo são os gráficos ACF (Fator de Autocorrelação) e PACF (Fator de Autocorrelação Parcial):
+A série decomposta é observada para determinar se o comportamento da quantidade de óbitos ao longo do tempo é característico de uma série modelável pelo SARIMA. A tendência é um forte indicativo de que há uma média móvel neste fenômeno, mas a grande quantidade de resíduo aponta que não há uma sazonalidade tão bem estabelicida e cíclica. Assim, outros métodos usados para o entendimento da sinistrilidade no tempo são os gráficos ACF (Fator de Autocorrelação) e PACF (Fator de Autocorrelação Parcial):
 
 ```{r}
 #| echo: false
@@ -1525,7 +1523,7 @@ pacf(ts, main = "PACF")
 par(mfrow = c(1, 1))
 ```
 
-Desta maneira, atenta-se que os dados possuem altas correlações com diversos períodos de atraso de forma indireta e direta. Em especial, a quantidade de óbitos em um certo mês aparenta estar profundamente relacionada ao número de óbitos no mesmo mês no ano anterior, visto que há uma alta correlação no *lag* de 12 meses para ambos os gráficos.
+Desta maneira, atenta-se que os dados possuem altas correlações com diversos períodos de *lag* de forma indireta e direta. Em especial, a quantidade de óbitos em um certo mês aparenta estar profundamente relacionada ao número de óbitos no mesmo mês no ano anterior, visto que há uma alta correlação no *lag* de 12 meses para ambos os gráficos.
 
 Estas análises são úteis para a decisão manual de valores iniciais para os parâmetros do SARIMA. Todavia, outra forma mais adequada e automatizada de chegar ao ajuste ideal para o modelo é a função de ajuste automático `auto.arima()` do pacote [`forecast`](https://github.com/robjhyndman/forecast) [@hyndman2008], uma implementação do método que busca a melhor combinação de parâmetros baseado nos critérios de seleção de modelo AIC (*Akaike Information Criterion*) e BIC (*Bayesian Information Criterion*).
 
@@ -1556,8 +1554,8 @@ metricas_sarima <- metricas(sarima_pred, truth = mortes, estimate = .pred)
 
 ```{r}
 #| echo: false
-#| fig-cap: fig-pred-arima 
-#| label: Previsão por SARIMA
+#| label: fig-pred-arima 
+#| fig-cap: Previsão por SARIMA
 
 plot_pred_sarima <- sarima_pred |> 
   filter(year(data) > 2010) |> 
@@ -1683,7 +1681,7 @@ metricas_ets |>
 ```
 :::
 
-Modelos de suavização são ainda mais simplistas que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura destaca que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor à séries sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais novos, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do valor mais recente [@shumway2017].
+Modelos de suavização são ainda mais simples que modelos ARIMA já que constituem métodos de filtragem espectral convencionais. Usualmente, a literatura destaca que modelos autoregressivos são mais adequados para séries temporais ruidosas, enquanto modelos exponenciais respondem melhor à séries sazonais. Outra possível vantagem da exponenciação é sua priorização de dados mais novos, dado que este método reduz o peso de cada observação exponencialmente conforme a distância do valor mais recente [@shumway2017].
 
 ### Comparação de Modelos
 
@@ -1719,7 +1717,7 @@ rbind(
             locations = cells_title())
 ```
 
-RMSE e MAE melhoram em resoluções menores de unidades de tempo, sendo consequência indireta da maior disponibilidade de dados para o treinamento do modelo. Mesmo assim, será perceptível que, por exemplo, um modelo mensal bem ajustado não prevê um ano inteiro melhor que um modelo anual, por efeito da acumulação de erros associados às previsões de cada mês. Como implica a @tbl-compare, o modelo linear anual aparenta ter resultados mais plausíveis que o mensal, mesmo tendo um desempenho de RMSE e MAE inferior. Em relação ao RSQ, o modelo anual apresenta o melhor desempenho.
+O RMSE e o MAE melhoram em escalas menores de tempo, sendo consequência indireta da maior disponibilidade de dados para o treinamento do modelo. Mesmo assim, será perceptível que, por exemplo, um modelo mensal bem ajustado não prevê um ano inteiro melhor que um modelo anual, por efeito da acumulação de erros associados às previsões de cada mês. Como implica a @tbl-compare, o modelo linear anual aparenta ter resultados mais plausíveis que o mensal, mesmo tendo um desempenho de RMSE e MAE inferior. Em relação ao 𝑅^2^, o modelo anual apresenta o melhor desempenho.
 
 ```{r}
 #| include: false
@@ -1862,6 +1860,12 @@ ggplotly(plot_comparison, tooltip = "text") |>
 #| include: false
 
 load(here("data/populacao.rda"))
+
+populacao <- populacao |>
+  rbind(data.frame(
+    populacao = c(203080756, 216284269),
+    ano = c(2022, 2023)
+  ))
 ```
 
 Em questão das taxas anteriormente discutidas para quantificação dos óbitos em relação à população e à frota veicular, novos valores podem ser calculados sobre as previsões a fim de averiguar a mudança destas taxas em função do tempo e tipo de modelo:
@@ -1896,13 +1900,18 @@ plot_taxa_popul <- pred_list |>
     geom_point(aes(color = "Óbitos reais", 
                    text = paste("Taxa real:", taxa_real))) +
     scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
-    scale_x_continuous(breaks = seq(2011, 2021, 1), limits = c(2011, 2021)) +
+    scale_x_continuous(breaks = seq(2011, 2023, 1), limits = c(2011, NA)) +
     theme(axis.text.x = element_text(angle = 90)) +
     facet_wrap(tipo ~ .) +
     labs(x = NULL, y = NULL)
   
 ggplotly(plot_taxa_popul, tooltip = "text") |> 
-  layout(legend = list(title = list(text = "")))
+  layout(legend = list(title = list(text = "")),
+         annotations = list(x = 0, y = -0.13, 
+                            text = "Nota: 2022 e 2023 foram obtidos por censo IBGE e projeção respectivamente", 
+                            showarrow = F, 
+                            xref='paper', 
+                            yref='paper'))
 ```
 
 ## Óbitos por 10 mil veic.
@@ -1933,7 +1942,7 @@ plot_taxa_frota <- pred_list |>
     geom_point(aes(color = "Óbitos reais", 
                    text = paste("Taxa real:", taxa_real))) +
     scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
-    scale_x_continuous(breaks = seq(2011, 2021, 1), limits = c(2011, 2021)) +
+    scale_x_continuous(breaks = seq(2011, 2023, 1), limits = c(2011, NA)) +
     theme(axis.text.x = element_text(angle = 90)) +
     facet_wrap(tipo ~ .) +
     labs(x = NULL, y = NULL)
@@ -1945,7 +1954,7 @@ ggplotly(plot_taxa_frota, tooltip = "text") |>
 
 ## Conclusão
 
-Os modelos regressivos desenvolvidos antecipam uma tendência ao aumento relativo nas vítimas de sinistros de trânsito em 2023, uma revelação preocupante à presente situação da segurança viária no Brasil. Em contrapartida, os modelos de séries tempoais prevêem uma possível diminuição, provavelmente devido a sensibilidade destes tipos de técnicas à sazonalidade. Por isso, a análise de regressão permanece como a abordagem mais interessante no contexto do fenômeno estudado, tanto pela qualidade da previsão quanto pela capacidade explicativa deste tipo de metodologia.
+Os modelos regressivos desenvolvidos antecipam uma tendência ao aumento relativo nas vítimas de sinistros de trânsito em 2023, uma revelação preocupante à presente situação da segurança viária no Brasil. Em contrapartida, os modelos de séries tempoais antecipam uma possível diminuição, provavelmente devido a sensibilidade destes tipos de técnicas à sazonalidade. Por isso, a análise de regressão permanece como a abordagem mais interessante no contexto do fenômeno estudado, tanto pela qualidade da previsão quanto pela capacidade explicativa deste tipo de metodologia.
 
 É fundamental também destacar que as soluções de segurança viária não dependem apenas de atributos da mobilidade urbana. Inúmeros fatores socioeconômicos e de infraestrutura podem afetar o desempenho da segurança. O cenário atual da segurança viária brasileira apresenta alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos mostram um desempenho abaixo do ideal no combate da fatalidade no trânsito brasileiro, conferindo uma perspectiva pessimista para a década atual no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável a ocorrência de avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
