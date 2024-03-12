@@ -1,6 +1,6 @@
 ---
 title: "Modelo Preditivo de Óbitos no Trânsito Brasileiro"
-date: 2024-02-29
+date: today
 
 smooth-scroll: true
 
