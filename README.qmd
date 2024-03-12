@@ -18,46 +18,21 @@ source("R/main.R")
   <img src="figures/onsv.png"/>
 </p>
 ```
-
 ## Objetivo
 
-Este projeto é um estudo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com o intuito de confeccionar um modelo de melhor ajuste para expressar a quantidade futura de mortes no trânsito, a fim de gerar um artigo científico para o Observatório Nacional de Segurança Viária (ONSV).
+Este projeto é um estudo baseado em dados viários para previsão de mortes relacionadas à segurança viária e veicular no Brasil com o intuito de avaliar diferentes abordagens e técnicas para criação de um modelo de melhor ajuste que expresse a quantidade futura de vítimas da sinistralidade no trânsito, a fim de gerar um relatório técnico para o Observatório Nacional de Segurança Viária (ONSV).
 
 ## Método
 
-Os dados brutos e *scripts* de tratamento se encontram em `data-raw/`, utilizados para extração de dados tratados encontrados em `data/`.
-
-```{r echo=FALSE}
-df_total |> drop_na() |> kable()
-```
-
-O modelo ajustado é uma regressão linear multivariada, construída após um processo de seleção de atributos manual:
-
-As funções para o modelo criado se encontram em `R/main.R`, onde demonstram a previsão para 2022. Para futuras previsões, basta imputar novos dados ao *dataset* de entrada e chamar o modelo com `lm_model()` e `lm_extract()`.
+Os estudo contempla técnicas de modelagem de análise de regressão e análise de séries temporais, cultivando diferentes modelos e os testando para avaliar a qualidade de das previsões, as taxas de acertos, a influência das variáveis consideradas e a capacidade de cada tipo de método em expressar o fenômeno real dos óbitos em trânsito, utilizando *frameworks* como [`tidymodels`](https://github.com/tidymodels/tidymodels) e [`forecast`](https://github.com/robjhyndman/forecast).
 
 ## Estrutura dos Arquivos
 
--   `report/` contém relatórios sobre o processo de criação do modelo
+-   `report/` contém relatórios em Quarto Markdown sobre o processo de criação do projeto
 -   `data-raw/` possui dados brutos e scripts de extração deles
--   `data/` possui os dados tratados utilizados no modelo
--   `R/` possui o modelo e as funções criadas para previsão
+-   `data/` possui os dados tratados utilizados no modelo durante o projeto e disponibilizados para reuso
+-   `R/` possui os scripts de modelos
 
 ## Principais resultados
 
-O modelo contemplou um intervalo de dez anos (2011 à 2021) e foi testado com os dados de 2022. Avaliando as métricas com o pacote `yardstick`, têm-se:
-
-```{r echo=FALSE}
-res2$erros |> 
-  rename(metricas = .metric, valores = .estimate) |> 
-  select(-.estimator) |> 
-  kable()
-```
-
-Seus coeficientes podem ser observados:
-
-```{r echo=FALSE}
-res2$specs |> 
-  rename(variavel = term, pvalor = p.value, valor = estimate) |> 
-  select(-std.error, -statistic) |> 
-  kable()
-```
+O conteúdo do artigo pode ser lido no site oficial do [ONSV](https://www.onsv.org.br/).
