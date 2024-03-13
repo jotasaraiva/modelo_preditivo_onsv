@@ -546,8 +546,8 @@ plot_prf_anual <- df_prf_plot |>
   summarise(.by = ano, across(.fns = sum, acidentes:mortes)) |> 
   filter(ano > 2010) |> 
   rename(
-    "Acidentes" = acidentes,
-    "Acidentes fatais" = acidentes_fatais,
+    "Sinistros" = acidentes,
+    "Sinistros fatais" = acidentes_fatais,
     "Feridos" = feridos,
     "Mortos" = mortes
   ) |> 
@@ -576,8 +576,8 @@ plot_prf_tri <- df_prf_plot |>
   summarise(.by = data, across(.fns = sum, acidentes:mortes)) |> 
   filter(year(data) > 2010) |> 
   rename(
-    "Acidentes" = acidentes,
-    "Acidentes fatais" = acidentes_fatais,
+    "Sinistros" = acidentes,
+    "Sinistros fatais" = acidentes_fatais,
     "Feridos" = feridos,
     "Mortos" = mortes
   ) |> 
@@ -606,8 +606,8 @@ plot_prf_mensal <- df_prf_plot |>
   summarise(.by = data, across(.fns = sum, acidentes:mortes)) |> 
   filter(year(data) > 2010) |> 
   rename(
-    "Acidentes" = acidentes,
-    "Acidentes fatais" = acidentes_fatais,
+    "Sinistros" = acidentes,
+    "Sinistros fatais" = acidentes_fatais,
     "Feridos" = feridos,
     "Mortos" = mortes
   ) |> 
@@ -675,8 +675,8 @@ cor_spearman_anual <- df_total |>
     `Veículos Totais` = veiculos_total,
     PIB = pib,
     `População` = populacao,
-    Acidentes = qnt_acidentes,
-    `Acidentes fatais` = qnt_acidentes_fatais,
+    Sinistros = qnt_acidentes,
+    `Sinistros fatais` = qnt_acidentes_fatais,
     Feridos = qnt_feridos,
     Condutores = condutores,
     `Mortes PRF` = qnt_mortos
@@ -725,8 +725,8 @@ cor_spearman_trimestral <- dados_mensais |>
     Motocicletas = motocicleta,
     `Veículos Totais` = veiculos,
     PIB = pib,
-    Acidentes = acidentes,
-    `Acidentes fatais` = acidentes_fatais,
+    Sinistros = acidentes,
+    `Sinistros fatais` = acidentes_fatais,
     Feridos = feridos,
     `Mortes PRF` = mortes_prf
   ) |> 
@@ -761,8 +761,8 @@ cor_spearman_mensal <-dados_mensais |>
     Motocicletas = motocicleta,
     `Veículos Totais` = veiculos,
     PIB = pib,
-    Acidentes = acidentes,
-    `Acidentes fatais` = acidentes_fatais,
+    Sinistros = acidentes,
+    `Sinistros fatais` = acidentes_fatais,
     Feridos = feridos,
     `Mortes PRF` = mortes_prf
   ) |> 
@@ -977,7 +977,7 @@ metricas_anual |>
 
 Como é demonstrado pelo amplo intervalo de confiança preditado (área em cinza no gráfico), o fato do conjunto de dados anuais ser relativamente pequeno confere uma incerteza atribuída à essa abordagem. Para 2023, o modelo prevê 34.631 óbitos no trânsito brasileiro, uma diferença de 737 vítimas e um aumento de aproximadamente 2,1% em relação ao valor real do ano anterior (2022).
 
-As métricas RMSE e MAE são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar as ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os acidentes totais e fatais em rodovias federais e os condutores habilitados.
+As métricas RMSE e MAE são melhor aplicadas de forma comparativa entre diferentes ajustes, sendo utilizados para auxiliar na seleção de atributos para o treinamento do modelo. Foi concluído que as melhores variáveis para explicar as ocorrências de óbitos no trânsito para esta categoria de modelo foram a frota total, os sinistros totais e fatais em rodovias federais e os condutores habilitados.
 
 Como este modelo em específico possui maior variedade de atributos, a combinação de diversas configurações das variáveis preditivas foi feita manualmente para filtrar as de maior utilidade. Componentes como a população, o PIB e as mortes em rodovias federais foram considerados muito colineares, prejudicando a performance do modelo. Na @tbl-coefs, estão explicitados os melhores atributos e seus coeficientes:
 
@@ -992,8 +992,8 @@ wflow_anual_2023 |>
     "Variável" = c(
       "Intercepto Y",
       "Frota",
-      "Acidentes fatais",
-      "Acidentes",
+      "Sinistros fatais",
+      "Sinistros",
       "Condutores"
     ),
     .before = 1
