@@ -796,25 +796,31 @@ Estes índices são usualmente referidos em função de altas casas decimais par
 #| fig-cap: Taxas de óbitos
 #| label: fig-taxa-obitos
 
-plot_taxas <- df_total |> 
-  select(ano, veiculos_total, populacao, mortes) |> 
-  drop_na() |> 
-  mutate(taxa_hab = (mortes/populacao) * 100000,
-         taxa_veic = (mortes/veiculos_total) * 10000) |> 
-  select(ano, taxa_hab, taxa_veic) |> 
-  rename(
-    "Óbitos por 100.000 hab" = taxa_hab,
-    "Óbitos por 10.000 veículos" = taxa_veic
-  ) |> 
-  pivot_longer(-ano) |> 
+plot_taxas <- df_total |>
+  select(ano, veiculos_total, populacao, mortes) |>
+  mutate(
+    mortes = if_else(ano == 2022, 33894, mortes),
+    populacao = if_else(ano == 2022, 203080756, populacao)
+  ) |>
+  mutate(
+    taxa_hab = (mortes / populacao) * 100000,
+    taxa_veic = (mortes / veiculos_total) * 10000
+  ) |>
+  select(ano, taxa_hab, taxa_veic) |>
+  rename("Óbitos por 100.000 hab" = taxa_hab,
+         "Óbitos por 10.000 veículos" = taxa_veic) |>
+  pivot_longer(-ano) |>
   ggplot(aes(ano, value, color = name)) +
-    geom_line() +
-    geom_point(aes(text = paste0(name,": ", round(value, 2)))) +
-    facet_wrap(vars(name), scales = "free_y") +
-    labs(y = "Índices", x = "Data") +
-    scale_color_manual(values = paleta)
+  geom_line() +
+  geom_point(aes(text = paste0(name, ": ", round(value, 2)))) +
+  scale_x_continuous(limits = c(2011, NA),
+                     breaks = seq(2011, 2022, 1)) +
+  facet_wrap(vars(name), scales = "free_y") +
+  labs(y = "Índices", x = "Data") +
+  scale_color_manual(values = paleta) +
+  theme(axis.text.x = element_text(vjust = 0.5, angle = 90))
 
-ggplotly(plot_taxas, tooltip = "text") |> 
+ggplotly(plot_taxas, tooltip = "text") |>
   layout(legend = list(title = list(text = "")))
 ```
 
@@ -1908,7 +1914,7 @@ plot_taxa_popul <- pred_list |>
 ggplotly(plot_taxa_popul, tooltip = "text") |> 
   layout(legend = list(title = list(text = "")),
          annotations = list(x = 0, y = -0.13, 
-                            text = "Nota: 2022 e 2023 foram obtidos por censo IBGE e projeção respectivamente", 
+                            text = "Nota: Dados populacionais de 2022 e 2023 foram obtidos por censo IBGE e projeção respectivamente", 
                             showarrow = F, 
                             xref='paper', 
                             yref='paper'))
