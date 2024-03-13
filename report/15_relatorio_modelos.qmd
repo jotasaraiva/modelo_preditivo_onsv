@@ -90,13 +90,13 @@ Apesar da crescente adesão por itens de segurança veicular, os sinistros de tr
 
 -   Normalização e Fiscalização.
 
-Em relação à Resolução Contran N° 870, de 13 de setembro de 2021 [@conselhonacionaldetrânsito2018], a N° 1004 ratifica o quinto pilar, expandindo a visão de atendimento às vítimas no trânsito. A resolução mais recente ainda adiciona ao PNATRANS os princípios e diretrizes que constituem um sistema seguro de mobilidade, aprofundando os conceitos de iniciativas, ações e produtos promovidos pelos orgãos do Sistema Nacional de Trânsito para cada pilar.
+Em relação à Resolução Contran N° 870, de 13 de setembro de 2021 [@conselhonacionaldetrânsito2018], a N° 1004 ratifica o quinto pilar, expandindo a visão de atendimento às vítimas no trânsito. A resolução mais recente ainda adiciona ao PNATRANS os princípios e diretrizes que constituem um sistema seguro de mobilidade, aprofundando os conceitos de iniciativas, ações e produtos promovidos pelos órgãos do Sistema Nacional de Trânsito para cada pilar.
 
 A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a sinistralidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas sobre a ocorrência de sinistros fatais. Em geral, a literatura pertinente apresenta alguns meios distintos para alcançar estes modelos de melhor ajuste: Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizam técnicas de análise de séries temporais, utilizando métodos autoregressivos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
 ## Objetivos
 
-Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto ainda visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno dos óbitos em trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado para a incidência destes eventos. O código-fonte do trabalho todo está abertamente disponibilizado para acesso como repositório no [perfil do GitHub](https://github.com/ONSV) do Observatório Nacional de Segurança Viária.
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto ainda visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado para a incidência destes eventos. O código-fonte do trabalho todo está abertamente disponibilizado para acesso como repositório no [perfil do GitHub](https://github.com/ONSV) do Observatório Nacional de Segurança Viária.
 
 ## Metodologia
 
@@ -116,7 +116,7 @@ Dito isto, investigam-se diversas bases de dados a fim de compilar e extrair est
 
 -   Frota veicular, fornecida pelo portal de estatísticas da Senatran, provida pelo Registro Nacional de Veículos Automotores (RENAVAM) [@ministériodostransportes2023];
 
--   Óbitos em sinistros de trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos com auxílio da biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação científica *R*.
+-   Óbitos em sinistros de trânsito, fornecidos pelo Sistema de Informação de Mortalidade (SIM) do DataSUS [@ministériodasaúde2023a], obtidos com auxílio da biblioteca [`microdatasus`](https://github.com/rfsaldanha/microdatasus) [@microdatasus] da linguagem de programação *R*.
 
 Vale ressaltar que nem todos os dados estão disponíveis em todas as escalas de tempo estudadas, por isso não foram inclusas no processo de criação de certos modelos. As bases de condutores habilitados e população residente, por exemplo, são unicamente anuais, impossibilitando sua utilização no modo trimestral e mensal.
 
@@ -179,7 +179,7 @@ data.frame(
   sub_values(values = F, replacement = "\u2717")
 ```
 
-Conforme @james2021, o Random Forest é um método da família de técnicas conhecidas como árvores de decisão que se baseiam em algoritmos que segregam os dados em estratos ou *ramos*, separando os dados conforme regras de decisão previamente estabelecidas pelo método. Assim, estas árvores "crescem" com base na necessidade do algoritmo em otimizar o processo de divisão dos dados em conjunto menores para melhor expressá-los. O resultado deste algoritmo é uma função estatística que irá retornar um valor previsto com base nas regras de decisões impostas em cada variável preditiva.
+De acordo com @james2021, o Random Forest é um método da família de técnicas conhecidas como árvores de decisão que se baseiam em algoritmos que segregam os dados em estratos ou *ramos*, separando os dados conforme regras de decisão previamente estabelecidas pelo método. Assim, estas árvores "crescem" com base na necessidade do algoritmo em otimizar o processo de divisão dos dados em conjunto menores para melhor expressá-los. O resultado deste algoritmo é uma função estatística que irá retornar um valor previsto com base nas regras de decisões impostas em cada variável preditiva.
 
 ```{mermaid}
 %%| echo: false
@@ -818,7 +818,7 @@ ggplotly(plot_taxas, tooltip = "text") |>
   layout(legend = list(title = list(text = "")))
 ```
 
-As duas taxas anunciam tendências distintas a cerca da fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa de habitantes corrobora à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração que esta diferença de comportamente pode resultar da evolução da frota veicular e da população nacional em velocidades distintas.
+As duas taxas anunciam tendências distintas a cerca da fatalidade no trânsito brasileiro. Enquanto o índice de mortes por veículos oferece uma perspectiva de estabilização no número de vítimas, a taxa de habitantes corrobora à visão de que as mortes estão inclinadas ao aumento na década atual. Deve-se levar em consideração que esta diferença de comportamente pode resultar da evolução da frota veicular e da população nacional em intensidades distintas.
 
 ### Resultados dos modelos
 
@@ -1954,7 +1954,7 @@ ggplotly(plot_taxa_frota, tooltip = "text") |>
 
 ## Conclusão
 
-Os modelos regressivos desenvolvidos antecipam uma tendência ao aumento relativo nas vítimas de sinistros de trânsito em 2023, uma revelação preocupante à presente situação da segurança viária no Brasil. Em contrapartida, os modelos de séries tempoais antecipam uma possível diminuição, provavelmente devido a sensibilidade destes tipos de técnicas à sazonalidade. Por isso, a análise de regressão permanece como a abordagem mais interessante no contexto do fenômeno estudado, tanto pela qualidade da previsão quanto pela capacidade explicativa deste tipo de metodologia.
+Os modelos regressivos desenvolvidos antecipam uma tendência ao aumento relativo nas vítimas de sinistros de trânsito em 2023, uma revelação preocupante à presente situação da segurança viária no Brasil. Em contrapartida, os modelos de séries temporais antecipam uma possível diminuição, provavelmente devido a sensibilidade desses tipos de técnicas à sazonalidade. Por isso, a análise de regressão permanece como a abordagem mais interessante no contexto do fenômeno estudado, tanto pela qualidade da previsão quanto pela capacidade explicativa deste tipo de metodologia.
 
 É fundamental também destacar que as soluções de segurança viária não dependem apenas de atributos da mobilidade urbana. Inúmeros fatores socioeconômicos e de infraestrutura podem afetar o desempenho da segurança. O cenário atual da segurança viária brasileira apresenta alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos mostram um desempenho abaixo do ideal no combate da fatalidade no trânsito brasileiro, conferindo uma perspectiva pessimista para a década atual no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável a ocorrência de avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
