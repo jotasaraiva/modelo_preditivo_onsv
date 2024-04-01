@@ -68,6 +68,10 @@ arrange_pop <- function() {
   return(df_temp)
 }
 
-populacao <- arrange_pop()
+populacao <- arrange_pop() |> 
+  rbind(data.frame(
+    populacao = c(203080756, 203080756),
+    ano = c(2022, 2023)
+  ))
 
 save(populacao, file = "data/populacao.rda")
