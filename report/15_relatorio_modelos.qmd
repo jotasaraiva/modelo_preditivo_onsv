@@ -197,7 +197,7 @@ flowchart TD
     2 --> f2[Nó final]
 ```
 
-O *Bagged Trees* é uma evolução da árvore de decisões convencional, onde diversas árvores são construídas simultaneamente com diversos conjuntos de reamostragem aleatória ajustados paralelamente (técnica de *bagging*), sendo a média do resultado de todas as árvores o resultado final da predição. O *Random Forest* é um algoritmo que vai além do *Bagged Trees*: além da criação de múltiplas árvores simultaneamente, ele também reamostra aleatoriamente as variáveis preditivas, selecionando conjuntos diferentes de variáveis para cada árvore. Isto serve para *descorrelacionar* estes atributos, já que altas correlações entre preditivas podem enviesar o modelo final, mostrando que o Random Forest é um algoritmo que pratica seleção de atributos internamente.
+O *Bagged Trees* é uma evolução da árvore de decisões convencional, onde diversas árvores são construídas simultaneamente com diversos conjuntos de reamostragem aleatória ajustados paralelamente (técnica de *bagging*), sendo a média do resultado de todas as árvores o resultado final da predição. O *Random Forest* é um algoritmo que vai além do *Bagged Trees*: além da criação de múltiplas árvores simultaneamente, ele também faz aleatoriamente a reamostragem das variáveis preditivas, selecionando conjuntos diferentes de variáveis para cada árvore. Isto serve para *descorrelacionar* estes atributos, já que altas correlações entre preditivas podem enviesar o modelo final, mostrando que o Random Forest é um algoritmo que pratica seleção de atributos internamente.
 
 Diversas técnicas de aprendizado de máquina requerem valores pré-estabelecidos de hiperparâmetros para o treinamento. Neste caso, este tipo de modelo requer valores iniciais para o número de árvores que se deseja treinar (parâmetro `trees`) e o número de atributos que se deseja reamostrar para cada árvore (parâmetros `mtry`). Estes valores foram arbitrariamente escolhidos como 5000 e 5 respectivamente neste estudo, mas outra possível abordagem seria a otimização de hiperparâmetros, utilizando técnicas como *grid search*.
 
@@ -1958,6 +1958,51 @@ ggplotly(plot_taxa_frota, tooltip = "text") |>
   layout(legend = list(title = list(text = "")))
 ```
 :::
+
+## Custos dos óbitos
+
+### Estimativa dos custos em 2023
+
+<!-- O IPEA estima o custo das vítimas fatais (fator humano) para 2014: R$ 433.286,69 -->
+
+<!-- IPCA entre 12/2014 e 12/2023: 68,14% -->
+
+```{r}
+pred_2023 <- round(
+  pred_anual_2023$.pred[pred_anual_2023$ano == 2023], digits = 0
+)
+ipca <- 1.6814
+custos_mortes <- 433286.69
+
+custo_2023 <- pred_2023 * ipca * custos_mortes
+
+custo_rs <- scales::dollar(
+  custo_2023, 
+  prefix = "R$",
+  accuracy = 0.01, 
+  big.mark = ".", 
+  decimal.mark = ","
+)
+
+custo_rs
+```
+
+### Impacto no sistema de atendimento de saúde
+
+<!-- MORBIDADE HOSPITALAR DO SUS POR CAUSAS EXTERNAS -->
+
+<!-- Quantidade de internações como consequência de sinistros de trânsito em 2023 (por ano de atendimento): 229.529 -->
+
+<!-- Quantidade de dias de permanencia na internação como consequência de sinistros de trânsito em 2023 (por ano de processamento): 1.256.095 -->
+
+```{r}
+#| include: false
+
+leitos_path <- here("data", "leitos_2023.csv")
+leitos <- read_csv2(leitos_path)
+media_leitos <- leitos$Quantidade_existente |> mean() |> round(digits = 0)
+
+```
 
 ## Conclusão
 
