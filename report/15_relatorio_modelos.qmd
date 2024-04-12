@@ -51,6 +51,7 @@ library(arrow)
 # opções de display
 theme_set(theme_onsv())
 set.seed(123)
+options(scipen = 999999)
 
 # load dos dados
 load(here("data","tabela_total.rda"))
@@ -1959,26 +1960,42 @@ ggplotly(plot_taxa_frota, tooltip = "text") |>
 ```
 :::
 
-## Custos dos óbitos
+## Custos dos óbitos {#sec-custos}
 
-### Estimativa dos custos em 2023
+A presente seção inclui o processo e resultado da estimativa de custos para a quantidade de óbitos prevista para 2023, conforme o modelo linear anual previamente ajustado (34.631 óbitos). Em um primeiro momento, faz-se a estimativa dos custos financeiros (@sec-custos-ipea), com base na estimativa dos custos de sinistros do Brasil elaborada pelo Instituto de Pesquisa Econômica Aplicada (IPEA). Em seguida, a @sec-internacoes inclui uma análise da ocupação de leitos voltados ao atendimento dos feridos em sinistros de trânsito, também para o ano de 2023.
+
+### Estimativa dos custos em 2023 {#sec-custos-ipea}
 
 <!-- O IPEA estima o custo das vítimas fatais (fator humano) para 2014: R$ 433.286,69 -->
 
 <!-- IPCA entre 12/2014 e 12/2023: 68,14% -->
 
+Em 2020, o IPEA divulgou o relatório "CUSTOS DOS ACIDENTES DE TRÂNSITO NO BRASIL: ESTIMATIVA SIMPLIFICADA COM BASE NA ATUALIZAÇÃO DAS PESQUISAS DO IPEA SOBRE CUSTOS DE ACIDENTES NOS AGLOMERADOS URBANOS E RODOVIAS" [@carvalhoCustosAcidentesTransito2020a], cujo principal objetivo foi apresentar o resultado das atualizações das pesquisas de custos dos acidentes de trânsito no Brasil.
+
+No trabalho realizado pelo IPEA, a estimativa dos custos dos sinistros é realizada de forma distinta para rodovias federais, rodovias estaduais ou municipais, e aglomerados urbanos. A estimativa para os sinistros ocorridos em rodovias federais é baseada em três componentes: (i) componentes de custos associados às pessoas; (ii) componentes de custos associados aos veículos; e (iii) componentes de custos institucionais e danos patrimoniais [@carvalhoCustosAcidentesTransito2020a]. Para o fim de estimar o custo dos óbitos no trânsito brasileiro em 2023, será utilizado o custo associado às pessoas, na categoria "Mortos". Mesmo que essa seja uma estimativa para rodovias federais, ela será utilizada no calculo dos custos dos óbitos de uma forma geral para a quantidade de óbitos no Brasil em 2023, pois as outras categorias (rodovias estaduais / municipais e aglomerados urbanos) não possuem essa estimativa de componente associado às pessoas. Assim, será possível alcançar uma estimativa aproximada deste custo total.
+
 ```{r}
+#| include: false
+
 pred_2023 <- round(
   pred_anual_2023$.pred[pred_anual_2023$ano == 2023], digits = 0
 )
 ipca <- 1.6814
 custos_mortes <- 433286.69
 
+custo_individual <- scales::dollar(
+  ipca * custos_mortes,
+  prefix = "R$ ",
+  accuracy = 0.01, 
+  big.mark = ".", 
+  decimal.mark = ","
+)
+
 custo_2023 <- pred_2023 * ipca * custos_mortes
 
 custo_rs <- scales::dollar(
   custo_2023, 
-  prefix = "R$",
+  prefix = "R$ ",
   accuracy = 0.01, 
   big.mark = ".", 
   decimal.mark = ","
@@ -1987,7 +2004,13 @@ custo_rs <- scales::dollar(
 custo_rs
 ```
 
-### Impacto no sistema de atendimento de saúde
+
+Os componentes de custos associados às pessoas que foram à óbito por consequência de sinistros de trânsito englobam os custos pré-hospitalares, custos hospitalares, custos de perda de perda de produção e custos de remoção. O IPEA estimou um custo total associado à cada vítima fatal de sinistros de R$ 433.286,69, considerando um valor em reais de dezembro de 2014 [@carvalhoCustosAcidentesTransito2020a]. Com o objetivo desse atualizar esse valor para dezembro de 2023, utilizou-se o Índice Nacional de Preços ao Consumidor Amplo (IPCA). De acordo com a Calculadora do Cidadão, disponibilizada pelo @bancocentraldobrasilCalculadoraCidadao2022, o IPCA acumulado entre dez/2014 e dez/2023 é de 68,14%. Assim, para alcançar o custo por vítima fatal em 2023, multiplica-se a taxa de `r scales::number(ipca, decimal.mark = ",", accuracy = 0.0001)` pelo custo de 2014, alcançando um **custo por óbito de `r custo_individual`**.
+
+Por fim, multiplicando o custo individual das mortes em 2023 pelo valor estimado de `r scales::number(pred_2023, big.mark = ".")`, tem-se que o custo total dos óbitos previstos no trânsito em 2023 é de `r custo_rs`, ou aproximadamente **R$ 25,2 bilhões**.
+
+
+### Impacto no sistema de atendimento de saúde {#sec-internacoes}
 
 <!-- MORBIDADE HOSPITALAR DO SUS POR CAUSAS EXTERNAS -->
 
