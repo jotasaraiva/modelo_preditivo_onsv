@@ -1,20 +1,175 @@
 ---
-title: Modelo Preditivo de Óbitos no Trânsito Brasileiro
+title: "Modelo Preditivo de Óbitos no Trânsito Brasileiro"
+subtitle: "Modelagem orientada a dados relacionados à segurança viária para o reconhecimento de padrões e previsão de óbitos no trânsito"
+lang: pt-br
 format: 
   revealjs: 
-    theme: simple
+    theme: [default, reveal.scss]
+    logo: "onsv_icone.png"
+    transition: slide
 author: 
   - name: João Pedro Melani Saraiva
+    affiliations:
+      - ref: obs 
   - name: Pedro Augusto Borges dos Santos
+    affiliations:
+      - ref: obs
+affiliations: 
+  - id: obs
+    number: 1
+    name: Observatório Nacional de Segurança Viária
+bibliography: references.bib
+csl: associacao-brasileira-de-normas-tecnicas.csl
 ---
 
-## Introdução
+# Introdução
 
-- Motivação
-- Objetivo
+```{r}
+#| include: false
 
-## Metodologia
+library(tidyverse)
+library(onsvplot)
+library(gt)
+```
 
-## Resultados e Discussão
+## Motivação
 
-## Conclusão
+-   Presente cenário da segurança viária mundial e brasileira [@worldhealthorganization2023];
+
+-   Diversos países com demanda por modelos estatísticos preditivos [@rodríguez2020];
+
+-   Defasagem nas fontes de dados: Sistema de Mortalidade - DataSUS;
+
+-   Ocorrência de vítimas fatais no trânsito se relaciona com diversos atributos estruturais, socioeconômicos e ambientais [@zhong-xiang2014].
+
+## Referenciais Teóricos
+
+-   Brasil falhou na *Primeira Década de Ação pela Segurança no Trânsito*, como previsto em @blumenberg2018;
+
+-   Desenvolvimento do PNATRANS;
+
+-   Modelos Preditivos na Literatura:
+
+    -   Modelos Lineares Multivariados [@blumenberg2018; @cai2015];
+
+    -   Cadeia de Markov [@seneta1996; @jin2020];
+
+    -   Modelos Autoregressivos [@al-ghamdi1995];
+
+    -   Redes Neurais Artificiais [@jafari2015].
+
+## Objetivo
+
+-   Desenvolver um modelo capaz de prever óbitos em trânsito;
+
+-   Explicar a influência das variáveis;
+
+-   Avaliar desempenho de diferentes abordagens (Determinística e Temporal);
+
+-   Avaliar o desempenho de diferentes modelos e escalas temporais.
+
+# Metodologia
+
+## Coleta de dados
+
+-   Dados coletados de diversas fontes, com diferentes escalas de tempo;
+
+-   Diferentes modelos são ajustados de acordo com a disponibiliade de dados:
+
+::: panel-tabset
+### Escala de tempo
+
+```{r}
+data.frame(
+  Categoria = c("PIB", "População", "Sinistros em rodovias federais", "Condutores Habilitados", "Frota veicular", "Óbitos em sinistros de trânsito"),
+  Anual = c(T, T, T, T, T, T),
+  Trimestral = c(T, F, T, F, T, T),
+  Mensal = c(T, F, T, F, T, T)
+) |> 
+  gt(rowname_col = "Categoria") |> 
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  sub_values(values = T, replacement = "\u2713") |> 
+  sub_values(values = F, replacement = "\u2717") |> 
+  tab_options(table.font.size = 24) |> 
+  tab_stubhead("Variáveis") |> 
+  tab_spanner(label = "Resolução Temporal", columns = ends_with("l")) |> 
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_stubhead()) |> 
+  tab_style(
+    style = "vertical-align:middle",
+    locations = cells_stubhead()
+  )
+```
+
+### Fontes de dados
+
+-   **PIB**: @bancocentraldobrasil2023;
+-   **População**: @ministériodasaúde2023b;
+-   **Sinistros em rodovias federais**: @políciarodoviáriafederal2023;
+-   **Condutores habilitados**: @ministériodostransporte2023;
+-   **Frota veicular**: @ministériodostransportes2023;
+-   **Óbitos em trânsito**: @ministériodasaúde2023a, coletado utilizando pacote `microdatasus` [@microdatasus] da linguagem de programação estatística *R*.
+:::
+
+## Modelos
+
+-   Disponibilidade de dados é um grande obstáculo na confecção de modelos mais complexos e custosos;
+
+-   Diferentes abordagens são testadas a fim de encontrar a metodologia ideal para modelagem da fatalidade dos sinistros.
+
+```{r}
+data.frame(
+  modelo = c(
+    "Regressão Linear",
+    "Random Forest",
+    "SARIMA",
+    "Suavização Exponencial"
+  ),
+  anual = c(T, F, F, F),
+  trimestral = c(T, F, F, F),
+  mensal = c(T, T, T, T)
+) |>
+  mutate(tipo = case_when(
+    modelo %in% c("Regressão Linear", "Random Forest") ~ "Determinístico",
+    modelo %in% c("SARIMA", "Suavização Exponencial") ~ "Série Temporal"
+  ), .before = 1) |>
+  rename_with(str_to_title) |>
+  gt(rowname_col = "Modelo", groupname_col = "Tipo") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |>
+  sub_values(values = T, replacement = "\u2713") |>
+  sub_values(values = F, replacement = "\u2717") |>
+  tab_options(table.font.size = 26) |>
+  tab_stubhead("Modelos") |>
+  tab_spanner(label = "Resolução Temporal", columns = ends_with("l")) |>
+  tab_style(style = cell_text(align = "center"),
+            locations = cells_stubhead()) |>
+  tab_style(style = "vertical-align:middle",
+            locations = cells_stubhead()) |> 
+  tab_style(style = cell_fill(color = "grey90"),
+            locations = cells_group())
+```
+
+# Resultados e Discussão
+
+## Análise Exploratória de Dados
+
+## Correlação
+
+## Resultados dos modelos
+
+## Comparação entre modelos
+
+# Conclusão
+
+## Referências

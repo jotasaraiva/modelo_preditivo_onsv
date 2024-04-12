@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="pt-br"><head>
 <script src="16_apresentacao_files/libs/clipboard/clipboard.min.js"></script>
 <script src="16_apresentacao_files/libs/quarto-html/tabby.min.js"></script>
 <script src="16_apresentacao_files/libs/quarto-html/popper.min.js"></script>
@@ -30,7 +30,27 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-  </style>
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 1em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
   <link rel="stylesheet" href="16_apresentacao_files/libs/revealjs/dist/theme/quarto.css">
   <link href="16_apresentacao_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="16_apresentacao_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
@@ -328,6 +348,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">Modelo Preditivo de Óbitos no Trânsito Brasileiro</h1>
+  <p class="subtitle">Modelagem orientada a dados relacionados à segurança viária para o reconhecimento de padrões e previsão de óbitos no trânsito</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -342,31 +363,1157 @@ João Pedro Melani Saraiva
 <div class="quarto-title-author-name">
 Pedro Augusto Borges dos Santos 
 </div>
-</div>
+        <p class="quarto-title-affiliation">
+            Observatório Nacional de Segurança Viária
+          </p>
+    </div>
 </div>
 
 </section>
-<section id="introdução" class="slide level2">
-<h2>Introdução</h2>
+<section>
+<section id="introdução" class="title-slide slide level1 center">
+<h1>Introdução</h1>
+
+</section>
+<section id="motivação" class="slide level2">
+<h2>Motivação</h2>
 <ul>
-<li>Motivação</li>
-<li>Objetivo</li>
+<li><p>Presente cenário da segurança viária mundial e brasileira <span class="citation" data-cites="worldhealthorganization2023">(<a href="#/referências" role="doc-biblioref" onclick="">WORLD HEALTH ORGANIZATION, 2023</a>)</span>;</p></li>
+<li><p>Diversos países com demanda por modelos estatísticos preditivos <span class="citation" data-cites="rodríguez2020">(<a href="#/referências" role="doc-biblioref" onclick="">RODRÍGUEZ; JATTIN; SORACIPA, 2020</a>)</span>;</p></li>
+<li><p>Defasagem nas fontes de dados: Sistema de Mortalidade - DataSUS;</p></li>
+<li><p>Ocorrência de vítimas fatais no trânsito se relaciona com diversos atributos estruturais, socioeconômicos e ambientais <span class="citation" data-cites="zhong-xiang2014">(<a href="#/referências" role="doc-biblioref" onclick="">ZHONG-XIANG et al., 2014</a>)</span>.</p></li>
 </ul>
 </section>
-<section id="metodologia" class="slide level2">
-<h2>Metodologia</h2>
+<section id="referenciais-teóricos" class="slide level2">
+<h2>Referenciais Teóricos</h2>
+<ul>
+<li><p>Brasil falhou na <em>Primeira Década de Ação pela Segurança no Trânsito</em>, como previsto em <span class="citation" data-cites="blumenberg2018">BLUMENBERG et al. (<a href="#/referências" role="doc-biblioref" onclick="">2018</a>)</span>;</p></li>
+<li><p>Desenvolvimento do PNATRANS;</p></li>
+<li><p>Modelos Preditivos na Literatura:</p>
+<ul>
+<li><p>Modelos Lineares Multivariados <span class="citation" data-cites="blumenberg2018 cai2015">(<a href="#/referências" role="doc-biblioref" onclick="">BLUMENBERG et al., 2018</a>; <a href="#/referências" role="doc-biblioref" onclick="">CAI; ZHU; YAN, 2015</a>)</span>;</p></li>
+<li><p>Cadeia de Markov <span class="citation" data-cites="seneta1996 jin2020">(<a href="#/referências" role="doc-biblioref" onclick="">JIN; ZHENG; GENG, 2020</a>; <a href="#/referências" role="doc-biblioref" onclick="">SENETA, 1996</a>)</span>;</p></li>
+<li><p>Modelos Autoregressivos <span class="citation" data-cites="al-ghamdi1995">(<a href="#/referências" role="doc-biblioref" onclick="">AL-GHAMDI, 1995</a>)</span>;</p></li>
+<li><p>Redes Neurais Artificiais <span class="citation" data-cites="jafari2015">(<a href="#/referências" role="doc-biblioref" onclick="">JAFARI et al., 2015</a>)</span>.</p></li>
+</ul></li>
+</ul>
 </section>
-<section id="resultados-e-discussão" class="slide level2">
-<h2>Resultados e Discussão</h2>
+<section id="objetivo" class="slide level2">
+<h2>Objetivo</h2>
+<ul>
+<li><p>Desenvolver um modelo capaz de prever óbitos em trânsito;</p></li>
+<li><p>Explicar a influência das variáveis;</p></li>
+<li><p>Avaliar desempenho de diferentes abordagens (Determinística e Temporal);</p></li>
+<li><p>Avaliar o desempenho de diferentes modelos e escalas temporais.</p></li>
+</ul>
+</section></section>
+<section>
+<section id="metodologia" class="title-slide slide level1 center">
+<h1>Metodologia</h1>
+
 </section>
-<section id="conclusão" class="slide level2">
-<h2>Conclusão</h2>
+<section id="coleta-de-dados" class="slide level2">
+<h2>Coleta de dados</h2>
+<ul>
+<li><p>Dados coletados de diversas fontes, com diferentes escalas de tempo;</p></li>
+<li><p>Diferentes modelos são ajustados de acordo com a disponibiliade de dados:</p></li>
+</ul>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Escala de tempo</a></li><li><a href="#tabset-1-2">Fontes de dados</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<div class="cell">
+<div class="cell-output-display">
+<div id="bvthhsmqax" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#bvthhsmqax table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#bvthhsmqax thead, #bvthhsmqax tbody, #bvthhsmqax tfoot, #bvthhsmqax tr, #bvthhsmqax td, #bvthhsmqax th {
+  border-style: none;
+}
+
+#bvthhsmqax p {
+  margin: 0;
+  padding: 0;
+}
+
+#bvthhsmqax .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 24px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#bvthhsmqax .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#bvthhsmqax .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#bvthhsmqax .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #00496D;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#bvthhsmqax .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #00496D;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#bvthhsmqax .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#bvthhsmqax .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#bvthhsmqax .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#bvthhsmqax .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#bvthhsmqax .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#bvthhsmqax .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#bvthhsmqax .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#bvthhsmqax .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#bvthhsmqax .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#bvthhsmqax .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bvthhsmqax .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#bvthhsmqax .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#bvthhsmqax .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#bvthhsmqax .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bvthhsmqax .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#bvthhsmqax .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bvthhsmqax .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#bvthhsmqax .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bvthhsmqax .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bvthhsmqax .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bvthhsmqax .gt_left {
+  text-align: left;
+}
+
+#bvthhsmqax .gt_center {
+  text-align: center;
+}
+
+#bvthhsmqax .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#bvthhsmqax .gt_font_normal {
+  font-weight: normal;
+}
+
+#bvthhsmqax .gt_font_bold {
+  font-weight: bold;
+}
+
+#bvthhsmqax .gt_font_italic {
+  font-style: italic;
+}
+
+#bvthhsmqax .gt_super {
+  font-size: 65%;
+}
+
+#bvthhsmqax .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#bvthhsmqax .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#bvthhsmqax .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#bvthhsmqax .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#bvthhsmqax .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#bvthhsmqax .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#bvthhsmqax .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings gt_spanner_row">
+<th rowspan="2" id="Variáveis" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="text-align: center; vertical-align: middle;" scope="col">Variáveis</th>
+<th colspan="3" id="Resolução Temporal" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Resolução Temporal</span></th>
+</tr>
+<tr class="odd gt_col_headings">
+<th id="Anual" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Anual</th>
+<th id="Trimestral" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Trimestral</th>
+<th id="Mensal" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Mensal</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td id="stub_1_1" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">PIB</td>
+<td class="gt_row gt_center" headers="stub_1_1 Anual">✓</td>
+<td class="gt_row gt_center" headers="stub_1_1 Trimestral">✓</td>
+<td class="gt_row gt_center" headers="stub_1_1 Mensal">✓</td>
+</tr>
+<tr class="even">
+<td id="stub_1_2" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">População</td>
+<td class="gt_row gt_center" headers="stub_1_2 Anual">✓</td>
+<td class="gt_row gt_center" headers="stub_1_2 Trimestral">✗</td>
+<td class="gt_row gt_center" headers="stub_1_2 Mensal">✗</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_3" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Sinistros em rodovias federais</td>
+<td class="gt_row gt_center" headers="stub_1_3 Anual">✓</td>
+<td class="gt_row gt_center" headers="stub_1_3 Trimestral">✓</td>
+<td class="gt_row gt_center" headers="stub_1_3 Mensal">✓</td>
+</tr>
+<tr class="even">
+<td id="stub_1_4" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Condutores Habilitados</td>
+<td class="gt_row gt_center" headers="stub_1_4 Anual">✓</td>
+<td class="gt_row gt_center" headers="stub_1_4 Trimestral">✗</td>
+<td class="gt_row gt_center" headers="stub_1_4 Mensal">✗</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_5" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Frota veicular</td>
+<td class="gt_row gt_center" headers="stub_1_5 Anual">✓</td>
+<td class="gt_row gt_center" headers="stub_1_5 Trimestral">✓</td>
+<td class="gt_row gt_center" headers="stub_1_5 Mensal">✓</td>
+</tr>
+<tr class="even">
+<td id="stub_1_6" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Óbitos em sinistros de trânsito</td>
+<td class="gt_row gt_center" headers="stub_1_6 Anual">✓</td>
+<td class="gt_row gt_center" headers="stub_1_6 Trimestral">✓</td>
+<td class="gt_row gt_center" headers="stub_1_6 Mensal">✓</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2">
+<ul>
+<li><strong>PIB</strong>: <span class="citation" data-cites="bancocentraldobrasil2023">BANCO CENTRAL DO BRASIL (<a href="#/referências" role="doc-biblioref" onclick="">2023</a>)</span>;</li>
+<li><strong>População</strong>: <span class="citation" data-cites="ministériodasaúde2023b">MINISTÉRIO DA SAÚDE (<a href="#/referências" role="doc-biblioref" onclick="">2023a</a>)</span>;</li>
+<li><strong>Sinistros em rodovias federais</strong>: <span class="citation" data-cites="políciarodoviáriafederal2023">POLÍCIA RODOVIÁRIA FEDERAL (<a href="#/referências" role="doc-biblioref" onclick="">2023</a>)</span>;</li>
+<li><strong>Condutores habilitados</strong>: <span class="citation" data-cites="ministériodostransporte2023">MINISTÉRIO DOS TRANSPORTES (<a href="#/referências" role="doc-biblioref" onclick="">2023a</a>)</span>;</li>
+<li><strong>Frota veicular</strong>: <span class="citation" data-cites="ministériodostransportes2023">MINISTÉRIO DOS TRANSPORTES (<a href="#/referências" role="doc-biblioref" onclick="">2023b</a>)</span>;</li>
+<li><strong>Óbitos em trânsito</strong>: <span class="citation" data-cites="ministériodasaúde2023a">MINISTÉRIO DA SAÚDE (<a href="#/referências" role="doc-biblioref" onclick="">2023b</a>)</span>, coletado utilizando pacote <code>microdatasus</code> <span class="citation" data-cites="microdatasus">(<a href="#/referências" role="doc-biblioref" onclick="">SALDANHA, 2023</a>)</span> da linguagem de programação estatística <em>R</em>.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="modelos" class="slide level2">
+<h2>Modelos</h2>
+<ul>
+<li><p>Disponibilidade de dados é um grande obstáculo na confecção de modelos mais complexos e custosos;</p></li>
+<li><p>Diferentes abordagens são testadas a fim de encontrar a metodologia ideal para modelagem da fatalidade dos sinistros.</p></li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tymmcuxkry" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tymmcuxkry table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#tymmcuxkry thead, #tymmcuxkry tbody, #tymmcuxkry tfoot, #tymmcuxkry tr, #tymmcuxkry td, #tymmcuxkry th {
+  border-style: none;
+}
+
+#tymmcuxkry p {
+  margin: 0;
+  padding: 0;
+}
+
+#tymmcuxkry .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 26px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#tymmcuxkry .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#tymmcuxkry .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#tymmcuxkry .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #00496D;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#tymmcuxkry .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #00496D;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#tymmcuxkry .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#tymmcuxkry .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#tymmcuxkry .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#tymmcuxkry .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#tymmcuxkry .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#tymmcuxkry .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tymmcuxkry .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#tymmcuxkry .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#tymmcuxkry .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#tymmcuxkry .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tymmcuxkry .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#tymmcuxkry .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#tymmcuxkry .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#tymmcuxkry .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tymmcuxkry .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#tymmcuxkry .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tymmcuxkry .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#tymmcuxkry .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tymmcuxkry .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tymmcuxkry .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tymmcuxkry .gt_left {
+  text-align: left;
+}
+
+#tymmcuxkry .gt_center {
+  text-align: center;
+}
+
+#tymmcuxkry .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#tymmcuxkry .gt_font_normal {
+  font-weight: normal;
+}
+
+#tymmcuxkry .gt_font_bold {
+  font-weight: bold;
+}
+
+#tymmcuxkry .gt_font_italic {
+  font-style: italic;
+}
+
+#tymmcuxkry .gt_super {
+  font-size: 65%;
+}
+
+#tymmcuxkry .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#tymmcuxkry .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#tymmcuxkry .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#tymmcuxkry .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#tymmcuxkry .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#tymmcuxkry .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#tymmcuxkry .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings gt_spanner_row">
+<th rowspan="2" id="Modelos" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="text-align: center; vertical-align: middle;" scope="col">Modelos</th>
+<th colspan="3" id="Resolução Temporal" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Resolução Temporal</span></th>
+</tr>
+<tr class="odd gt_col_headings">
+<th id="Anual" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Anual</th>
+<th id="Trimestral" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Trimestral</th>
+<th id="Mensal" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Mensal</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd gt_group_heading_row">
+<td colspan="4" id="Determinístico" class="gt_group_heading" data-quarto-table-cell-role="th" style="background-color: #E5E5E5" scope="colgroup">Determinístico</td>
+</tr>
+<tr class="even gt_row_group_first">
+<td id="stub_1_1" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Regressão Linear</td>
+<td class="gt_row gt_center" headers="Determinístico stub_1_1 Anual">✓</td>
+<td class="gt_row gt_center" headers="Determinístico stub_1_1 Trimestral">✓</td>
+<td class="gt_row gt_center" headers="Determinístico stub_1_1 Mensal">✓</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_2" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Random Forest</td>
+<td class="gt_row gt_center" headers="Determinístico stub_1_2 Anual">✗</td>
+<td class="gt_row gt_center" headers="Determinístico stub_1_2 Trimestral">✗</td>
+<td class="gt_row gt_center" headers="Determinístico stub_1_2 Mensal">✓</td>
+</tr>
+<tr class="even gt_group_heading_row">
+<td colspan="4" id="Série Temporal" class="gt_group_heading" data-quarto-table-cell-role="th" style="background-color: #E5E5E5" scope="colgroup">Série Temporal</td>
+</tr>
+<tr class="odd gt_row_group_first">
+<td id="stub_1_3" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">SARIMA</td>
+<td class="gt_row gt_center" headers="Série Temporal stub_1_3 Anual">✗</td>
+<td class="gt_row gt_center" headers="Série Temporal stub_1_3 Trimestral">✗</td>
+<td class="gt_row gt_center" headers="Série Temporal stub_1_3 Mensal">✓</td>
+</tr>
+<tr class="even">
+<td id="stub_1_4" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Suavização Exponencial</td>
+<td class="gt_row gt_center" headers="Série Temporal stub_1_4 Anual">✗</td>
+<td class="gt_row gt_center" headers="Série Temporal stub_1_4 Trimestral">✗</td>
+<td class="gt_row gt_center" headers="Série Temporal stub_1_4 Mensal">✓</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section></section>
+<section>
+<section id="resultados-e-discussão" class="title-slide slide level1 center">
+<h1>Resultados e Discussão</h1>
+
+</section>
+<section id="análise-exploratória-de-dados" class="slide level2">
+<h2>Análise Exploratória de Dados</h2>
+</section>
+<section id="correlação" class="slide level2">
+<h2>Correlação</h2>
+</section>
+<section id="resultados-dos-modelos" class="slide level2">
+<h2>Resultados dos modelos</h2>
+</section>
+<section id="comparação-entre-modelos" class="slide level2">
+<h2>Comparação entre modelos</h2>
+</section></section>
+<section>
+<section id="conclusão" class="title-slide slide level1 center">
+<h1>Conclusão</h1>
+
+</section>
+<section id="referências" class="slide level2 smaller scrollable">
+<h2>Referências</h2>
 <div class="quarto-auto-generated-content">
+<p><img src="onsv_icone.png" class="slide-logo"></p>
 <div class="footer footer-default">
 
 </div>
 </div>
-</section>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list">
+<div id="ref-al-ghamdi1995" class="csl-entry" role="listitem">
+AL-GHAMDI, A. S. <a href="https://doi.org/10.1016/S1018-3639(18)30627-5">Time Series Forecasts for Traffic Accidents, Injuries, and Fatalities in Saudi Arabia</a>. <strong>Journal of King Saud University - Engineering Sciences</strong>, v. 7, n. 2, p. 199–217, 1995.
+</div>
+<div id="ref-bancocentraldobrasil2023" class="csl-entry" role="listitem">
+BANCO CENTRAL DO BRASIL. <a href="https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries">SGS - Sistema Gerenciador de Séries Temporais - v2.1</a>. 8 dez. 2023.
+</div>
+<div id="ref-blumenberg2018" class="csl-entry" role="listitem">
+BLUMENBERG, C. et al. <a href="https://doi.org/10.1136/injuryprev-2017-042473">Is Brazil going to achieve the road traffic deaths target? An analysis about the sustainable development goals</a>. <strong>Injury Prevention</strong>, v. 24, n. 4, p. 250–255, ago. 2018.
+</div>
+<div id="ref-cai2015" class="csl-entry" role="listitem">
+CAI, H.; ZHU, D.; YAN, L. <strong>2015 International Conference on Transportation Information and Safety (ICTIS)</strong>. Wuhan, China: IEEE, jun. 2015. Disponível em: &lt;<a href="http://ieeexplore.ieee.org/document/7232140/">http://ieeexplore.ieee.org/document/7232140/</a>&gt;
+</div>
+<div id="ref-jafari2015" class="csl-entry" role="listitem">
+JAFARI, S. A. et al. <a href="https://doi.org/10.1080/17457300.2013.857695">Prediction of road traffic death rate using neural networks optimised by genetic algorithm</a>. <strong>International Journal of Injury Control and Safety Promotion</strong>, v. 22, n. 2, p. 153–157, 3 abr. 2015.
+</div>
+<div id="ref-jin2020" class="csl-entry" role="listitem">
+JIN, X.; ZHENG, J.; GENG, X. <a href="https://doi.org/10.18280/ijsse.100214">Prediction of Road Traffic Accidents Based on Grey System Theory and Grey Markov Model</a>. <strong>International Journal of Safety and Security Engineering</strong>, v. 10, n. 2, p. 263–268, 30 abr. 2020.
+</div>
+<div id="ref-ministériodasaúde2023a" class="csl-entry" role="listitem">
+MINISTÉRIO DA SAÚDE. <a href="https://datasus.saude.gov.br/mortalidade-desde-1996-pela-cid-10">Mortalidade <span></span> desde 1996 pela CID-10</a>. 25 set. b2023.
+</div>
+<div id="ref-ministériodasaúde2023b" class="csl-entry" role="listitem">
+MINISTÉRIO DA SAÚDE. <a href="https://datasus.saude.gov.br/populacao-residente">População residente</a>. 25 set. a2023.
+</div>
+<div id="ref-ministériodostransportes2023" class="csl-entry" role="listitem">
+MINISTÉRIO DOS TRANSPORTES. <a href="https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2022">Frota de Veículos - 2022</a>. 25 set. b2023.
+</div>
+<div id="ref-ministériodostransporte2023" class="csl-entry" role="listitem">
+MINISTÉRIO DOS TRANSPORTES. <a href="https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/estatisticas-quantidade-de-habilitados-denatran">Registro Nacional de Condutores Habilitados</a>. 25 set. a2023.
+</div>
+<div id="ref-políciarodoviáriafederal2023" class="csl-entry" role="listitem">
+POLÍCIA RODOVIÁRIA FEDERAL. <a href="https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf">Dados Abertos da PRF</a>. 23 set. 2023.
+</div>
+<div id="ref-rodríguez2020" class="csl-entry" role="listitem">
+RODRÍGUEZ, J.; JATTIN, J.; SORACIPA, Y. <a href="https://doi.org/10.1016/j.aap.2019.105332">Probabilistic temporal prediction of the deaths caused by traffic in Colombia. Mortality caused by traffic prediction</a>. <strong>Accident Analysis &amp; Prevention</strong>, v. 135, p. 105332, fev. 2020.
+</div>
+<div id="ref-microdatasus" class="csl-entry" role="listitem">
+SALDANHA, R. <strong><a href="https://github.com/rfsaldanha/microdatasus">Microdatasus: pacote para download e pré-processamento de microdados do Departamento de Informática do SUS (DATASUS)</a></strong>. [s.l: s.n.].
+</div>
+<div id="ref-seneta1996" class="csl-entry" role="listitem">
+SENETA, E. <a href="https://doi.org/10.2307/1403785">Markov and the Birth of Chain Dependence Theory</a>. <strong>International Statistical Review / Revue Internationale de Statistique</strong>, v. 64, n. 3, p. 255, dez. 1996.
+</div>
+<div id="ref-worldhealthorganization2023" class="csl-entry" role="listitem">
+WORLD HEALTH ORGANIZATION. <strong><a href="https://www.who.int/publications/i/item/9789240086517">Global status report on road safety 2023</a></strong>. [s.l: s.n.].
+</div>
+<div id="ref-zhong-xiang2014" class="csl-entry" role="listitem">
+ZHONG-XIANG, F. et al. <a href="https://doi.org/10.1155/2014/103196">Combined Prediction Model of Death Toll for Road Traffic Accidents Based on Independent and Dependent Variables</a>. <strong>Computational Intelligence and Neuroscience</strong>, v. 2014, p. 1–7, 2014.
+</div>
+</div>
+</section></section>
     </div>
   </div>
 
@@ -523,7 +1670,7 @@ Pedro Augusto Borges dos Santos
         previewLinks: false,
 
         // Transition style (none/fade/slide/convex/concave/zoom)
-        transition: 'none',
+        transition: 'slide',
 
         // Transition speed (default/fast/slow)
         transitionSpeed: 'default',
@@ -577,6 +1724,44 @@ Pedro Augusto Borges dos Santos
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
@@ -628,12 +1813,12 @@ Pedro Augusto Borges dos Santos
         // flash "checked"
         button.classList.add('code-copy-button-checked');
         var currentTitle = button.getAttribute("title");
-        button.setAttribute("title", "Copied!");
+        button.setAttribute("title", "Copiada");
         let tooltip;
         if (window.bootstrap) {
           button.setAttribute("data-bs-toggle", "tooltip");
           button.setAttribute("data-bs-placement", "left");
-          button.setAttribute("data-bs-title", "Copied!");
+          button.setAttribute("data-bs-title", "Copiada");
           tooltip = new bootstrap.Tooltip(button, 
             { trigger: "manual", 
               customClass: "code-copy-button-tooltip",
