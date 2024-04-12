@@ -1,0 +1,20 @@
+---
+title: Modelo Preditivo de Óbitos no Trânsito Brasileiro
+format: 
+  revealjs: 
+    theme: simple
+author: 
+  - name: João Pedro Melani Saraiva
+  - name: Pedro Augusto Borges dos Santos
+---
+
+## Introdução
+
+- Motivação
+- Objetivo
+
+## Metodologia
+
+## Resultados e Discussão
+
+## Conclusão
