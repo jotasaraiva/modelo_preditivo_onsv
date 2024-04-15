@@ -341,6 +341,14 @@
       margin-right: 0; 
     }
   </style>
+  <script src="16_apresentacao_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+  <script src="16_apresentacao_files/libs/plotly-binding-4.10.4/plotly.js"></script>
+  <script src="16_apresentacao_files/libs/typedarray-0.1/typedarray.min.js"></script>
+  <script src="16_apresentacao_files/libs/jquery-3.5.1/jquery.min.js"></script>
+  <link href="16_apresentacao_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+  <script src="16_apresentacao_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+  <link href="16_apresentacao_files/libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+  <script src="16_apresentacao_files/libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -424,23 +432,23 @@ Pedro Augusto Borges dos Santos
 <div id="tabset-1-1">
 <div class="cell">
 <div class="cell-output-display">
-<div id="bvthhsmqax" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bvthhsmqax table {
+<div id="tvgrhuyacy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tvgrhuyacy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bvthhsmqax thead, #bvthhsmqax tbody, #bvthhsmqax tfoot, #bvthhsmqax tr, #bvthhsmqax td, #bvthhsmqax th {
+#tvgrhuyacy thead, #tvgrhuyacy tbody, #tvgrhuyacy tfoot, #tvgrhuyacy tr, #tvgrhuyacy td, #tvgrhuyacy th {
   border-style: none;
 }
 
-#bvthhsmqax p {
+#tvgrhuyacy p {
   margin: 0;
   padding: 0;
 }
 
-#bvthhsmqax .gt_table {
+#tvgrhuyacy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -466,12 +474,12 @@ Pedro Augusto Borges dos Santos
   border-left-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_caption {
+#tvgrhuyacy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bvthhsmqax .gt_title {
+#tvgrhuyacy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -483,7 +491,7 @@ Pedro Augusto Borges dos Santos
   border-bottom-width: 0;
 }
 
-#bvthhsmqax .gt_subtitle {
+#tvgrhuyacy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -495,7 +503,7 @@ Pedro Augusto Borges dos Santos
   border-top-width: 0;
 }
 
-#bvthhsmqax .gt_heading {
+#tvgrhuyacy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -507,13 +515,13 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_bottom_border {
+#tvgrhuyacy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_col_headings {
+#tvgrhuyacy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -528,7 +536,7 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_col_heading {
+#tvgrhuyacy .gt_col_heading {
   color: #FFFFFF;
   background-color: #00496D;
   font-size: 100%;
@@ -548,7 +556,7 @@ Pedro Augusto Borges dos Santos
   overflow-x: hidden;
 }
 
-#bvthhsmqax .gt_column_spanner_outer {
+#tvgrhuyacy .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #00496D;
   font-size: 100%;
@@ -560,15 +568,15 @@ Pedro Augusto Borges dos Santos
   padding-right: 4px;
 }
 
-#bvthhsmqax .gt_column_spanner_outer:first-child {
+#tvgrhuyacy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bvthhsmqax .gt_column_spanner_outer:last-child {
+#tvgrhuyacy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bvthhsmqax .gt_column_spanner {
+#tvgrhuyacy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -580,11 +588,11 @@ Pedro Augusto Borges dos Santos
   width: 100%;
 }
 
-#bvthhsmqax .gt_spanner_row {
+#tvgrhuyacy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bvthhsmqax .gt_group_heading {
+#tvgrhuyacy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -610,7 +618,7 @@ Pedro Augusto Borges dos Santos
   text-align: left;
 }
 
-#bvthhsmqax .gt_empty_group_heading {
+#tvgrhuyacy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -625,15 +633,15 @@ Pedro Augusto Borges dos Santos
   vertical-align: middle;
 }
 
-#bvthhsmqax .gt_from_md > :first-child {
+#tvgrhuyacy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bvthhsmqax .gt_from_md > :last-child {
+#tvgrhuyacy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bvthhsmqax .gt_row {
+#tvgrhuyacy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -652,7 +660,7 @@ Pedro Augusto Borges dos Santos
   overflow-x: hidden;
 }
 
-#bvthhsmqax .gt_stub {
+#tvgrhuyacy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -665,7 +673,7 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#bvthhsmqax .gt_stub_row_group {
+#tvgrhuyacy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -679,15 +687,15 @@ Pedro Augusto Borges dos Santos
   vertical-align: top;
 }
 
-#bvthhsmqax .gt_row_group_first td {
+#tvgrhuyacy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#bvthhsmqax .gt_row_group_first th {
+#tvgrhuyacy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#bvthhsmqax .gt_summary_row {
+#tvgrhuyacy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -697,16 +705,16 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#bvthhsmqax .gt_first_summary_row {
+#tvgrhuyacy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_first_summary_row.thick {
+#tvgrhuyacy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bvthhsmqax .gt_last_summary_row {
+#tvgrhuyacy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -716,7 +724,7 @@ Pedro Augusto Borges dos Santos
   border-bottom-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_grand_summary_row {
+#tvgrhuyacy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -726,7 +734,7 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#bvthhsmqax .gt_first_grand_summary_row {
+#tvgrhuyacy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -736,7 +744,7 @@ Pedro Augusto Borges dos Santos
   border-top-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_last_grand_summary_row_top {
+#tvgrhuyacy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -746,11 +754,11 @@ Pedro Augusto Borges dos Santos
   border-bottom-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_striped {
+#tvgrhuyacy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bvthhsmqax .gt_table_body {
+#tvgrhuyacy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -759,7 +767,7 @@ Pedro Augusto Borges dos Santos
   border-bottom-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_footnotes {
+#tvgrhuyacy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -773,7 +781,7 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_footnote {
+#tvgrhuyacy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -782,7 +790,7 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#bvthhsmqax .gt_sourcenotes {
+#tvgrhuyacy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -796,7 +804,7 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#bvthhsmqax .gt_sourcenote {
+#tvgrhuyacy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -804,63 +812,63 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#bvthhsmqax .gt_left {
+#tvgrhuyacy .gt_left {
   text-align: left;
 }
 
-#bvthhsmqax .gt_center {
+#tvgrhuyacy .gt_center {
   text-align: center;
 }
 
-#bvthhsmqax .gt_right {
+#tvgrhuyacy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bvthhsmqax .gt_font_normal {
+#tvgrhuyacy .gt_font_normal {
   font-weight: normal;
 }
 
-#bvthhsmqax .gt_font_bold {
+#tvgrhuyacy .gt_font_bold {
   font-weight: bold;
 }
 
-#bvthhsmqax .gt_font_italic {
+#tvgrhuyacy .gt_font_italic {
   font-style: italic;
 }
 
-#bvthhsmqax .gt_super {
+#tvgrhuyacy .gt_super {
   font-size: 65%;
 }
 
-#bvthhsmqax .gt_footnote_marks {
+#tvgrhuyacy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bvthhsmqax .gt_asterisk {
+#tvgrhuyacy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bvthhsmqax .gt_indent_1 {
+#tvgrhuyacy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bvthhsmqax .gt_indent_2 {
+#tvgrhuyacy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bvthhsmqax .gt_indent_3 {
+#tvgrhuyacy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bvthhsmqax .gt_indent_4 {
+#tvgrhuyacy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bvthhsmqax .gt_indent_5 {
+#tvgrhuyacy .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -942,23 +950,23 @@ Pedro Augusto Borges dos Santos
 </ul>
 <div class="cell">
 <div class="cell-output-display">
-<div id="tymmcuxkry" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#tymmcuxkry table {
+<div id="nvexfsgjav" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#nvexfsgjav table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#tymmcuxkry thead, #tymmcuxkry tbody, #tymmcuxkry tfoot, #tymmcuxkry tr, #tymmcuxkry td, #tymmcuxkry th {
+#nvexfsgjav thead, #nvexfsgjav tbody, #nvexfsgjav tfoot, #nvexfsgjav tr, #nvexfsgjav td, #nvexfsgjav th {
   border-style: none;
 }
 
-#tymmcuxkry p {
+#nvexfsgjav p {
   margin: 0;
   padding: 0;
 }
 
-#tymmcuxkry .gt_table {
+#nvexfsgjav .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -984,12 +992,12 @@ Pedro Augusto Borges dos Santos
   border-left-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_caption {
+#nvexfsgjav .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#tymmcuxkry .gt_title {
+#nvexfsgjav .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1001,7 +1009,7 @@ Pedro Augusto Borges dos Santos
   border-bottom-width: 0;
 }
 
-#tymmcuxkry .gt_subtitle {
+#nvexfsgjav .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1013,7 +1021,7 @@ Pedro Augusto Borges dos Santos
   border-top-width: 0;
 }
 
-#tymmcuxkry .gt_heading {
+#nvexfsgjav .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1025,13 +1033,13 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_bottom_border {
+#nvexfsgjav .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_col_headings {
+#nvexfsgjav .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1046,7 +1054,7 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_col_heading {
+#nvexfsgjav .gt_col_heading {
   color: #FFFFFF;
   background-color: #00496D;
   font-size: 100%;
@@ -1066,7 +1074,7 @@ Pedro Augusto Borges dos Santos
   overflow-x: hidden;
 }
 
-#tymmcuxkry .gt_column_spanner_outer {
+#nvexfsgjav .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #00496D;
   font-size: 100%;
@@ -1078,15 +1086,15 @@ Pedro Augusto Borges dos Santos
   padding-right: 4px;
 }
 
-#tymmcuxkry .gt_column_spanner_outer:first-child {
+#nvexfsgjav .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tymmcuxkry .gt_column_spanner_outer:last-child {
+#nvexfsgjav .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tymmcuxkry .gt_column_spanner {
+#nvexfsgjav .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1098,11 +1106,11 @@ Pedro Augusto Borges dos Santos
   width: 100%;
 }
 
-#tymmcuxkry .gt_spanner_row {
+#nvexfsgjav .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#tymmcuxkry .gt_group_heading {
+#nvexfsgjav .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1128,7 +1136,7 @@ Pedro Augusto Borges dos Santos
   text-align: left;
 }
 
-#tymmcuxkry .gt_empty_group_heading {
+#nvexfsgjav .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1143,15 +1151,15 @@ Pedro Augusto Borges dos Santos
   vertical-align: middle;
 }
 
-#tymmcuxkry .gt_from_md > :first-child {
+#nvexfsgjav .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tymmcuxkry .gt_from_md > :last-child {
+#nvexfsgjav .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tymmcuxkry .gt_row {
+#nvexfsgjav .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1170,7 +1178,7 @@ Pedro Augusto Borges dos Santos
   overflow-x: hidden;
 }
 
-#tymmcuxkry .gt_stub {
+#nvexfsgjav .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1183,7 +1191,7 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#tymmcuxkry .gt_stub_row_group {
+#nvexfsgjav .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1197,15 +1205,15 @@ Pedro Augusto Borges dos Santos
   vertical-align: top;
 }
 
-#tymmcuxkry .gt_row_group_first td {
+#nvexfsgjav .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#tymmcuxkry .gt_row_group_first th {
+#nvexfsgjav .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#tymmcuxkry .gt_summary_row {
+#nvexfsgjav .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1215,16 +1223,16 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#tymmcuxkry .gt_first_summary_row {
+#nvexfsgjav .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_first_summary_row.thick {
+#nvexfsgjav .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#tymmcuxkry .gt_last_summary_row {
+#nvexfsgjav .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1234,7 +1242,7 @@ Pedro Augusto Borges dos Santos
   border-bottom-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_grand_summary_row {
+#nvexfsgjav .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1244,7 +1252,7 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#tymmcuxkry .gt_first_grand_summary_row {
+#nvexfsgjav .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1254,7 +1262,7 @@ Pedro Augusto Borges dos Santos
   border-top-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_last_grand_summary_row_top {
+#nvexfsgjav .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1264,11 +1272,11 @@ Pedro Augusto Borges dos Santos
   border-bottom-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_striped {
+#nvexfsgjav .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#tymmcuxkry .gt_table_body {
+#nvexfsgjav .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1277,7 +1285,7 @@ Pedro Augusto Borges dos Santos
   border-bottom-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_footnotes {
+#nvexfsgjav .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1291,7 +1299,7 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_footnote {
+#nvexfsgjav .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1300,7 +1308,7 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#tymmcuxkry .gt_sourcenotes {
+#nvexfsgjav .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1314,7 +1322,7 @@ Pedro Augusto Borges dos Santos
   border-right-color: #D3D3D3;
 }
 
-#tymmcuxkry .gt_sourcenote {
+#nvexfsgjav .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1322,63 +1330,63 @@ Pedro Augusto Borges dos Santos
   padding-right: 5px;
 }
 
-#tymmcuxkry .gt_left {
+#nvexfsgjav .gt_left {
   text-align: left;
 }
 
-#tymmcuxkry .gt_center {
+#nvexfsgjav .gt_center {
   text-align: center;
 }
 
-#tymmcuxkry .gt_right {
+#nvexfsgjav .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tymmcuxkry .gt_font_normal {
+#nvexfsgjav .gt_font_normal {
   font-weight: normal;
 }
 
-#tymmcuxkry .gt_font_bold {
+#nvexfsgjav .gt_font_bold {
   font-weight: bold;
 }
 
-#tymmcuxkry .gt_font_italic {
+#nvexfsgjav .gt_font_italic {
   font-style: italic;
 }
 
-#tymmcuxkry .gt_super {
+#nvexfsgjav .gt_super {
   font-size: 65%;
 }
 
-#tymmcuxkry .gt_footnote_marks {
+#nvexfsgjav .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#tymmcuxkry .gt_asterisk {
+#nvexfsgjav .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#tymmcuxkry .gt_indent_1 {
+#nvexfsgjav .gt_indent_1 {
   text-indent: 5px;
 }
 
-#tymmcuxkry .gt_indent_2 {
+#nvexfsgjav .gt_indent_2 {
   text-indent: 10px;
 }
 
-#tymmcuxkry .gt_indent_3 {
+#nvexfsgjav .gt_indent_3 {
   text-indent: 15px;
 }
 
-#tymmcuxkry .gt_indent_4 {
+#nvexfsgjav .gt_indent_4 {
   text-indent: 20px;
 }
 
-#tymmcuxkry .gt_indent_5 {
+#nvexfsgjav .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1432,6 +1440,25 @@ Pedro Augusto Borges dos Santos
 </div>
 </div>
 </div>
+</section>
+<section id="análise-de-série-temporal-x-análise-determinística" class="slide level2">
+<h2>Análise de Série Temporal x Análise Determinística</h2>
+<ul>
+<li><p>Duas abordagens esatísticas abordadas no estudo.</p></li>
+<li><p>Análise de Série Temporal:</p>
+<ul>
+<li>Conjunto de dados em uma sequência cronológica;</li>
+<li>Sazonalidade e tendência;</li>
+<li>Autocorrelação e autorregressão;</li>
+<li>Média móvel.</li>
+</ul></li>
+<li><p>Análise Determinística:</p>
+<ul>
+<li>Algoritmos de Regressão;</li>
+<li>Multivariados;</li>
+<li>Independem da sequência cronológica.</li>
+</ul></li>
+</ul>
 </section></section>
 <section>
 <section id="resultados-e-discussão" class="title-slide slide level1 center">
@@ -1440,6 +1467,12 @@ Pedro Augusto Borges dos Santos
 </section>
 <section id="análise-exploratória-de-dados" class="slide level2">
 <h2>Análise Exploratória de Dados</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-1b72b3a3b902a76ef420" style="width:100%;height:325px;"></div>
+<script type="application/json" data-for="htmlwidget-1b72b3a3b902a76ef420">{"x":{"visdat":{"493c2ef87ecd":["function () ","plotlyVisDat"]},"cur_data":"493c2ef87ecd","attrs":{"493c2ef87ecd":{"x":{},"y":{},"mode":"lines","line":{"color":"#00496d"},"text":{},"hoverinfo":"text","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"yaxis":{"domain":[0,1],"automargin":true,"exponentformat":"none","title":"Óbitos"},"xaxis":{"domain":[0,1],"automargin":true,"title":"Data"},"separators":",.","hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022],"y":[35246,35588,30867,29556,28975,30524,32753,33139,35105,35994,36367,37407,38273,37594,42844,43256,44812,42266,43780,38651,37345,35375,32655,31945,32716,33813,33894],"mode":"lines","line":{"color":"#00496d"},"text":["Vítimas: 35246 <br>Ano: 1996","Vítimas: 35588 <br>Ano: 1997","Vítimas: 30867 <br>Ano: 1998","Vítimas: 29556 <br>Ano: 1999","Vítimas: 28975 <br>Ano: 2000","Vítimas: 30524 <br>Ano: 2001","Vítimas: 32753 <br>Ano: 2002","Vítimas: 33139 <br>Ano: 2003","Vítimas: 35105 <br>Ano: 2004","Vítimas: 35994 <br>Ano: 2005","Vítimas: 36367 <br>Ano: 2006","Vítimas: 37407 <br>Ano: 2007","Vítimas: 38273 <br>Ano: 2008","Vítimas: 37594 <br>Ano: 2009","Vítimas: 42844 <br>Ano: 2010","Vítimas: 43256 <br>Ano: 2011","Vítimas: 44812 <br>Ano: 2012","Vítimas: 42266 <br>Ano: 2013","Vítimas: 43780 <br>Ano: 2014","Vítimas: 38651 <br>Ano: 2015","Vítimas: 37345 <br>Ano: 2016","Vítimas: 35375 <br>Ano: 2017","Vítimas: 32655 <br>Ano: 2018","Vítimas: 31945 <br>Ano: 2019","Vítimas: 32716 <br>Ano: 2020","Vítimas: 33813 <br>Ano: 2021","Vítimas: 33894 <br>Ano: 2022"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
 </section>
 <section id="correlação" class="slide level2">
 <h2>Correlação</h2>

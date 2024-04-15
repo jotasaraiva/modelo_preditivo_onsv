@@ -7,6 +7,7 @@ format:
     theme: [default, reveal.scss]
     logo: "onsv_icone.png"
     transition: slide
+    fig-responsive: true
 author: 
   - name: João Pedro Melani Saraiva
     affiliations:
@@ -20,6 +21,8 @@ affiliations:
     name: Observatório Nacional de Segurança Viária
 bibliography: references.bib
 csl: associacao-brasileira-de-normas-tecnicas.csl
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Introdução
@@ -29,6 +32,8 @@ csl: associacao-brasileira-de-normas-tecnicas.csl
 
 library(tidyverse)
 library(onsvplot)
+library(roadtrafficdeaths)
+library(plotly)
 library(gt)
 ```
 
@@ -160,9 +165,39 @@ data.frame(
             locations = cells_group())
 ```
 
+## Análise de Série Temporal x Análise Determinística
+
+- Duas abordagens esatísticas abordadas no estudo.
+
+- Análise de Série Temporal:
+  - Conjunto de dados em uma sequência cronológica;
+  - Sazonalidade e tendência;
+  - Autocorrelação e autorregressão;
+  - Média móvel.
+- Análise Determinística:
+  - Algoritmos de Regressão;
+  - Multivariados;
+  - Independem da sequência cronológica.
+  
 # Resultados e Discussão
 
 ## Análise Exploratória de Dados
+
+```{r}
+rtdeaths |> 
+  summarise(.by = ano_ocorrencia, obitos = n()) |> 
+  drop_na() |> 
+  plot_ly(x = ~ano_ocorrencia, y = ~obitos, 
+          type = "scatter", 
+          mode = "lines",
+          line = list(color = onsv_palette$blue),
+          text = ~paste("Vítimas:", obitos, "<br>Ano:", ano_ocorrencia),
+          hoverinfo = "text") |> 
+  layout(yaxis = list(exponentformat = "none",
+                      title = "Óbitos"),
+         xaxis = list(title = "Data"),
+         separators = ",.")
+```
 
 ## Correlação
 
