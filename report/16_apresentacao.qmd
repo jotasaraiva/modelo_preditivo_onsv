@@ -37,6 +37,8 @@ library(here)
 library(ggcorrplot)
 library(gt)
 
+theme_set(theme_onsv())
+
 load(here("data","tabela_total.rda"))
 load(here("data","tabela_total_mensal.rda"))
 ```
@@ -171,28 +173,31 @@ data.frame(
 
 ## Análise de Série Temporal x Análise Determinística
 
-- Duas abordagens esatísticas abordadas no estudo.
+-   Duas abordagens esatísticas abordadas no estudo.
 
-- Análise de Série Temporal:
-  - Conjunto de dados em uma sequência cronológica;
-  - Sazonalidade e tendência;
-  - Autocorrelação e autorregressão;
-  - Média móvel.
-- Análise Determinística:
-  - Algoritmos de Regressão;
-  - Multivariados;
-  - Independem da sequência cronológica.
-  
+-   Análise de Série Temporal:
+
+    -   Conjunto de dados em uma sequência cronológica;
+    -   Sazonalidade e tendência;
+    -   Autocorrelação e autorregressão;
+    -   Média móvel.
+
+-   Análise Determinística:
+
+    -   Algoritmos de Regressão;
+    -   Multivariados;
+    -   Independem da sequência cronológica.
+
 # Resultados e Discussão
 
 ## Análise Exploratória de Dados
 
-- Efetuada para todas as variáveis;
-- Dados históricos de óbitos no trânsito:
+-   Efetuada para todas as variáveis;
+-   Dados históricos de óbitos no trânsito:
 
 ::: panel-tabset
-
 ### Anual
+
 ```{r}
 rtdeaths |> 
   summarise(.by = ano_ocorrencia, obitos = n()) |> 
@@ -211,6 +216,7 @@ rtdeaths |>
 ```
 
 ### Trimestral
+
 ```{r}
 rtdeaths |> 
   arrange(data_ocorrencia) |> 
@@ -232,6 +238,7 @@ rtdeaths |>
 ```
 
 ### Mensal
+
 ```{r}
 rtdeaths |> 
   arrange(data_ocorrencia) |> 
@@ -251,17 +258,16 @@ rtdeaths |>
          xaxis = list(title = "Data"),
          separators = ",.")
 ```
-
 :::
 
 ## Correlação
 
-- Correlação não-paramétrica de Spearman;
-- Variação da correlação em relação da resolução temporal.
+-   Correlação não-paramétrica de Spearman;
+-   Variação da correlação em relação da resolução temporal.
 
-:::panel-tabset
-
+::: panel-tabset
 ### Anual
+
 ```{r}
 #| fig-height: 4
 #| fig-align: center
@@ -299,6 +305,7 @@ ggcorrplot(
 ```
 
 ### Trimestral
+
 ```{r}
 #| fig-height: 4
 #| fig-align: center
@@ -346,6 +353,7 @@ ggcorrplot(
 ```
 
 ### Mensal
+
 ```{r}
 #| fig-height: 4
 #| fig-align: center
@@ -378,14 +386,203 @@ ggcorrplot(
   colors = c(onsv_palette$blue, "white", onsv_palette$red)
 )
 ```
-
 :::
 
-## Resultados dos modelos
+## Resultados dos Modelos
 
+```{r}
+source(here("R","lin_reg.R"))
+source(here("R","rforest.R"))
+source(here("R","sarima.R"))
+source(here("R","ets.R"))
+```
 
+## Comparação entre Modelos - Métricas de Erros
 
-## Comparação entre modelos
+::: columns
+::: {.column width="50%"}
+Métricas utilizadas:
+
+-   RSME (*Root Mean Squared Error*);
+-   MAE (*Mean Absolute Error*);
+-   R^2^ (coeficiente de determinação).
+:::
+
+::: {.column width="50%"}
+```{r}
+rbind(
+  mutate(metricas_anual, modelo = "Regressão Linear", resol = "Anual"),
+  mutate(metricas_trimestre, modelo = "Regressão Linear", resol = "Trimestral"),
+  mutate(metricas_mensal, modelo = "Regressão Linear", resol = "Mensal"),
+  mutate(metricas_rf, modelo = "Random Forest Regressor", resol = "Mensal"),
+  mutate(metricas_ets, modelo = "Exponential Smoothing", resol = "Mensal"),
+  mutate(metricas_sarima, modelo = "SARIMA", resol = "Mensal")
+) |>
+  select(-.estimator) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  rename_with(toupper, rmse:rsq) |>
+  group_by(resol) |>
+  gt(rowname_col = "modelo") |>
+  tab_stubhead("Modelos") |> 
+  tab_spanner("Métricas", columns = everything()) |> 
+  fmt_number(decimals = 2,
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  tab_style(style = cell_fill(color = "grey90"),
+            locations = cells_group()) |> 
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_stubhead()) |> 
+  tab_style(
+    style = "vertical-align:middle",
+    locations = cells_stubhead()
+  ) |> 
+  tab_options(table.font.size = 20) 
+```
+:::
+:::
+
+## Comparação entre Modelos - Previsões para 2023
+
+```{r}
+pred_list <- list(
+  rename(
+    pred_anual_2023, 
+    pred.anual = .pred, 
+    upper.anual = .pred_upper, 
+    lower.anual = .pred_lower
+  ),
+  summarise(
+    mutate(pred_trimestre_2023, ano = year(data)),
+    .by = ano,
+    pred.trimestral = sum(.pred),
+    upper.trimestral = sum(.pred_upper),
+    lower.trimestral = sum(.pred_lower)
+  ),
+  summarise(
+    mutate(pred_mensal_2023, ano = year(data)),
+    .by = ano,
+    pred.mensal = sum(.pred),
+    upper.mensal = sum(.pred_upper),
+    lower.mensal = sum(.pred_lower)
+  ),
+  summarise(
+    mutate(rf_pred, ano = year(data)),
+    .by = ano,
+    pred.rf = sum(.pred)
+  ),
+  summarise(
+    mutate(sarima_pred, ano = year(data)),
+    .by = ano,
+    pred.sarima = sum(.pred),
+    upper.sarima = sum(.pred_upper.80.),
+    lower.sarima = sum(.pred_lower.80.)
+  ),
+  summarise(
+    mutate(ets_pred, ano = year(data)),
+    .by = ano,
+    pred.ets = sum(.pred),
+    upper.ets = sum(.pred_upper.80.),
+    lower.ets = sum(.pred_lower.80.)
+  )
+)
+```
+
+::: panel-tabset
+
+### Gráficos
+```{r}
+dodge <- position_dodge(1)
+
+plot_comparison <- pred_list |> 
+  reduce(left_join, by = "ano") |> 
+  select(c(ano, mortes, starts_with("pred"))) |> 
+  pivot_longer(starts_with("pred"), names_to = "tipo", values_to = "pred") |>
+  mutate(tipo = case_match(tipo,
+                           "pred.anual" ~ "Linear Anual",
+                           "pred.trimestral" ~ "Linear Trimestral",
+                           "pred.mensal" ~ "Linear Mensal",
+                           "pred.rf" ~ "RF Mensal",
+                           "pred.sarima" ~ "SARIMA Mensal",
+                           "pred.ets" ~ "ETS Mensal")) |> 
+  ggplot(aes(ano, mortes)) +
+    geom_line(aes(y = pred, color = "Óbitos previstos")) +
+    geom_point(aes(y = pred, color = "Óbitos previstos", 
+                   text = paste("Previstos:", round(pred)))) +
+    geom_line(aes(color = "Óbitos reais")) +
+    geom_point(aes(color = "Óbitos reais", 
+                   text = paste("Óbitos:", mortes))) +
+    scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
+    scale_x_continuous(breaks = seq(2011, 2023, 1), limits = c(2011, NA)) +
+    scale_y_continuous(labels = label_comma(decimal.mark = ",", big.mark = ".")) +
+    theme(axis.text.x = element_text(angle = 90)) +
+    facet_wrap(tipo ~ .) +
+    labs(x = NULL, y = NULL)
+    
+ggplotly(plot_comparison, tooltip = "text",
+         height = 500, width = 1000) |> 
+  layout(legend = list(title = list(text = "")))
+```
+
+### Tabela
+```{r}
+pred_list |> 
+  reduce(left_join, by = "ano") |> 
+  select(c(ano, starts_with(c("pred","upper","lower")))) |> 
+  last() |> 
+  pivot_longer(-ano) |> 
+  mutate(
+    modelo = str_remove(str_extract(name, "\\..*"), "\\."),
+    tipo = str_remove(str_extract(name, "^(.*?)\\."), "\\.")
+  ) |> 
+  select(-c(ano, name)) |> 
+  pivot_wider(values_from = value, names_from = tipo) |> 
+  mutate(
+    modelo = case_match(
+      modelo,
+      "anual" ~ "Linear Anual",
+      "trimestral" ~ "Linear Trimestral",
+      "mensal" ~ "Linear Mensal",
+      "rf" ~ "RF Mensal",
+      "sarima" ~ "SARIMA Mensal",
+      "ets" ~ "ETS Mensal"
+    )
+  ) |> 
+  gt() |> 
+  cols_label(
+    modelo = "Modelo",
+    pred = "Previsão",
+    upper = "Máx.",
+    lower = "Mín."
+  ) |> 
+  fmt_number(decimals = 0,
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  sub_missing(missing_text = "-") |> 
+  tab_footnote(
+    footnote = "Algoritmo não produz intervalo de confiança",
+    locations = cells_body(columns = modelo,
+                           rows = modelo == "RF Mensal"),
+    placement = "left"
+  ) |> 
+  opt_footnote_marks("standard") |>
+  tab_options(table.font.size = 26,
+              table.width = px(1000))
+```
+
+:::
 
 # Conclusão
 
