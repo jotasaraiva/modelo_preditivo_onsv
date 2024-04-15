@@ -7,7 +7,6 @@ format:
     theme: [default, reveal.scss]
     logo: "onsv_icone.png"
     transition: slide
-    fig-responsive: true
 author: 
   - name: João Pedro Melani Saraiva
     affiliations:
@@ -34,7 +33,12 @@ library(tidyverse)
 library(onsvplot)
 library(roadtrafficdeaths)
 library(plotly)
+library(here)
+library(ggcorrplot)
 library(gt)
+
+load(here("data","tabela_total.rda"))
+load(here("data","tabela_total_mensal.rda"))
 ```
 
 ## Motivação
@@ -183,6 +187,12 @@ data.frame(
 
 ## Análise Exploratória de Dados
 
+- Efetuada para todas as variáveis;
+- Dados históricos de óbitos no trânsito:
+
+::: panel-tabset
+
+### Anual
 ```{r}
 rtdeaths |> 
   summarise(.by = ano_ocorrencia, obitos = n()) |> 
@@ -192,16 +202,188 @@ rtdeaths |>
           mode = "lines",
           line = list(color = onsv_palette$blue),
           text = ~paste("Vítimas:", obitos, "<br>Ano:", ano_ocorrencia),
-          hoverinfo = "text") |> 
+          hoverinfo = "text",
+          width = 1000, height = 400) |> 
   layout(yaxis = list(exponentformat = "none",
                       title = "Óbitos"),
          xaxis = list(title = "Data"),
          separators = ",.")
 ```
 
+### Trimestral
+```{r}
+rtdeaths |> 
+  arrange(data_ocorrencia) |> 
+  mutate(trimestre = quarter(data_ocorrencia, type = "date_last"), 
+         .before = 1) |> 
+  summarise(.by = trimestre, obitos = n()) |> 
+  drop_na() |> 
+  plot_ly(x = ~trimestre, y = ~obitos,
+          type = "scatter",
+          mode = "lines",
+          line = list(color = onsv_palette$blue),
+          text = ~paste("Vítimas:", obitos, "<br>Trimestre:", trimestre),
+          hoverinfo = "text",
+          width = 1000, height = 400) |> 
+  layout(yaxis = list(exponentformat = "none",
+                      title = "Óbitos"),
+         xaxis = list(title = "Data"),
+         separators = ",.")
+```
+
+### Mensal
+```{r}
+rtdeaths |> 
+  arrange(data_ocorrencia) |> 
+  mutate(data = ym(paste0(ano_ocorrencia,"-",month(data_ocorrencia))),
+         .before = 1) |> 
+  summarise(.by = data, obitos = n()) |> 
+  drop_na() |>
+  plot_ly(x = ~data, y = ~obitos,
+          type = "scatter",
+          mode = "lines",
+          line = list(color = onsv_palette$blue),
+          text = ~paste("Vítimas:", obitos, "<br>Mês:", data),
+          hoverinfo = "text",
+          width = 1000, height = 400) |> 
+  layout(yaxis = list(exponentformat = "none",
+                      title = "Óbitos"),
+         xaxis = list(title = "Data"),
+         separators = ",.")
+```
+
+:::
+
 ## Correlação
 
+- Correlação não-paramétrica de Spearman;
+- Variação da correlação em relação da resolução temporal.
+
+:::panel-tabset
+
+### Anual
+```{r}
+#| fig-height: 4
+#| fig-align: center
+
+cor_spearman_anual <- df_total |> 
+  drop_na() |> 
+  select(-c(quilometragem_10_bilhoes, mortos_por_pop, ano)) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos_total,
+    PIB = pib,
+    `População` = populacao,
+    Sinistros = qnt_acidentes,
+    `Sinistros fatais` = qnt_acidentes_fatais,
+    Feridos = qnt_feridos,
+    Condutores = condutores,
+    `Mortes PRF` = qnt_mortos
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_anual,
+  lab_col = "white",
+  type = "lower",
+  lab = T,
+  hc.order = T,
+  lab_size = 2.5, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+### Trimestral
+```{r}
+#| fig-height: 4
+#| fig-align: center
+
+cor_spearman_trimestral <- dados_mensais |> 
+  mutate(data = quarter(data, type = "date_last")) |> 
+  summarise(
+    .by = data,
+    veiculos = last(veiculos),
+    automovel = last(automovel),
+    motocicleta = last(motocicleta),
+    mortes = sum(mortes),
+    pib = sum(pib),
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes_prf)
+  ) |> 
+  select(-data) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos,
+    PIB = pib,
+    Sinistros = acidentes,
+    `Sinistros fatais` = acidentes_fatais,
+    Feridos = feridos,
+    `Mortes PRF` = mortes_prf
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_trimestral,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 2.5, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+### Mensal
+```{r}
+#| fig-height: 4
+#| fig-align: center
+
+cor_spearman_mensal <- dados_mensais |> 
+  select(-data) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos,
+    PIB = pib,
+    Sinistros = acidentes,
+    `Sinistros fatais` = acidentes_fatais,
+    Feridos = feridos,
+    `Mortes PRF` = mortes_prf
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_mensal,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 2.5, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+:::
+
 ## Resultados dos modelos
+
+
 
 ## Comparação entre modelos
 
