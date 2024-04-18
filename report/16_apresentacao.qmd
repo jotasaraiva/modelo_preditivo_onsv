@@ -65,7 +65,7 @@ load(here("data","tabela_total_mensal.rda"))
 
     -   Cadeia de Markov [@seneta1996; @jin2020];
 
-    -   Modelos Autoregressivos [@al-ghamdi1995];
+    -   Modelos Autorregressivos [@al-ghamdi1995];
 
     -   Redes Neurais Artificiais [@jafari2015].
 
@@ -130,7 +130,7 @@ data.frame(
 
 ## Modelos
 
--   Disponibilidade de dados é um grande obstáculo na confecção de modelos mais complexos e custosos;
+-   Indisponibilidade de dados é um grande obstáculo na confecção de modelos mais complexos e custosos;
 
 -   Diferentes abordagens são testadas a fim de encontrar a metodologia ideal para modelagem da fatalidade dos sinistros.
 
@@ -263,14 +263,12 @@ rtdeaths |>
 ## Correlação
 
 ::: columns
-
 ::: {.column width="30%"}
 -   Correlação não-paramétrica de Spearman (oposta à Pearson);
 -   Variação da correlação em relação à resolução temporal.
 :::
 
 ::: {.column width="70%"}
-
 ::: panel-tabset
 ### Anual
 
@@ -393,9 +391,7 @@ ggcorrplot(
 )
 ```
 :::
-
 :::
-
 :::
 
 ```{r}
@@ -452,6 +448,7 @@ pred_list <- list(
 ```
 
 ## Decomposição temporal
+
 ```{r}
 decomposed <- decompose(ts)
 
@@ -471,15 +468,14 @@ decomposed_plot <- bind_cols(Original = as.double(decomposed$x),
 decomposed_plot
 ```
 
-
 ## Resultados dos Modelos - Regressão Linear
 
-- Intervalos de confiança amplos;
-- Ajuste sensível à *outliers*.
+-   Intervalos de confiança amplos;
+-   Ajuste sensível à *outliers*.
 
 ::: panel-tabset
-
 ### Anual
+
 ```{r}
 plot_pred_anual <- pred_anual_2023 |> 
   select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
@@ -510,6 +506,7 @@ ggplotly(plot_pred_anual, tooltip = "text", width = 1000, height = 400)
 ```
 
 ### Trimestral
+
 ```{r}
 plot_pred_tri <- pred_trimestre_2023 |> 
   select(data, trimestre, mortes, .pred_lower, .pred_upper, .pred) |> 
@@ -536,6 +533,7 @@ ggplotly(plot_pred_tri, tooltip = "text", width = 1000, height = 400)
 ```
 
 ### Mensal
+
 ```{r}
 plot_pred_mensal <- pred_mensal_2023 |> 
   filter(year(data) > 2010) |> 
@@ -557,6 +555,7 @@ ggplotly(plot_pred_mensal, tooltip = "text", width = 1000, height = 400)
 ```
 
 ### Coeficientes
+
 ```{r}
 wflow_anual_2023 |> 
   tidy() |> 
@@ -586,12 +585,12 @@ wflow_anual_2023 |>
   tab_options(table.font.size = 20,
               table.width = px(1000))
 ```
-
 :::
 
 ## Resultados dos Modelos - Random Forest
-- Reamostragem reduz a colinearidade e sensibilidade à *outliers*;
-- Algoritmo não produz intervalos de confiança.
+
+-   Reamostragem reduz a colinearidade e sensibilidade à *outliers*;
+-   Algoritmo não produz intervalos de confiança.
 
 ```{r}
 plot_pred_rf <- rf_pred |> 
@@ -609,8 +608,9 @@ ggplotly(plot_pred_rf, tooltip = "text", width = 1000, height = 400)
 ```
 
 ## Resultados dos Modelos - SARIMA
-- Alta sazonalidade;
-- Amplo intervalo de confiança.
+
+-   Alta sazonalidade;
+-   Amplo intervalo de confiança.
 
 ```{r}
 plot_pred_sarima <- sarima_pred |> 
@@ -632,8 +632,9 @@ ggplotly(plot_pred_sarima, tooltip = "text", width = 1000, height = 400)
 ```
 
 ## Resultados dos Modelos - Exponential Smoothing
-- Ajuste mais ruidoso;
-- Problemas similares ao SARIMA.
+
+-   Ajuste mais ruidoso;
+-   Problemas similares ao SARIMA.
 
 ```{r}
 plot_pre_ets <- ets_pred |> 
@@ -708,8 +709,8 @@ rbind(
 ## Comparação entre Modelos - Previsões para 2023
 
 ::: panel-tabset
-
 ### Gráficos
+
 ```{r}
 dodge <- position_dodge(1)
 
@@ -757,6 +758,7 @@ ggplotly(
 ```
 
 ### Tabela
+
 ```{r}
 pred_list |>
   reduce(left_join, by = "ano") |>
@@ -807,18 +809,17 @@ pred_list |>
   tab_options(table.font.size = 26,
               table.width = px(1000))
 ```
-
 :::
 
 # Conclusão
 
-- Modelos determinísticos aparentam ser mais adequados para previsão;
-- Óbitos em sinistros são dificilmente modelados utilizando métodos de média móvel;
-- Muitas variáveis consideradas são extremamente colineares;
-- Modelos determinísticos prevêem aumento nos óbitos em 2023;
-- Possíveis avanços:
-  - Outros métodos de regressão (Support Vector, Bayesiano, MLP, RNN);
-  - Utilizar indicadores em lugar de variáveis brutas;
-  - Redução da colinearidade (reduzir preditoras, PCA).
+1.  Modelos determinísticos aparentam ser mais adequados para previsão;
+2.  Óbitos em sinistros são dificilmente modelados utilizando métodos de média móvel;
+3.  Muitas variáveis consideradas são extremamente colineares;
+4.  Modelos determinísticos prevêem aumento nos óbitos em 2023;
+5.  Possíveis avanços:
+    1.  Outros métodos de regressão (Ridge, Support Vector, MLP, RNN);
+    2.  Utilizar indicadores em lugar de variáveis brutas;
+    3.  Redução da colinearidade (reduzir preditoras, PCA).
 
 ## Referências
