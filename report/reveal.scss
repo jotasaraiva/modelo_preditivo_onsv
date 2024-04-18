@@ -1,0 +1,23 @@
+/*-- scss:defaults --*/
+
+$font-family-sans-serif: "Bahnschrift", sans-serif;
+$presentation-heading-font: "Franklin Gothic", sans-serif;
+$presentation-h1-font-size: 2.5em;
+$presentation-font-size-root: 30px;
+
+$presentation-heading-color: #383d3d !default;
+$presentation-heading-color: #00496d;
+$body-bg: #fff !default;
+$body-color: #383d3d !default;
+$link-color: #00496d;
+
+/*-- scss:rules --*/
+
+.reveal .slide-logo {
+  display: block;
+  position: fixed;
+  bottom: unset !important;
+  height: 5vh !important;
+  max-width: unset !important;
+  max-height: unset !important;
+}

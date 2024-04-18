@@ -1,0 +1,825 @@
+---
+title: "Modelo Preditivo de Óbitos no Trânsito Brasileiro"
+subtitle: "Modelagem orientada a dados relacionados à segurança viária para o reconhecimento de padrões e previsão de óbitos no trânsito"
+lang: pt-br
+format: 
+  revealjs: 
+    theme: [default, reveal.scss]
+    logo: "onsv_icone.png"
+    transition: fade
+author: 
+  - name: João Pedro Melani Saraiva
+    affiliations:
+      - ref: obs 
+  - name: Pedro Augusto Borges dos Santos
+    affiliations:
+      - ref: obs
+affiliations: 
+  - id: obs
+    number: 1
+    name: Observatório Nacional de Segurança Viária
+bibliography: references.bib
+csl: associacao-brasileira-de-normas-tecnicas.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introdução
+
+```{r}
+#| include: false
+
+library(tidyverse)
+library(onsvplot)
+library(roadtrafficdeaths)
+library(plotly)
+library(here)
+library(ggcorrplot)
+library(gt)
+
+theme_set(theme_onsv())
+
+load(here("data","tabela_total.rda"))
+load(here("data","tabela_total_mensal.rda"))
+```
+
+## Motivação
+
+-   Presente cenário da segurança viária mundial e brasileira [@worldhealthorganization2023];
+
+-   Diversos países com demanda por modelos estatísticos preditivos [@rodríguez2020];
+
+-   Defasagem nas fontes de dados: Sistema de Mortalidade - DataSUS;
+
+-   Ocorrência de vítimas fatais no trânsito se relaciona com diversos atributos estruturais, socioeconômicos e ambientais [@zhong-xiang2014].
+
+## Referenciais Teóricos
+
+<!-- -   Brasil falhou na *Primeira Década de Ação pela Segurança no Trânsito*, como previsto em @blumenberg2018; -->
+
+-   Desenvolvimento do PNATRANS;
+
+-   Modelos Preditivos na Literatura:
+
+    -   Modelos Lineares Multivariados [@blumenberg2018; @cai2015];
+
+    -   Cadeia de Markov [@seneta1996; @jin2020];
+
+    -   Modelos Autorregressivos [@al-ghamdi1995];
+
+    -   Redes Neurais Artificiais [@jafari2015].
+
+## Objetivo
+
+-   Desenvolver um modelo capaz de prever óbitos em sinistros de trânsito;
+
+-   Explicar a influência e importância das variáveis;
+
+-   Avaliar desempenho de diferentes abordagens (Determinística e Temporal);
+
+-   Avaliar o desempenho de diferentes modelos e escalas temporais.
+
+# Metodologia
+
+## Coleta de dados
+
+-   Dados coletados de diversas fontes, com diferentes escalas de tempo;
+
+-   Diferentes modelos são ajustados de acordo com a disponibiliade de dados:
+
+::: panel-tabset
+### Escala de tempo
+
+```{r}
+data.frame(
+  Categoria = c("PIB", "População", "Sinistros em rodovias federais", "Condutores Habilitados", "Frota veicular", "Óbitos em sinistros de trânsito"),
+  Anual = c(T, T, T, T, T, T),
+  Trimestral = c(T, F, T, F, T, T),
+  Mensal = c(T, F, T, F, T, T)
+) |> 
+  gt(rowname_col = "Categoria") |> 
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  sub_values(values = T, replacement = "\u2713") |> 
+  sub_values(values = F, replacement = "\u2717") |> 
+  tab_options(table.font.size = 24) |> 
+  tab_stubhead("Variáveis") |> 
+  tab_spanner(label = "Resolução Temporal", columns = ends_with("l")) |> 
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_stubhead()) |> 
+  tab_style(
+    style = "vertical-align:middle",
+    locations = cells_stubhead()
+  )
+```
+
+### Fontes de dados
+
+-   **PIB**: @bancocentraldobrasil2023;
+-   **População**: @ministériodasaúde2023b;
+-   **Sinistros em rodovias federais**: @políciarodoviáriafederal2023;
+-   **Condutores habilitados**: @ministériodostransporte2023;
+-   **Frota veicular**: @ministériodostransportes2023;
+-   **Óbitos em sinistros de trânsito**: @ministériodasaúde2023a, coletado utilizando pacote `microdatasus` [@microdatasus] da linguagem de programação estatística *R*.
+:::
+
+## Modelos
+
+-   Indisponibilidade de dados é um grande obstáculo na confecção de modelos mais complexos e custosos;
+
+-   Diferentes abordagens são testadas a fim de encontrar a metodologia ideal para modelagem da fatalidade dos sinistros.
+
+```{r}
+data.frame(
+  modelo = c(
+    "Regressão Linear",
+    "Random Forest",
+    "SARIMA",
+    "Suavização Exponencial"
+  ),
+  anual = c(T, F, F, F),
+  trimestral = c(T, F, F, F),
+  mensal = c(T, T, T, T)
+) |>
+  mutate(tipo = case_when(
+    modelo %in% c("Regressão Linear", "Random Forest") ~ "Determinístico",
+    modelo %in% c("SARIMA", "Suavização Exponencial") ~ "Série Temporal"
+  ), .before = 1) |>
+  rename_with(str_to_title) |>
+  gt(rowname_col = "Modelo", groupname_col = "Tipo") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |>
+  sub_values(values = T, replacement = "\u2713") |>
+  sub_values(values = F, replacement = "\u2717") |>
+  tab_options(table.font.size = 26) |>
+  tab_stubhead("Modelos") |>
+  tab_spanner(label = "Resolução Temporal", columns = ends_with("l")) |>
+  tab_style(style = cell_text(align = "center"),
+            locations = cells_stubhead()) |>
+  tab_style(style = "vertical-align:middle",
+            locations = cells_stubhead()) |> 
+  tab_style(style = cell_fill(color = "grey90"),
+            locations = cells_group())
+```
+
+## Análise de Série Temporal x Análise Determinística
+
+-   Duas abordagens estatísticas utilizadas no estudo.
+
+-   **Análise de Série Temporal**:
+
+    -   Conjunto de dados em uma sequência cronológica;
+    -   Sazonalidade e tendência;
+    -   Autocorrelação e autorregressão;
+    -   Média móvel.
+
+-   **Análise Determinística**:
+
+    -   Algoritmos de Regressão;
+    -   Multivariados;
+    -   Independem da sequência cronológica dos eventos.
+
+# Resultados e Discussão
+
+## Análise Exploratória de Dados
+
+-   Efetuada para todas as variáveis contempladas;
+-   Dados históricos de óbitos no trânsito (variável preditada):
+
+::: panel-tabset
+### Anual
+
+```{r}
+rtdeaths |> 
+  summarise(.by = ano_ocorrencia, obitos = n()) |> 
+  drop_na() |> 
+  plot_ly(x = ~ano_ocorrencia, y = ~obitos, 
+          type = "scatter", 
+          mode = "lines",
+          line = list(color = onsv_palette$blue),
+          text = ~paste("Vítimas:", obitos, "<br>Ano:", ano_ocorrencia),
+          hoverinfo = "text",
+          width = 1000, height = 400) |> 
+  layout(yaxis = list(exponentformat = "none",
+                      title = "Óbitos"),
+         xaxis = list(title = "Data"),
+         separators = ",.")
+```
+
+### Trimestral
+
+```{r}
+rtdeaths |> 
+  arrange(data_ocorrencia) |> 
+  mutate(trimestre = quarter(data_ocorrencia, type = "date_last"), 
+         .before = 1) |> 
+  summarise(.by = trimestre, obitos = n()) |> 
+  drop_na() |> 
+  plot_ly(x = ~trimestre, y = ~obitos,
+          type = "scatter",
+          mode = "lines",
+          line = list(color = onsv_palette$blue),
+          text = ~paste("Vítimas:", obitos, "<br>Trimestre:", trimestre),
+          hoverinfo = "text",
+          width = 1000, height = 400) |> 
+  layout(yaxis = list(exponentformat = "none",
+                      title = "Óbitos"),
+         xaxis = list(title = "Data"),
+         separators = ",.")
+```
+
+### Mensal
+
+```{r}
+rtdeaths |> 
+  arrange(data_ocorrencia) |> 
+  mutate(data = ym(paste0(ano_ocorrencia,"-",month(data_ocorrencia))),
+         .before = 1) |> 
+  summarise(.by = data, obitos = n()) |> 
+  drop_na() |>
+  plot_ly(x = ~data, y = ~obitos,
+          type = "scatter",
+          mode = "lines",
+          line = list(color = onsv_palette$blue),
+          text = ~paste("Vítimas:", obitos, "<br>Mês:", data),
+          hoverinfo = "text",
+          width = 1000, height = 400) |> 
+  layout(yaxis = list(exponentformat = "none",
+                      title = "Óbitos"),
+         xaxis = list(title = "Data"),
+         separators = ",.")
+```
+:::
+
+## Correlação
+
+::: columns
+::: {.column width="30%"}
+-   Correlação não-paramétrica de Spearman (oposta à Pearson);
+-   Variação da correlação em relação à resolução temporal.
+:::
+
+::: {.column width="70%"}
+::: panel-tabset
+### Anual
+
+```{r}
+#| fig-height: 7
+#| fig-align: center
+
+cor_spearman_anual <- df_total |> 
+  drop_na() |> 
+  select(-c(quilometragem_10_bilhoes, mortos_por_pop, ano)) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos_total,
+    PIB = pib,
+    `População` = populacao,
+    Sinistros = qnt_acidentes,
+    `Sinistros fatais` = qnt_acidentes_fatais,
+    Feridos = qnt_feridos,
+    Condutores = condutores,
+    `Mortes PRF` = qnt_mortos
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_anual,
+  lab_col = "white",
+  type = "lower",
+  lab = T,
+  hc.order = T,
+  lab_size = 4, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+### Trimestral
+
+```{r}
+#| fig-height: 7
+#| fig-align: center
+
+cor_spearman_trimestral <- dados_mensais |> 
+  mutate(data = quarter(data, type = "date_last")) |> 
+  summarise(
+    .by = data,
+    veiculos = last(veiculos),
+    automovel = last(automovel),
+    motocicleta = last(motocicleta),
+    mortes = sum(mortes),
+    pib = sum(pib),
+    acidentes = sum(acidentes),
+    acidentes_fatais = sum(acidentes_fatais),
+    feridos = sum(feridos),
+    mortes_prf = sum(mortes_prf)
+  ) |> 
+  select(-data) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos,
+    PIB = pib,
+    Sinistros = acidentes,
+    `Sinistros fatais` = acidentes_fatais,
+    Feridos = feridos,
+    `Mortes PRF` = mortes_prf
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_trimestral,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 4, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+
+### Mensal
+
+```{r}
+#| fig-height: 7
+#| fig-align: center
+
+cor_spearman_mensal <- dados_mensais |> 
+  select(-data) |> 
+  rename(
+    `Óbitos` = mortes,
+    Automóveis = automovel,
+    Motocicletas = motocicleta,
+    `Veículos Totais` = veiculos,
+    PIB = pib,
+    Sinistros = acidentes,
+    `Sinistros fatais` = acidentes_fatais,
+    Feridos = feridos,
+    `Mortes PRF` = mortes_prf
+  ) |> 
+  cor(method = "spearman")
+
+ggcorrplot(
+  cor_spearman_mensal,
+  lab_col = "white",
+  type = "lower",
+  lab = TRUE, 
+  hc.order = T,
+  lab_size = 4, 
+  tl.srt = 60,
+  tl.cex = 12, 
+  legend.title = "Correlação",
+  colors = c(onsv_palette$blue, "white", onsv_palette$red)
+)
+```
+:::
+:::
+:::
+
+```{r}
+source(here("R","lin_reg.R"))
+source(here("R","rforest.R"))
+source(here("R","sarima.R"))
+source(here("R","ets.R"))
+
+paleta = as_vector(unname(onsv_palette))
+```
+
+```{r}
+pred_list <- list(
+  rename(
+    pred_anual_2023,
+    pred.anual = .pred,
+    upper.anual = .pred_upper,
+    lower.anual = .pred_lower
+  ),
+  summarise(
+    mutate(pred_trimestre_2023, ano = year(data)),
+    .by = ano,
+    pred.trimestral = sum(.pred),
+    upper.trimestral = sum(.pred_upper),
+    lower.trimestral = sum(.pred_lower)
+  ),
+  summarise(
+    mutate(pred_mensal_2023, ano = year(data)),
+    .by = ano,
+    pred.mensal = sum(.pred),
+    upper.mensal = sum(.pred_upper),
+    lower.mensal = sum(.pred_lower)
+  ),
+  summarise(
+    mutate(rf_pred, ano = year(data)),
+    .by = ano,
+    pred.rf = sum(.pred)
+  ),
+  summarise(
+    mutate(sarima_pred, ano = year(data)),
+    .by = ano,
+    pred.sarima = sum(.pred),
+    upper.sarima = sum(.pred_upper.80.),
+    lower.sarima = sum(.pred_lower.80.)
+  ),
+  summarise(
+    mutate(ets_pred, ano = year(data)),
+    .by = ano,
+    pred.ets = sum(.pred),
+    upper.ets = sum(.pred_upper.80.),
+    lower.ets = sum(.pred_lower.80.)
+  )
+)
+```
+
+## Decomposição temporal
+
+```{r}
+decomposed <- decompose(ts)
+
+decomposed_plot <- bind_cols(Original = as.double(decomposed$x),
+          `Tendência` = decomposed$trend,
+          `Sazonalidade` = decomposed$seasonal,
+          `Residual` = decomposed$random,
+          time = as.numeric(time(decomposed$x))) |> 
+  pivot_longer(-time) |> 
+  ggplot(aes(time, value)) +
+  geom_line(color = onsv_palette$blue) +
+  facet_wrap(vars(name), scales = "free_y") +
+  scale_y_continuous(labels = label_comma(decimal.mark = ",", big.mark = ".")) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(x = NULL, y = NULL)
+
+decomposed_plot
+```
+
+## Resultados dos Modelos - Regressão Linear
+
+-   Intervalos de confiança amplos;
+-   Ajuste sensível à *outliers*.
+
+::: panel-tabset
+### Anual
+
+```{r}
+plot_pred_anual <- pred_anual_2023 |> 
+  select(ano, mortes, .pred, .pred_lower, .pred_upper) |> 
+  pivot_longer(
+    cols = c(.pred, mortes),
+    names_to = "Tipo",
+    values_to = "Mortes"
+  ) |> 
+  mutate(
+    Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")
+  ) |> 
+  filter(ano>2010) |> 
+  ggplot(aes(ano, Mortes, color = Tipo)) +
+    geom_ribbon(
+      aes(ymax = .pred_upper, ymin = .pred_lower),
+      fill = "grey",
+      color = "grey",
+      alpha = 0.25
+    ) +
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size = 0.5) +
+    scale_x_continuous(breaks = seq(2011,2023,1)) +
+    scale_y_continuous(labels = comma_format(big.mark = ".")) +
+    scale_color_manual(values = paleta) + 
+    labs(x = NULL, y = NULL)
+
+ggplotly(plot_pred_anual, tooltip = "text", width = 1000, height = 400)
+```
+
+### Trimestral
+
+```{r}
+plot_pred_tri <- pred_trimestre_2023 |> 
+  select(data, trimestre, mortes, .pred_lower, .pred_upper, .pred) |> 
+  filter(year(data) > 2010) |>  
+  pivot_longer(cols = c(.pred, mortes),
+               names_to = "Tipo",
+               values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes, color = Tipo)) +
+    geom_ribbon(
+      aes(ymax = .pred_upper, ymin = .pred_lower),
+      fill = "grey",
+      color = "grey",
+      alpha = 0.25
+    ) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size = 0.5) +
+    scale_color_manual(values = paleta) + 
+    labs(x = NULL, y = NULL)
+
+ggplotly(plot_pred_tri, tooltip = "text", width = 1000, height = 400)
+```
+
+### Mensal
+
+```{r}
+plot_pred_mensal <- pred_mensal_2023 |> 
+  filter(year(data) > 2010) |> 
+  pivot_longer(cols = c(.pred, mortes),
+               names_to = "Tipo",
+               values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes, color = Tipo)) +
+    geom_ribbon(aes(ymax = .pred_upper, ymin = .pred_lower),
+                fill = "grey", color = "grey", alpha = 0.25) +
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size = 0.5) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    labs(x = NULL, y = NULL) +
+    scale_color_manual(values = paleta)
+
+ggplotly(plot_pred_mensal, tooltip = "text", width = 1000, height = 400)
+```
+
+### Coeficientes
+
+```{r}
+wflow_anual_2023 |> 
+  tidy() |> 
+  mutate(
+    "Variável" = c(
+      "Intercepto Y",
+      "Frota",
+      "Sinistros fatais",
+      "Sinistros",
+      "Condutores"
+    ),
+    .before = 1
+  ) |> 
+  select(1, 3, 6) |> 
+  rename(
+    Coeficientes = estimate,
+    `p-valor` = p.value
+  ) |> 
+  mutate(across(where(is.numeric), round, 2)) |> 
+  gt() |> 
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |> 
+  tab_options(table.font.size = 20,
+              table.width = px(1000))
+```
+:::
+
+## Resultados dos Modelos - Random Forest
+
+-   Reamostragem reduz a colinearidade e sensibilidade à *outliers*;
+-   Algoritmo não produz intervalos de confiança.
+
+```{r}
+plot_pred_rf <- rf_pred |> 
+  pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes, color = Tipo)) +
+    geom_line() +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0))), size=0.5) +
+    scale_color_manual(values = paleta) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years") +
+    labs(x = NULL, y = NULL)
+
+ggplotly(plot_pred_rf, tooltip = "text", width = 1000, height = 400)
+```
+
+## Resultados dos Modelos - SARIMA
+
+-   Alta sazonalidade;
+-   Amplo intervalo de confiança.
+
+```{r}
+plot_pred_sarima <- sarima_pred |> 
+  filter(year(data) > 2010) |> 
+  pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", 
+                        "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes)) +
+    geom_ribbon(aes(ymin = .pred_lower.80., ymax = .pred_upper.80.), fill = "grey80", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .pred_lower.95., ymax = .pred_upper.95.), fill = "grey90", alpha = 0.5) +
+    geom_line(aes(color = Tipo)) + 
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0)), color = Tipo), size = 0.5) +
+    scale_color_manual(values = paleta) +
+    labs(x = NULL, y = NULL) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years")
+
+ggplotly(plot_pred_sarima, tooltip = "text", width = 1000, height = 400)
+```
+
+## Resultados dos Modelos - Exponential Smoothing
+
+-   Ajuste mais ruidoso;
+-   Problemas similares ao SARIMA.
+
+```{r}
+plot_pre_ets <- ets_pred |> 
+  filter(year(data) > 2010) |> 
+  pivot_longer(c(.pred, mortes), names_to = "Tipo", values_to = "Mortes") |> 
+  mutate(Tipo = if_else(Tipo == "mortes", 
+                        "Óbitos reais", "Óbitos previstos")) |> 
+  ggplot(aes(data, Mortes)) +
+    geom_ribbon(aes(ymin = .pred_lower.80., ymax = .pred_upper.80.), fill = "grey80", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .pred_lower.95., ymax = .pred_upper.95.), fill = "grey90", alpha = 0.5) +
+    geom_line(aes(color = Tipo)) +
+    geom_point(aes(text = paste0(Tipo,": ", round(Mortes, 0)), color = Tipo), size = 0.5) +
+    scale_color_manual(values = paleta) +
+    labs(x = NULL, y = NULL) +
+    scale_y_continuous(labels = comma_format(big.mark = ".", decimal.mark = ",")) +
+    scale_x_date(date_breaks = "2 years")
+
+ggplotly(plot_pre_ets, tooltip = "text", width = 1000, height = 400)
+```
+
+## Comparação entre Modelos - Métricas de Erros
+
+::: columns
+::: {.column width="50%"}
+Métricas utilizadas:
+
+-   RMSE (*Root Mean Squared Error*);
+-   MAE (*Mean Absolute Error*);
+-   R^2^ (coeficiente de determinação).
+:::
+
+::: {.column width="50%"}
+```{r}
+rbind(
+  mutate(metricas_anual, modelo = "Regressão Linear", resol = "Anual"),
+  mutate(metricas_trimestre, modelo = "Regressão Linear", resol = "Trimestral"),
+  mutate(metricas_mensal, modelo = "Regressão Linear", resol = "Mensal"),
+  mutate(metricas_rf, modelo = "Random Forest Regressor", resol = "Mensal"),
+  mutate(metricas_ets, modelo = "Exponential Smoothing", resol = "Mensal"),
+  mutate(metricas_sarima, modelo = "SARIMA", resol = "Mensal")
+) |>
+  select(-.estimator) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  rename_with(toupper, rmse:rsq) |>
+  group_by(resol) |>
+  gt(rowname_col = "modelo") |>
+  tab_stubhead("Modelos") |>
+  tab_spanner("Métricas", columns = everything()) |>
+  fmt_number(decimals = 2,
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |>
+  tab_style(style = cell_fill(color = "grey90"),
+            locations = cells_group()) |>
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_stubhead()) |>
+  tab_style(
+    style = "vertical-align:middle",
+    locations = cells_stubhead()
+  ) |>
+  tab_options(table.font.size = 20)
+```
+:::
+:::
+
+## Comparação entre Modelos - Previsões para 2023
+
+::: panel-tabset
+### Gráficos
+
+```{r}
+dodge <- position_dodge(1)
+
+plot_comparison <- pred_list |>
+  reduce(left_join, by = "ano") |>
+  select(c(ano, mortes, starts_with("pred"))) |>
+  pivot_longer(starts_with("pred"),
+               names_to = "tipo",
+               values_to = "pred") |>
+  mutate(
+    tipo = case_match(
+      tipo,
+      "pred.anual" ~ "Linear Anual",
+      "pred.trimestral" ~ "Linear Trimestral",
+      "pred.mensal" ~ "Linear Mensal",
+      "pred.rf" ~ "RF Mensal",
+      "pred.sarima" ~ "SARIMA Mensal",
+      "pred.ets" ~ "ETS Mensal"
+    )
+  ) |>
+  ggplot(aes(ano, mortes)) +
+  geom_line(aes(y = pred, color = "Óbitos previstos")) +
+  geom_point(aes(
+    y = pred,
+    color = "Óbitos previstos",
+    text = paste("Previstos:", round(pred))
+  )) +
+  geom_line(aes(color = "Óbitos reais")) +
+  geom_point(aes(color = "Óbitos reais",
+                 text = paste("Óbitos:", mortes))) +
+  scale_color_manual(values = c(onsv_palette$blue, onsv_palette$yellow)) +
+  scale_x_continuous(breaks = seq(2011, 2023, 1), limits = c(2011, NA)) +
+  scale_y_continuous(labels = label_comma(decimal.mark = ",", big.mark = ".")) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(tipo ~ .) +
+  labs(x = NULL, y = NULL)
+
+ggplotly(
+  plot_comparison,
+  tooltip = "text",
+  height = 500,
+  width = 1000
+) |>
+  layout(legend = list(title = list(text = "")))
+```
+
+### Tabela
+
+```{r}
+pred_list |>
+  reduce(left_join, by = "ano") |>
+  select(c(ano, starts_with(c(
+    "pred", "upper", "lower"
+  )))) |>
+  last() |>
+  pivot_longer(-ano) |>
+  mutate(modelo = str_remove(str_extract(name, "\\..*"), "\\."),
+         tipo = str_remove(str_extract(name, "^(.*?)\\."), "\\.")) |>
+  select(-c(ano, name)) |>
+  pivot_wider(values_from = value, names_from = tipo) |>
+  mutate(
+    modelo = case_match(
+      modelo,
+      "anual" ~ "Linear Anual",
+      "trimestral" ~ "Linear Trimestral",
+      "mensal" ~ "Linear Mensal",
+      "rf" ~ "RF Mensal",
+      "sarima" ~ "SARIMA Mensal",
+      "ets" ~ "ETS Mensal"
+    )
+  ) |>
+  gt() |>
+  cols_label(
+    modelo = "Modelo",
+    pred = "Previsão",
+    upper = "Máx.",
+    lower = "Mín."
+  ) |>
+  fmt_number(decimals = 0,
+             sep_mark = ".",
+             dec_mark = ",") |>
+  tab_options(
+    column_labels.background.color = onsv_palette$blue,
+    column_labels.font.weight = "bold"
+  ) |>
+  tab_style(style = cell_text(color = onsv_palette$blue),
+            locations = cells_title()) |>
+  sub_missing(missing_text = "-") |>
+  tab_footnote(
+    footnote = "Algoritmo não produz intervalo de confiança",
+    locations = cells_body(columns = modelo,
+                           rows = modelo == "RF Mensal"),
+    placement = "left"
+  ) |>
+  opt_footnote_marks("standard") |>
+  tab_options(table.font.size = 26,
+              table.width = px(1000))
+```
+:::
+
+# Conclusão
+
+1.  Modelos determinísticos aparentam ser mais adequados para previsão;
+2.  Óbitos em sinistros são dificilmente modelados utilizando métodos de média móvel;
+3.  Muitas variáveis consideradas são extremamente colineares;
+4.  Modelos determinísticos prevêem aumento nos óbitos em 2023;
+5.  Possíveis avanços:
+    1.  Outros métodos de regressão (Ridge, Support Vector, MLP, RNN);
+    2.  Utilizar indicadores em lugar de variáveis brutas;
+    3.  Redução da colinearidade (reduzir preditoras, PCA).
+
+## Referências
