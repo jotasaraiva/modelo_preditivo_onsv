@@ -840,20 +840,34 @@ custo_rs <- scales::dollar(
   decimal.mark = ","
 )
 
-custo_rs
-
 format_billion <- function (x) { paste("R$", format(round(x / 1e9, 1), decimal.mark = "."), "Bi") }
+
+pred_2023_fmt <-
+  format(pred_2023, big.mark = ".", decimal.mark = ",")
+
+custos_mortes_fmt <-
+  label_currency(
+    x = custos_mortes,
+    prefix = "R$ ",
+    decimal.mark = ",",
+    big.mark = ".",
+    accuracy = 0.01
+  )
 ```
 
-- O custo financeiro dos `r format(pred_2023, big.mark = ".", decimal.mark = ",")` óbitos previstos pelo modelo anual linear para 2023 foi estimado com base nos custos médios elaborados pelo Instituto de Pesquisa Econômica Aplicada (IPEA) em @carvalhoCustosAcidentesTransito2020a;
-
-- O estudo do IPEA aborda custos sobre sinistros em aglomerados urbanos, rodovias estaduais e municipais, e rodovias federais. Foram utilizados os valores para rodovias federais, pois são os únicos que consideram os custos associados às pessoas;
+- O custo financeiro dos `r pred_2023_fmt` óbitos previstos pelo modelo anual linear para 2023 foi estimado com base nos custos médios elaborados pelo Instituto de Pesquisa Econômica Aplicada (IPEA) em @carvalhoCustosAcidentesTransito2020a;
 
 - O cálculo é corrigido monetariamente utilizando o Índice Nacional de Preços ao Consumidor Amplo (IPCA) acumulado de Dez/2014 à Dez/2023 (fator de 68,14%), por meio de:
+
 $$
-    Custo_{2023} = Óbitos_{2023} \times Custo_{2014} \times (1 + IPCA)
+\begin{aligned}
+  Custo_{2023} &= Óbitos_{2023} \times Custo_{2014} \times (1 + IPCA) \\ 
+               &= `r pred_2023_fmt` \times `r custos_mortes_fmt()` \times (1 + `r ipca-1`) \\ 
+               &= `r custo_rs`
+\end{aligned}
 $$
-- Têm-se um **custo por óbito** de `r custo_individual` e um **custo total** de `r custo_rs`; ou aproximadamente `r format_billion(custo_2023)` dos óbitos em 2023.
+
+- Têm-se um **custo por óbito** de `r custo_individual` e um **custo total em 2023** de `r custo_rs`, ou seja, aproximadamente `r format_billion(custo_2023)`.
 
 # Conclusão
 
