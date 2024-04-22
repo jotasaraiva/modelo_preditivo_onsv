@@ -51,6 +51,7 @@ library(arrow)
 # opções de display
 theme_set(theme_onsv())
 set.seed(123)
+options(scipen = 999999)
 
 # load dos dados
 load(here("data","tabela_total.rda"))
@@ -94,11 +95,17 @@ Em relação à Resolução Contran N° 870, de 13 de setembro de 2021 [@conselh
 
 A busca pela fundamentação técnica para a proposição de políticas públicas a respeito da mobilidade segura fomenta o estudo de diversas categorias de modelos preditivos para a sinistralidade no trânsito, tanto para estimar o número de ocorrências quanto para avaliar a influência das variáveis consideradas sobre a ocorrência de sinistros fatais. Em geral, a literatura pertinente apresenta alguns meios distintos para alcançar estes modelos de melhor ajuste: Modelos lineares multivariados foram ajustados para extrair tendências sobre os critérios aferidos [@blumenberg2018; @cai2015], assim como modelos preditivos baseados em cadeia de Markov [@seneta1996; @jin2020]. Outras abordagens utilizam técnicas de análise de séries temporais, utilizando métodos autoregressivos como o ARIMA - Modelo Auto-Regressivo Integrado de Médias Móveis [@al-ghamdi1995] e redes neurais artificiais [@jafari2015].
 
-## Objetivos
+O presente documento está organizado com a seguinte estrutura: a @sec-obj inclui os objetivos principais e complementares do trabalho; a @sec-method apresenta a metodologia aplicada no trabalho, juntamente com a coleta de dados e explicação sobre os modelos aplicados; a @sec-resultados traz os resultados dos modelos preditivos aplicados, a @sec-custos apresenta a estimativa de custo dos óbitos e por fim, a @sec-conclusao conclui o trabalho.
 
-Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto ainda visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado para a incidência destes eventos. O código-fonte do trabalho todo está abertamente disponibilizado para acesso como repositório no [perfil do GitHub](https://github.com/ONSV) do Observatório Nacional de Segurança Viária.
+## Objetivos {#sec-obj}
 
-## Metodologia
+Considerando o presente cenário, este estudo tem como objetivo elaborar um modelo de aprendizado de máquina para a previsão de mortes no trânsito em âmbito nacional no Brasil, investigando dados socioeconômicos e estruturais com o propósito de explorar diversos tipos de tratamentos e análises estatísticas para criar perspectivas futuras a cerca do cenário brasileiro da segurança viária. Posto isso, o projeto ainda visa avaliar a qualidade de cada tipo de modelo experimentado em expressar o fenômeno dos óbitos no trânsito, assim como elucidar a influência e relevância de cada variável considerada na construção do modelo preditivo criado para a incidência destes eventos.
+
+Outro objetivo do trabalho é realizar o cálculo do custo financeiro dos óbitos no trânsito brasileiro, utilizando como base o valor previsto pelo modelo para 2023 e com base nas estimativas do Instituto de Pesquisa Econômica Aplicada (IPEA). 
+
+O código-fonte do trabalho está disponibilizado para acesso em um repositório no [perfil do GitHub](https://github.com/ONSV/modelo_preditivo_onsv){target="_blank"} do Observatório Nacional de Segurança Viária.
+
+## Metodologia {#sec-method}
 
 ### Coleta de dados
 
@@ -197,7 +204,7 @@ flowchart TD
     2 --> f2[Nó final]
 ```
 
-O *Bagged Trees* é uma evolução da árvore de decisões convencional, onde diversas árvores são construídas simultaneamente com diversos conjuntos de reamostragem aleatória ajustados paralelamente (técnica de *bagging*), sendo a média do resultado de todas as árvores o resultado final da predição. O *Random Forest* é um algoritmo que vai além do *Bagged Trees*: além da criação de múltiplas árvores simultaneamente, ele também reamostra aleatoriamente as variáveis preditivas, selecionando conjuntos diferentes de variáveis para cada árvore. Isto serve para *descorrelacionar* estes atributos, já que altas correlações entre preditivas podem enviesar o modelo final, mostrando que o Random Forest é um algoritmo que pratica seleção de atributos internamente.
+O *Bagged Trees* é uma evolução da árvore de decisões convencional, onde diversas árvores são construídas simultaneamente com diversos conjuntos de reamostragem aleatória ajustados paralelamente (técnica de *bagging*), sendo a média do resultado de todas as árvores o resultado final da predição. O *Random Forest* é um algoritmo que vai além do *Bagged Trees*: além da criação de múltiplas árvores simultaneamente, ele também faz aleatoriamente a reamostragem das variáveis preditivas, selecionando conjuntos diferentes de variáveis para cada árvore. Isto serve para *descorrelacionar* estes atributos, já que altas correlações entre preditivas podem enviesar o modelo final, mostrando que o Random Forest é um algoritmo que pratica seleção de atributos internamente.
 
 Diversas técnicas de aprendizado de máquina requerem valores pré-estabelecidos de hiperparâmetros para o treinamento. Neste caso, este tipo de modelo requer valores iniciais para o número de árvores que se deseja treinar (parâmetro `trees`) e o número de atributos que se deseja reamostrar para cada árvore (parâmetros `mtry`). Estes valores foram arbitrariamente escolhidos como 5000 e 5 respectivamente neste estudo, mas outra possível abordagem seria a otimização de hiperparâmetros, utilizando técnicas como *grid search*.
 
@@ -207,7 +214,7 @@ A autoregressão é simplesmente uma variação da regressão linear que utiliza
 
 O último método utilizado foi a Suavização Exponencial de Holt-Winters, ou Suavização Exponencial Tripla. Este método é basicamente uma aplicação de filtragem de sinais, visando aproximar uma função matemática generalista sobre uma série ruidosa para melhor interpretar seu comportamento. Este *alisamento* da série resulta em um modelo simples, mas que pode ser tão eficaz em prever novas observações quanto um modelo ARMA, dependendo da sazonalidade do conjunto de dados.
 
-## Resultados
+## Resultados {#sec-resultados}
 
 ### Análise Exploratória de Dados
 
@@ -1959,12 +1966,87 @@ ggplotly(plot_taxa_frota, tooltip = "text") |>
 ```
 :::
 
-## Conclusão
+## Custos dos óbitos {#sec-custos}
+
+A presente seção inclui o processo e resultado da estimativa de custos para a quantidade de óbitos prevista para 2023, conforme o modelo linear anual previamente ajustado (34.631 óbitos). Fez-se a estimativa dos custos financeiros com base na estimativa dos custos de sinistros do Brasil elaborada pelo Instituto de Pesquisa Econômica Aplicada (IPEA).
+
+<!-- ### Estimativa dos custos em 2023 {#sec-custos-ipea} -->
+
+<!-- O IPEA estima o custo das vítimas fatais (fator humano) para 2014: R$ 433.286,69 -->
+
+<!-- IPCA entre 12/2014 e 12/2023: 68,14% -->
+
+Em 2020, o IPEA divulgou o relatório "CUSTOS DOS ACIDENTES DE TRÂNSITO NO BRASIL: ESTIMATIVA SIMPLIFICADA COM BASE NA ATUALIZAÇÃO DAS PESQUISAS DO IPEA SOBRE CUSTOS DE ACIDENTES NOS AGLOMERADOS URBANOS E RODOVIAS" [@carvalhoCustosAcidentesTransito2020a], cujo principal objetivo foi apresentar o resultado das atualizações das pesquisas de custos dos acidentes de trânsito no Brasil.
+
+No trabalho realizado pelo IPEA, a estimativa dos custos dos sinistros é realizada de forma distinta para rodovias federais, rodovias estaduais ou municipais, e aglomerados urbanos. A estimativa para os sinistros ocorridos em rodovias federais é baseada em três componentes: (i) componentes de custos associados às pessoas; (ii) componentes de custos associados aos veículos; e (iii) componentes de custos institucionais e danos patrimoniais [@carvalhoCustosAcidentesTransito2020a]. 
+
+Para o fim de estimar o custo dos óbitos no trânsito brasileiro em 2023, será utilizado o custo associado às pessoas, na categoria "Mortos". Mesmo que essa seja uma estimativa para rodovias federais, ela será utilizada no calculo dos custos dos óbitos de uma forma geral para a quantidade de óbitos no Brasil em 2023, pois as outras categorias (rodovias estaduais / municipais e aglomerados urbanos) não possuem essa estimativa de componente associado às pessoas. Assim, será possível alcançar uma estimativa aproximada deste custo total.
+
+```{r}
+#| include: false
+
+pred_2023 <- round(
+  pred_anual_2023$.pred[pred_anual_2023$ano == 2023], digits = 0
+)
+ipca <- 1.6814
+custos_mortes <- 433286.69
+
+custo_individual <- scales::dollar(
+  ipca * custos_mortes,
+  prefix = "R$ ",
+  accuracy = 0.01, 
+  big.mark = ".", 
+  decimal.mark = ","
+)
+
+custo_2023 <- pred_2023 * ipca * custos_mortes
+
+custo_rs <- scales::dollar(
+  custo_2023, 
+  prefix = "R$ ",
+  accuracy = 0.01, 
+  big.mark = ".", 
+  decimal.mark = ","
+)
+
+custo_rs
+```
+
+
+Os componentes de custos associados às pessoas que foram à óbito por consequência de sinistros de trânsito englobam os custos pré-hospitalares, custos hospitalares, custos de perda de perda de produção e custos de remoção. O IPEA estimou um custo total associado à cada vítima fatal de sinistros de R$ 433.286,69, considerando um valor em reais de dezembro de 2014 [@carvalhoCustosAcidentesTransito2020a]. Com o objetivo desse atualizar esse valor para dezembro de 2023, utilizou-se o Índice Nacional de Preços ao Consumidor Amplo (IPCA). De acordo com a Calculadora do Cidadão, disponibilizada pelo @bancocentraldobrasilCalculadoraCidadao2022, o IPCA acumulado entre dez/2014 e dez/2023 é de 68,14%. Assim, para alcançar o custo por vítima fatal em 2023, multiplica-se a taxa de `r scales::number(ipca, decimal.mark = ",", accuracy = 0.0001)` pelo custo de 2014, alcançando um **custo por óbito de `r custo_individual`**.
+
+Por fim, multiplicando o custo individual das mortes em 2023 pela quantidade estimada de óbitos de `r scales::number(pred_2023, big.mark = ".", decimal.mark = ",")`, tem-se que o custo total dos óbitos previstos no trânsito em 2023 é de `r custo_rs`, ou aproximadamente **R$ 25,2 bilhões**.
+
+<!--- ### Impacto no sistema de atendimento de saúde {#sec-internacoes} -->
+
+<!-- MORBIDADE HOSPITALAR DO SUS POR CAUSAS EXTERNAS -->
+
+<!-- Quantidade de internações como consequência de sinistros de trânsito em 2023 (por ano de atendimento): 229.529 -->
+
+<!-- Quantidade de dias de permanencia na internação como consequência de sinistros de trânsito em 2023 (por ano de processamento): 1.256.095 -->
+
+```{r}
+#| include: false
+
+leitos_path <- here("data", "leitos_2023.csv")
+leitos <- read_csv2(leitos_path)
+media_leitos <- leitos$Quantidade_existente |>
+  mean() |>
+  round(digits = 0)
+
+qnt_internacoes <- 229529
+qnt_dias_internados <- 1256095
+taxa_leitos_ano <- media_leitos * 365
+```
+
+## Conclusão {#sec-conclusao}
 
 Os modelos regressivos desenvolvidos antecipam uma tendência ao aumento relativo nas vítimas de sinistros de trânsito em 2023, uma revelação preocupante à presente situação da segurança viária no Brasil. Em contrapartida, os modelos de séries temporais antecipam uma possível diminuição, provavelmente devido a sensibilidade desses tipos de técnicas à sazonalidade. Por isso, a análise de regressão permanece como a abordagem mais interessante no contexto do fenômeno estudado, tanto pela qualidade da previsão quanto pela capacidade explicativa deste tipo de metodologia.
 
 Com base no modelo de regressão linear anual, que apresentou o melhor R-quadrado ($R^2 = 0,98$), a quantidade prevista de óbitos no trânsito brasileiro é de 34.631, representando um aumento de 737 vítimas fatais em comparação com a quantidade de 2022, que foi de 33.894. Traduzindo esses valores em taxas de óbitos por 100 mil habitantes, o valor previsto para 2023 é de 17,05 óbitos por 100 mil habitantes, um aumento em comparação com a taxa observada em 2022, que foi 16,69 óbitos por 100 mil habitantes. Considernado o modelo de regressão linear trimestral ($R^2 = 0,91$), a quantidade trimestral de óbitos previstos para o primeiro trimestre de 2023 é de 8.271, um aumento de 5% em relação com o valor observado no primeiro trimestre de 2022: 7.862 óbitos.
 
+Com a estimativa dos custos dos óbitos realizada, foi possível chegar a um valor aproximado de R$ 25 bilhões com base nos 34.631 previstos, ou seja, aproximadamente R$ 730 mil por óbito.
+
 É fundamental também destacar que as soluções de segurança viária não dependem apenas de atributos da mobilidade urbana. Inúmeros fatores socioeconômicos e de infraestrutura podem afetar o desempenho da segurança. O cenário atual da segurança viária brasileira apresenta alguns desafios e deficiências que podem impactar na conquista das metas de redução estabelecidas em âmbito nacional pelo PNATRANS. Os dados previstos mostram um desempenho abaixo do ideal no combate da fatalidade no trânsito brasileiro, conferindo uma perspectiva pessimista para a década atual no Brasil e, caso este cenário não seja amenizado com antecedência, é improvável a ocorrência de avanços significativos nos objetivos da Segunda Década de Ação pela Segurança no Trânsito.
 
-## Referências
+## Referências {.unnumbered}
