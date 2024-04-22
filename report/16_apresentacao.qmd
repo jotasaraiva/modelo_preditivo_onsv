@@ -816,9 +816,12 @@ pred_list |>
 ```{r}
 #| include: false
 
+options(scipen = 99999)
+
 pred_2023 <- round(
   pred_anual_2023$.pred[pred_anual_2023$ano == 2023], digits = 0
 )
+
 ipca <- 1.6814
 custos_mortes <- 433286.69
 
@@ -832,38 +835,49 @@ custo_individual <- scales::dollar(
 
 custo_2023 <- pred_2023 * ipca * custos_mortes
 
-custo_rs <- scales::dollar(
-  custo_2023, 
+custo_rs <- dollar(
+  custo_2023,
   prefix = "R$ ",
-  accuracy = 0.01, 
-  big.mark = ".", 
+  accuracy = 0.01,
+  big.mark = ".",
   decimal.mark = ","
 )
 
-format_billion <- function (x) { paste("R$", format(round(x / 1e9, 1), decimal.mark = "."), "Bi") }
+format_billion <-
+  function (x) {
+    paste("R$", format(round(x / 1e9, 1), decimal.mark = "."), "Bi")
+  }
 
 pred_2023_fmt <-
   format(pred_2023, big.mark = ".", decimal.mark = ",")
 
 custos_mortes_fmt <-
-  label_currency(
-    x = custos_mortes,
-    prefix = "R$ ",
+  comma(
+    custos_mortes,
     decimal.mark = ",",
     big.mark = ".",
     accuracy = 0.01
   )
+
+custo_2023_fmt <-
+  comma(
+    custo_2023,
+    decimal.mark = ",",
+    big.mark = ".",
+    accuracy = 0.01
+  )
+
+ipca_fmt <- format(ipca - 1, decimal.mark = ",")
 ```
 
 - O custo financeiro dos `r pred_2023_fmt` óbitos previstos pelo modelo anual linear para 2023 foi estimado com base nos custos médios elaborados pelo Instituto de Pesquisa Econômica Aplicada (IPEA) em @carvalhoCustosAcidentesTransito2020a;
 
 - O cálculo é corrigido monetariamente utilizando o Índice Nacional de Preços ao Consumidor Amplo (IPCA) acumulado de Dez/2014 à Dez/2023 (fator de 68,14%), por meio de:
-
 $$
 \begin{aligned}
-  Custo_{2023} &= Óbitos_{2023} \times Custo_{2014} \times (1 + IPCA) \\ 
-               &= `r pred_2023_fmt` \times `r custos_mortes_fmt()` \times (1 + `r ipca-1`) \\ 
-               &= `r custo_rs`
+  Custo_{\small2023} &= Óbitos_{\small2023} \times Custo_{\small2014} \times (1 + \mbox{IPCA}) \\ 
+               &= `r pred_2023_fmt` \times \text{R\$ } `r custos_mortes_fmt` \times (1 + `r ipca_fmt`) \\ 
+               &= \text{R\$ } `r custo_2023_fmt`
 \end{aligned}
 $$
 
