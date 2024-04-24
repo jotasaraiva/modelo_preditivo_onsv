@@ -51,13 +51,13 @@ load(here("data","tabela_total_mensal.rda"))
 
 -   Defasagem nas fontes de dados: Sistema de Mortalidade - DataSUS;
 
--   Ocorrência de vítimas fatais no trânsito se relaciona com diversos atributos estruturais, socioeconômicos e ambientais [@zhong-xiang2014].
+-   Ocorrência de vítimas fatais no trânsito se relaciona com diversos atributos estruturais, socioeconômicos e ambientais [@zhong-xiang2014];
+
+-   Desenvolvimento do PNATRANS.
 
 ## Referenciais Teóricos
 
 <!-- -   Brasil falhou na *Primeira Década de Ação pela Segurança no Trânsito*, como previsto em @blumenberg2018; -->
-
--   Desenvolvimento do PNATRANS;
 
 -   Modelos Preditivos na Literatura:
 
@@ -77,7 +77,7 @@ load(here("data","tabela_total_mensal.rda"))
 
 -   Avaliar desempenho de diferentes abordagens (Determinística e Temporal);
 
--   Avaliar o desempenho de diferentes modelos e escalas temporais.
+-   Avaliar o desempenho de diferentes escalas temporais.
 
 # Metodologia
 
@@ -265,7 +265,8 @@ rtdeaths |>
 ::: columns
 ::: {.column width="30%"}
 -   Correlação não-paramétrica de Spearman (oposta à Pearson);
--   Variação da correlação em relação à resolução temporal.
+-   Variação da correlação em relação à resolução temporal;
+-   Colinearidade entre diversas variáveis.
 :::
 
 ::: {.column width="70%"}
@@ -886,7 +887,7 @@ $$
 # Conclusão
 
 1.  Modelos determinísticos aparentam ser mais adequados para previsão;
-2.  Óbitos em sinistros são dificilmente modelados utilizando métodos de média móvel;
+2.  Óbitos em sinistros são dificilmente modelados utilizando métodos de análise temporal;
 3.  Muitas variáveis consideradas são extremamente colineares;
 4.  Modelos determinísticos prevêem aumento nos óbitos em 2023;
 5.  Possíveis avanços:
